@@ -30,6 +30,11 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+// Require composer autoloader if installed on it's own
+if (file_exists($composer = __DIR__ . '/vendor/autoload.php')) {
+    require_once $composer;
+}
+
 /**
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
