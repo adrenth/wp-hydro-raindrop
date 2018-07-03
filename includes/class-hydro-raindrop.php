@@ -117,6 +117,11 @@ class Hydro_Raindrop {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-hydro-raindrop-admin.php';
 
 		/**
+		 * The class responsibe for the REST API.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-hydro-raindrop-api.php';
+
+		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
@@ -158,6 +163,10 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'admin_init' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_menu' );
+
+		$plugin_api = new Hydro_Raindrop_Api( $this->get_plugin_name(), $this->get_version() );
+
+		$this->loader->add_action( 'rest_api_init', $plugin_api, 'register_routes' );
 	}
 
 	/**
