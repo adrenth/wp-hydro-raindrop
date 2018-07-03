@@ -1,5 +1,8 @@
 <?php
 
+use Adrenth\Raindrop\Exception\RegisterUserFailed;
+use Adrenth\Raindrop\Exception\VerifySignatureFailed;
+
 class Hydro_Raindrop_Api {
 
 	/**
@@ -44,10 +47,37 @@ class Hydro_Raindrop_Api {
 				'register_user'
 			]
 		));
+
+        register_rest_route('hydro-raindrop/v1', 'verify-signature', array (
+            'methods' => WP_REST_Server::CREATABLE,
+            'callback' => [
+                $this,
+                'verify_signature'
+            ]
+        ));
 	}
 
-	public function register_user( )
+	public function register_user( WP_REST_Request $request )
 	{
-		return 1;
+	    $client = Hydro_Raindrop::get_raindrop_client();
+
+	    try {
+            $client->registerUser($request['hydro_id']);
+            return true;
+        } catch (RegisterUserFailed $e) {
+	        return false;
+        }
 	}
+
+	public function verify_signature( WP_REST_Request $request )
+    {
+        $client = Hydro_Raindrop::get_raindrop_client();
+
+        try {
+            $client->verifySignature($request['hydro_id'], (int) $request['message']);
+            return true;
+        } catch (VerifySignatureFailed $e) {
+            return false;
+        }
+    }
 }
