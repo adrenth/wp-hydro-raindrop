@@ -1,0 +1,38 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+
+.hydro-logo {
+    position: absolute;
+    right: 10px;
+}
+
+.hydro td input#hydro_id {
+    border: 1px solid #0971f5;
+    padding: 10px 15px 5px 20px;
+    background-color: white;
+    font-family: "Courier New", sans-serif;
+    font-size: 28px;
+    font-weight: bold;
+    color: #0971f5;
+    letter-spacing: 13px;
+    width: 250px;
+}
+
+.hydro td .message-digits {
+    border: 1px solid #0971f5;
+    padding: 15px 15px 10px 15px;
+    background-color: white;
+    height: 32px;
+    margin-right: 10px;
+    display: inline;
+}
+
+.hydro td .digit {
+    font-family: "Courier New", sans-serif;
+    font-size: 28px;
+    font-weight: bold;
+    color: #0971f5;
+    margin: 0 5px;
+}

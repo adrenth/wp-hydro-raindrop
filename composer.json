@@ -1,0 +1,20 @@
+{
+    "name": "adrenth/wp-hydro-raindrop",
+    "description": "A WordPress plugin to integrate Hydro Raindrop MFA",
+    "type": "wordpress-plugin",
+    "keywords": ["wordpress", "plugin", "hydro", "raindrop", "mfa", "2fa"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alwin Drenth",
+            "email": "adrenth@gmail.com"
+        },
+        {
+            "name": "Ronald Drenth",
+            "email": "ronalddrenth@gmail.com"
+        }
+    ],
+    "require": {
+        "composer/installers": "^1.0"
+    }
+}
