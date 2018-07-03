@@ -65,8 +65,8 @@ if ( !current_user_can( 'manage_options' ) )  {
                 <th scope="row">Environment</th>
                 <td>
                     <select name="environment" class="selection">
-                        <option value="production"<?php if (get_option('environment') === 'production'): ?> selected<?php endif; ?>>Production</option>
-                        <option value="sandbox"<?php if (get_option('environment') === 'sandbox'): ?> selected<?php endif; ?>>Sandbox</option>
+                        <option value="production"<?php if ( get_option( 'environment' ) === 'production'): ?> selected<?php endif; ?>>Production</option>
+                        <option value="sandbox"<?php if ( get_option( 'environment' ) === 'sandbox'): ?> selected<?php endif; ?>>Sandbox</option>
                     </select>
                 </td>
             </tr>

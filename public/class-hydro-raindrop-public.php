@@ -106,24 +106,6 @@ class Hydro_Raindrop_Public {
 
 	}
 
-	public function verify_authentication() {
-		if ( is_user_logged_in() ) {
-			$user = wp_get_current_user();
-
-			// echo $user->display_name;
-
-		}
-	}
-
-	public function authenticate( $user = null, $username = null, $password = null ) {
-
-		if ( $user === null ) {
-			return;
-		}
-
-		// return WP_User or WP_Error
-	}
-
 	public function custom_user_profile_fields( $user ) {
 		include __DIR__ . '/partials/hydro-raindrop-public-user-profile.php';
 	}

@@ -126,6 +126,7 @@ class Hydro_Raindrop {
 		 * side of the site.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-hydro-raindrop-public.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-hydro-raindrop-authenticate.php';
 
 		$this->loader = new Hydro_Raindrop_Loader();
 
@@ -183,11 +184,27 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
-		$this->loader->add_action( 'init', $plugin_public, 'verify_authentication' );
-		$this->loader->add_filter( 'authenticate', $plugin_public, 'authenticate', 10, 3 );
-
 		$this->loader->add_action( 'show_user_profile', $plugin_public, 'custom_user_profile_fields' );
 		// $this->loader->add_action( 'edit_user_profile', $plugin_public, 'custom_user_profile_fields' );
+
+		$plugin_authenticate = new Hydro_Raindrop_Authenticate( $this->get_plugin_name(), $this->get_version() );
+
+		/**
+		 * Filter: init
+		 *
+		 * Most of WP is loaded at this stage, and the user is authenticated.
+		 * WP continues to load on the init hook that follows (e.g. widgets), and many plugins instantiate themselves
+		 * on it for all sorts of reasons (e.g. they need a user, a taxonomy, etc.).
+		 */
+		$this->loader->add_filter( 'init', $plugin_authenticate, 'authenticate' );
+
+		/**
+		 * Filter: wp_login
+		 *
+		 * The wp_login action hook is triggered when a user logs in by the wp_signon() function. It is the very last
+		 * action taken in the function, immediately following the wp_set_auth_cookie() call.
+		 */
+		$this->loader->add_filter( 'wp_login', $plugin_authenticate, 'wp_login', 10, 3 );
 	}
 
 	/**
