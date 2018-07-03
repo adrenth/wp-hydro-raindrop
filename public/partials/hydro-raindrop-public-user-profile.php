@@ -36,7 +36,7 @@
 				<span class="digit">5</span>
 				<span class="digit">6</span>
 			</div>
-			<button class="button button-secondary" id="hydro_id_link" type="button">Authenticate</button>
+			<button class="button button-secondary" id="hydro_id_authenticate" type="button">Authenticate</button>
 			<p class="description">Enter the 6 digit code into the Hydro mobile app, and press "Authenticate".</p>
 		</td>
 	</tr>

@@ -13,6 +13,12 @@
  * @subpackage Hydro_Raindrop/includes
  */
 
+use Adrenth\Raindrop\ApiSettings;
+use Adrenth\Raindrop\Client;
+use Adrenth\Raindrop\Environment\ProductionEnvironment;
+use Adrenth\Raindrop\Environment\SandboxEnvironment;
+use Adrenth\Raindrop\TokenStorage\FileTokenStorage;
+
 /**
  * The core plugin class.
  *
@@ -56,6 +62,11 @@ class Hydro_Raindrop {
 	 * @var      string $version The current version of the plugin.
 	 */
 	protected $version;
+
+    /**
+     * @var Client
+     */
+	private static $raindrop_client;
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -229,5 +240,29 @@ class Hydro_Raindrop {
 	public function get_version() {
 		return $this->version;
 	}
+
+    /**
+     * Retrieve the Raindrop Client.
+     *
+     * @since     1.0.0
+     * @return    Client    The version number of the plugin.
+     */
+	public static function get_raindrop_client() {
+        if (self::$raindrop_client === null) {
+            self::$raindrop_client = new Client(
+                new ApiSettings(
+                    get_option( 'client_id' ),
+                    get_option( 'client_secret' ),
+                    get_option( 'environment' ) === 'sandbox'
+                        ? new SandboxEnvironment()
+                        : new ProductionEnvironment()
+                ),
+                new FileTokenStorage(__DIR__ . '/token.txt'),
+                get_option( 'application_id' )
+            );
+        }
+
+        return self::$raindrop_client;
+    }
 
 }
