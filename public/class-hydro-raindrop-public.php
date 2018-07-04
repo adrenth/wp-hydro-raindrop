@@ -106,6 +106,9 @@ class Hydro_Raindrop_Public {
 
 	}
 
+	/**
+	 * @param $user
+	 */
 	public function custom_user_profile_fields( $user ) {
 		include __DIR__ . '/partials/hydro-raindrop-public-user-profile.php';
 	}

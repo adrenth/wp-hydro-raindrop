@@ -38,46 +38,47 @@ class Hydro_Raindrop_Api {
 
 	}
 
-	public function register_routes()
-	{
-		register_rest_route('hydro-raindrop/v1', 'register-user', array (
-			'methods' => WP_REST_Server::CREATABLE,
+	public function register_routes() {
+		register_rest_route( 'hydro-raindrop/v1', 'register-user', array(
+			'methods'  => WP_REST_Server::CREATABLE,
 			'callback' => [
 				$this,
 				'register_user'
 			]
-		));
+		) );
 
-        register_rest_route('hydro-raindrop/v1', 'verify-signature', array (
-            'methods' => WP_REST_Server::CREATABLE,
-            'callback' => [
-                $this,
-                'verify_signature'
-            ]
-        ));
+		register_rest_route( 'hydro-raindrop/v1', 'verify-signature', array(
+			'methods'  => WP_REST_Server::CREATABLE,
+			'callback' => [
+				$this,
+				'verify_signature'
+			]
+		) );
+
 	}
 
-	public function register_user( WP_REST_Request $request )
-	{
-	    $client = Hydro_Raindrop::get_raindrop_client();
+	public function register_user( WP_REST_Request $request ) {
+		$client = Hydro_Raindrop::get_raindrop_client();
 
-	    try {
-            $client->registerUser($request['hydro_id']);
-            return true;
-        } catch (RegisterUserFailed $e) {
-	        return false;
-        }
+		try {
+			$client->registerUser( $request['hydro_id'] );
+
+			return true;
+		} catch ( RegisterUserFailed $e ) {
+			return false;
+		}
 	}
 
-	public function verify_signature( WP_REST_Request $request )
-    {
-        $client = Hydro_Raindrop::get_raindrop_client();
+	public function verify_signature( WP_REST_Request $request ) {
+		$client = Hydro_Raindrop::get_raindrop_client();
 
-        try {
-            $client->verifySignature($request['hydro_id'], (int) $request['message']);
-            return true;
-        } catch (VerifySignatureFailed $e) {
-            return false;
-        }
-    }
+		try {
+			$client->verifySignature( $request['hydro_id'], (int) $request['message'] );
+
+			return true;
+		} catch ( VerifySignatureFailed $e ) {
+			return false;
+		}
+	}
+
 }

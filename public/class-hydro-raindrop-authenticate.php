@@ -1,6 +1,11 @@
 <?php
 
+use Adrenth\Raindrop\Exception\VerifySignatureFailed;
+
 class Hydro_Raindrop_Authenticate {
+
+	const MESSAGE_TRANSIENT_ID = 'HydroRaindropMessage_%s';
+
 	/**
 	 * The ID of this plugin.
 	 *
@@ -37,7 +42,7 @@ class Hydro_Raindrop_Authenticate {
 	/**
 	 * Action: wp_login
 	 *
-	 * @param string  $user_login The user login.
+	 * @param string $user_login The user login.
 	 * @param WP_User $user The user object.
 	 */
 	public function wp_login( $user_login, $user ) {
@@ -58,6 +63,7 @@ class Hydro_Raindrop_Authenticate {
 	 * Authenticate user on every single request.
 	 *
 	 * @return void
+	 * @throws Exception
 	 */
 	public function authenticate() {
 
@@ -65,6 +71,13 @@ class Hydro_Raindrop_Authenticate {
 
 		if ( ! is_user_logged_in() ) {
 			return;
+		}
+
+		// TODO: Add nonce verification
+
+		if ( $_REQUEST['hydro_raindrop'] && $this->verify_signature_login() ) {
+			wp_redirect( '/' );
+			exit();
 		}
 
 		if ( is_user_logged_in() ) {
@@ -81,7 +94,9 @@ class Hydro_Raindrop_Authenticate {
 	 */
 	private function verify_cookie() {
 
-		return false;
+		// TODO: Verify cookie
+
+		return true;
 
 	}
 
@@ -89,8 +104,23 @@ class Hydro_Raindrop_Authenticate {
 	 * Shows MFA
 	 *
 	 * @return void
+	 * @throws Exception
 	 */
 	private function show_mfa() {
+
+		$client = Hydro_Raindrop::get_raindrop_client();
+
+		$user = wp_get_current_user();
+
+		$transient_id = sprintf( self::MESSAGE_TRANSIENT_ID, $user->ID );
+
+		$message = get_transient( $transient_id );
+
+		if ( ! $message ) {
+			$message = $client->generateMessage();
+
+			set_transient( $transient_id, $message, 60 * 5 );
+		}
 
 		require __DIR__ . '/partials/hydro-raindrop-public-mfa.php';
 
@@ -105,11 +135,37 @@ class Hydro_Raindrop_Authenticate {
 	 */
 	private function user_requires_mfa( WP_User $user ) {
 
+		return true;
+
 		$hydro_id                 = (string) get_user_meta( $user->ID, 'hydro_id', true );
 		$hydro_mfa_enabled        = (bool) get_user_meta( $user->ID, 'hydro_mfa_enabled', true );
 		$hydro_raindrop_confirmed = (bool) get_user_meta( $user->ID, 'hydro_raindrop_confirmed', true );
 
 		return ! empty( $hydro_id ) && $hydro_mfa_enabled && $hydro_raindrop_confirmed;
 
+	}
+
+	public function verify_signature_login() {
+
+		if ( ! is_user_logged_in() ) {
+			return false;
+		}
+
+		$client = Hydro_Raindrop::get_raindrop_client();
+
+		try {
+			$user         = wp_get_current_user();
+			$hydro_id     = (string) get_user_meta( $user->ID, 'hydro_id', true );
+			$transient_id = sprintf( self::MESSAGE_TRANSIENT_ID, $user->ID );
+			$message      = (int) get_transient( $transient_id );
+
+			$client->verifySignature( $hydro_id, $message );
+
+			delete_transient( $transient_id );
+
+			return true;
+		} catch ( VerifySignatureFailed $e ) {
+			return false;
+		}
 	}
 }
