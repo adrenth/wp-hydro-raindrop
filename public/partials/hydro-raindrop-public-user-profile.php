@@ -23,21 +23,4 @@
 			<p class="description">Enter your HydroID, visible in the Hydro mobile app, and press "Link".</p>
 		</td>
 	</tr>
-	<tr>
-		<th>
-			<label for="message">First-Time Verification</label>
-		</th>
-		<td>
-			<div class="message-digits">
-				<span class="digit">1</span>
-				<span class="digit">2</span>
-				<span class="digit">3</span>
-				<span class="digit">4</span>
-				<span class="digit">5</span>
-				<span class="digit">6</span>
-			</div>
-			<button class="button button-secondary" id="hydro_id_authenticate" type="button">Authenticate</button>
-			<p class="description">Enter the 6 digit code into the Hydro mobile app, and press "Authenticate".</p>
-		</td>
-	</tr>
 </table>
