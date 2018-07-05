@@ -47,8 +47,10 @@ define( 'PLUGIN_NAME_VERSION', '1.0.0' );
  * This action is documented in includes/class-hydro-raindrop-activator.php
  */
 function activate_hydro_raindrop() {
+
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-hydro-raindrop-activator.php';
 	Hydro_Raindrop_Activator::activate();
+
 }
 
 /**
@@ -56,8 +58,10 @@ function activate_hydro_raindrop() {
  * This action is documented in includes/class-hydro-raindrop-deactivator.php
  */
 function deactivate_hydro_raindrop() {
+
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-hydro-raindrop-deactivator.php';
 	Hydro_Raindrop_Deactivator::deactivate();
+
 }
 
 register_activation_hook( __FILE__, 'activate_hydro_raindrop' );

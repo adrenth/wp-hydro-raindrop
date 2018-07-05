@@ -23,16 +23,20 @@
 
 <p>Enter these 6-digits into the Hydro app.</p>
 
-<form action="<?php echo esc_url( site_url( 'wp-login.php', 'login_post' ) ); ?>" method="post">
+<form action="" method="post">
+
+	<?php wp_nonce_field('hydro_raindrop_mfa') ?>
 
 	<div class="message-digits">
-		<span class="digit"><?php echo substr( $message, 0, 1 ) ?></span>
-		<span class="digit"><?php echo substr( $message, 1, 1 ) ?></span>
-		<span class="digit"><?php echo substr( $message, 2, 1 ) ?></span>
-		<span class="digit"><?php echo substr( $message, 3, 1 ) ?></span>
-		<span class="digit"><?php echo substr( $message, 4, 1 ) ?></span>
-		<span class="digit"><?php echo substr( $message, 5, 1 ) ?></span>
+		<span class="digit"><?php echo substr( $message, 0, 1 ); ?></span>
+		<span class="digit"><?php echo substr( $message, 1, 1 ); ?></span>
+		<span class="digit"><?php echo substr( $message, 2, 1 ); ?></span>
+		<span class="digit"><?php echo substr( $message, 3, 1 ); ?></span>
+		<span class="digit"><?php echo substr( $message, 4, 1 ); ?></span>
+		<span class="digit"><?php echo substr( $message, 5, 1 ); ?></span>
 	</div>
+
+	<input type="hidden" name="redirect_to" value="<?php echo esc_attr( $redirect_to ); ?>">
 
 	<button type="submit" name="hydro_raindrop" value="authenticate">Authenticate</button>
 

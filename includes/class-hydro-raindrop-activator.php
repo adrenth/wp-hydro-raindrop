@@ -23,9 +23,7 @@
 class Hydro_Raindrop_Activator {
 
 	/**
-	 * Short Description. (use period)
-	 *
-	 * Long Description.
+	 * Perform activation tasks.
 	 *
 	 * @since    1.0.0
 	 */

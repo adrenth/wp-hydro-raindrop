@@ -111,6 +111,21 @@ class Hydro_Raindrop_Admin {
 
 	}
 
+	/**
+	 * The `before_delete_post` action is fired before post metadata is deleted.
+	 *
+	 * @param $post_id
+	 */
+	public function before_delete_post( $post_id ) {
+
+		$post = WP_Post::get_instance( $post_id );
+
+		if ( $post->post_name === Hydro_Raindrop::POST_NAME_2FA ) {
+			// Do not delete the 2FA page
+			exit;
+		}
+	}
+
 	public function admin_init() {
 		register_setting( 'hydro_api', 'application_id' );
 		register_setting( 'hydro_api', 'client_id' );

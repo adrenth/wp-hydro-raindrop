@@ -35,6 +35,8 @@ use Adrenth\Raindrop\TokenStorage\FileTokenStorage;
  */
 class Hydro_Raindrop {
 
+	public const POST_NAME_2FA = 'hydro-raindrop-2fa';
+
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
 	 * the plugin.
@@ -175,6 +177,7 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'admin_init' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_menu' );
+		$this->loader->add_action( 'before_delete_post', $plugin_admin, 'before_delete_post' );
 
 		$plugin_api = new Hydro_Raindrop_Api( $this->get_plugin_name(), $this->get_version() );
 
@@ -194,9 +197,7 @@ class Hydro_Raindrop {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-
 		$this->loader->add_action( 'show_user_profile', $plugin_public, 'custom_user_profile_fields' );
-		// $this->loader->add_action( 'edit_user_profile', $plugin_public, 'custom_user_profile_fields' );
 
 		$plugin_authenticate = new Hydro_Raindrop_Authenticate( $this->get_plugin_name(), $this->get_version() );
 
@@ -207,15 +208,8 @@ class Hydro_Raindrop {
 		 * WP continues to load on the init hook that follows (e.g. widgets), and many plugins instantiate themselves
 		 * on it for all sorts of reasons (e.g. they need a user, a taxonomy, etc.).
 		 */
-		$this->loader->add_filter( 'init', $plugin_authenticate, 'authenticate' );
+		$this->loader->add_filter( 'init', $plugin_authenticate, 'verify' );
 
-		/**
-		 * Filter: wp_login
-		 *
-		 * The wp_login action hook is triggered when a user logs in by the wp_signon() function. It is the very last
-		 * action taken in the function, immediately following the wp_set_auth_cookie() call.
-		 */
-		$this->loader->add_filter( 'wp_login', $plugin_authenticate, 'wp_login', 10, 3 );
 	}
 
 	/**
