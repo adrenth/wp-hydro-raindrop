@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/adrenth/raindrop-sdk.git",
-                "reference": "901396cee15ba0dd265c84f93c0a049bf5a5bd84"
+                "reference": "f1d9bb3f653de310bd9b95ca5fb5d5084e3d73ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/adrenth/raindrop-sdk/zipball/901396cee15ba0dd265c84f93c0a049bf5a5bd84",
-                "reference": "901396cee15ba0dd265c84f93c0a049bf5a5bd84",
+                "url": "https://api.github.com/repos/adrenth/raindrop-sdk/zipball/f1d9bb3f653de310bd9b95ca5fb5d5084e3d73ec",
+                "reference": "f1d9bb3f653de310bd9b95ca5fb5d5084e3d73ec",
                 "shasum": ""
             },
             "require": {
@@ -52,7 +52,7 @@
                 }
             ],
             "description": "Hydro Raindrop SDK",
-            "time": "2018-07-03T17:37:57+00:00"
+            "time": "2018-07-05T19:53:56+00:00"
         },
         {
             "name": "composer/installers",
