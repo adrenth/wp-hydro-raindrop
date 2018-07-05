@@ -35,8 +35,6 @@ use Adrenth\Raindrop\TokenStorage\FileTokenStorage;
  */
 class Hydro_Raindrop {
 
-	public const POST_NAME_2FA = 'hydro-raindrop-2fa';
-
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
 	 * the plugin.
@@ -130,11 +128,6 @@ class Hydro_Raindrop {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-hydro-raindrop-admin.php';
 
 		/**
-		 * The class responsibe for the REST API.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-hydro-raindrop-api.php';
-
-		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
@@ -174,14 +167,10 @@ class Hydro_Raindrop {
 		$plugin_admin = new Hydro_Raindrop_Admin( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'admin_init' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_menu' );
 		$this->loader->add_action( 'before_delete_post', $plugin_admin, 'before_delete_post' );
 
-		$plugin_api = new Hydro_Raindrop_Api( $this->get_plugin_name(), $this->get_version() );
-
-		$this->loader->add_action( 'rest_api_init', $plugin_api, 'register_routes' );
 	}
 
 	/**
@@ -198,6 +187,8 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 		$this->loader->add_action( 'show_user_profile', $plugin_public, 'custom_user_profile_fields' );
+		$this->loader->add_action( 'personal_options_update', $plugin_public, 'custom_user_profile_update' );
+		$this->loader->add_action( 'user_profile_update_errors', $plugin_public, 'custom_user_profile_validate' );
 
 		$plugin_authenticate = new Hydro_Raindrop_Authenticate( $this->get_plugin_name(), $this->get_version() );
 

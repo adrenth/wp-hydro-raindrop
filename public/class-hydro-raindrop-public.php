@@ -113,4 +113,52 @@ class Hydro_Raindrop_Public {
 		include __DIR__ . '/partials/hydro-raindrop-public-user-profile.php';
 	}
 
+	public function custom_user_profile_update( $user_id ) {
+		if ( !current_user_can( 'edit_user', $user_id ) ) {
+			return;
+		}
+
+		if ( !empty( $_POST['hydro_id'] ) ) {
+			$client = Hydro_Raindrop::get_raindrop_client();
+			$hydroId = sanitize_text_field( $_POST['hydro_id'] );
+
+			try {
+				$client->registerUser( sanitize_text_field( $_POST['hydro_id'] ) );
+				update_user_meta( $user_id, 'hydro_id', $hydroId );
+				update_user_meta( $user_id, 'hydro_mfa_enabled', 1 );
+				update_user_meta( $user_id, 'hydro_raindrop_confirmed', 1 );
+			} catch ( \Adrenth\Raindrop\Exception\RegisterUserFailed $e ) {
+				var_dump($e->getMessage());exit;
+				// @todo error handling
+				delete_user_meta( $user_id, 'hydro_id' );
+				update_user_meta( $user_id, 'hydro_mfa_enabled', 0 );
+				update_user_meta( $user_id, 'hydro_raindrop_confirmed', 0 );
+			}
+		}
+
+		if ( isset( $_POST['disable_hydro_mfa'] ) ) {
+			$client = Hydro_Raindrop::get_raindrop_client();
+			$hydroId = (string) get_user_meta( $user_id , 'hydro_id', true );
+
+			// @todo empty hydroId check
+
+			try {
+				$client->unregisterUser( $hydroId );
+				delete_user_meta( $user_id, 'hydro_id', $hydroId );
+				delete_user_meta( $user_id, 'hydro_mfa_enabled' );
+				delete_user_meta( $user_id, 'hydro_raindrop_confirmed' );
+			} catch ( \Adrenth\Raindrop\Exception\UnregisterUserFailed $e ) {
+				var_dump($e->getMessage());exit;
+				// @todo error handling
+			}
+		}
+	}
+
+	public function custom_user_profile_validate( &$errors, $update = null, &$user = null ) {
+		// @todo
+		// if ( empty( $_POST['hydro_id'] ) ) {
+		// 	 $errors->add( 'hydro_id', esc_html__( 'Please provide a HydroID.', $this->plugin_name ) );
+		// }
+	}
+
 }

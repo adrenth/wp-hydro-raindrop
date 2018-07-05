@@ -21,7 +21,7 @@ if ( !current_user_can( 'manage_options' ) )  {
 
 <div class="wrap">
 
-    <img class="hydro-logo" src="<?php echo plugins_url('/hydro-raindrop/admin/images/Hydro-Blu-58.png') ?>">
+    <img class="hydro-logo" src="<?php echo plugins_url('/wp-hydro-raindrop/admin/images/Hydro-Blu-58.png') ?>">
 
     <h1>Hydro Raindrop MFA Settings</h1>
 
