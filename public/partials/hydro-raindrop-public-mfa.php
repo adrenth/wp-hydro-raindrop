@@ -37,9 +37,8 @@ $classes[] = ' locale-' . sanitize_html_class( strtolower( str_replace( '_', '-'
  * @since 3.5.0
  *
  * @param array $classes An array of body classes.
- * @param string $action The action that brought the visitor to the login page.
  */
-$classes = apply_filters( 'login_body_class', $classes, $action );
+$classes = apply_filters( 'login_body_class', $classes );
 ?>
 <body class="login login-action-login wp-core-ui<?php echo esc_attr( implode( ' ', $classes ) ); ?>">
 <div id="login" class="hydro-raindrop-mfa">
@@ -68,9 +67,6 @@ $classes = apply_filters( 'login_body_class', $classes, $action );
 		</div>
 		<p class="submit">
 			<?php wp_nonce_field( 'hydro_raindrop_mfa' ); ?>
-			<input type="hidden"
-					name="redirect_to"
-					value="<?php echo esc_attr( $redirect_to ); ?>">
 			<input type="submit"
 					name="hydro_raindrop"
 					class="button button-primary button-large"

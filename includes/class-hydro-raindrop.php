@@ -192,7 +192,10 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'personal_options_update', $plugin_public, 'custom_user_profile_update' );
 		$this->loader->add_action( 'user_profile_update_errors', $plugin_public, 'custom_user_profile_validate' );
 
-		$plugin_authenticate = new Hydro_Raindrop_Authenticate( $this->get_plugin_name(), $this->get_version() );
+		$plugin_authenticate = new Hydro_Raindrop_Authenticate(
+			$this->get_plugin_name(),
+			$this->get_version()
+		);
 
 		/**
 		 * Filter: init
@@ -202,14 +205,6 @@ class Hydro_Raindrop {
 		 * on it for all sorts of reasons (e.g. they need a user, a taxonomy, etc.).
 		 */
 		$this->loader->add_filter( 'init', $plugin_authenticate, 'verify' );
-
-		/**
-		 * Filter: wp_logout
-		 *
-		 * The wp_logout action hook is triggered when a user logs out using the wp_logout() function.
-		 * The action is executed after the wp_clear_auth_cookie() function call.
-		 */
-		$this->loader->add_filter( 'wp_logout', $plugin_authenticate, 'logout' );
 
 		/**
 		 * Filter: clear_auth_cookie
@@ -226,7 +221,9 @@ class Hydro_Raindrop {
 	 * @since    1.0.0
 	 */
 	public function run() {
+
 		$this->loader->run();
+
 	}
 
 	/**
@@ -237,7 +234,9 @@ class Hydro_Raindrop {
 	 * @return    string    The name of the plugin.
 	 */
 	public function get_plugin_name() {
+
 		return $this->plugin_name;
+
 	}
 
 	/**
@@ -247,7 +246,9 @@ class Hydro_Raindrop {
 	 * @return    Hydro_Raindrop_Loader    Orchestrates the hooks of the plugin.
 	 */
 	public function get_loader() {
+
 		return $this->loader;
+
 	}
 
 	/**
@@ -257,7 +258,9 @@ class Hydro_Raindrop {
 	 * @return    string    The version number of the plugin.
 	 */
 	public function get_version() {
+
 		return $this->version;
+
 	}
 
     /**
@@ -267,6 +270,7 @@ class Hydro_Raindrop {
      * @return    Client    The version number of the plugin.
      */
 	public static function get_raindrop_client() {
+
         if (self::$raindrop_client === null) {
             self::$raindrop_client = new Client(
                 new ApiSettings(
@@ -282,6 +286,7 @@ class Hydro_Raindrop {
         }
 
         return self::$raindrop_client;
+
     }
 
 }
