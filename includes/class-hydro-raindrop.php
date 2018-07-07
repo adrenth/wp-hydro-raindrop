@@ -98,6 +98,7 @@ class Hydro_Raindrop {
 	 * Include the following files that make up the plugin:
 	 *
 	 * - Hydro_Raindrop_Loader. Orchestrates the hooks of the plugin.
+	 * - Hydro_Raindrop_TransientTokenStorage. Implements the TokenStorage from the Raindrop SDK package.
 	 * - Hydro_Raindrop_i18n. Defines internationalization functionality.
 	 * - Hydro_Raindrop_Admin. Defines all hooks for the admin area.
 	 * - Hydro_Raindrop_Public. Defines all hooks for the public side of the site.
@@ -115,6 +116,11 @@ class Hydro_Raindrop {
 		 * core plugin.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-hydro-raindrop-loader.php';
+
+		/**
+		 * The class responsible for storing the access token from the Raindrop API
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-hydro-raindrop-token-storage.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
@@ -280,7 +286,7 @@ class Hydro_Raindrop {
                         ? new SandboxEnvironment()
                         : new ProductionEnvironment()
                 ),
-                new FileTokenStorage(__DIR__ . '/token.txt'),
+	            new Hydro_Raindrop_TransientTokenStorage(),
                 get_option( 'application_id' )
             );
         }
