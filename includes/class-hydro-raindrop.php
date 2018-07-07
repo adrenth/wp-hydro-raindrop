@@ -83,7 +83,7 @@ class Hydro_Raindrop {
 		} else {
 			$this->version = '1.0.0';
 		}
-		$this->plugin_name = 'hydro-raindrop';
+		$this->plugin_name = 'wp-hydro-raindrop';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -184,8 +184,10 @@ class Hydro_Raindrop {
 
 		$plugin_public = new Hydro_Raindrop_Public( $this->get_plugin_name(), $this->get_version() );
 
+		// TODO: Add action documentation
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action( 'login_enqueue_scripts', $plugin_public, 'enqueue_login_styles' );
 		$this->loader->add_action( 'show_user_profile', $plugin_public, 'custom_user_profile_fields' );
 		$this->loader->add_action( 'personal_options_update', $plugin_public, 'custom_user_profile_update' );
 		$this->loader->add_action( 'user_profile_update_errors', $plugin_public, 'custom_user_profile_validate' );
@@ -200,6 +202,21 @@ class Hydro_Raindrop {
 		 * on it for all sorts of reasons (e.g. they need a user, a taxonomy, etc.).
 		 */
 		$this->loader->add_filter( 'init', $plugin_authenticate, 'verify' );
+
+		/**
+		 * Filter: wp_logout
+		 *
+		 * The wp_logout action hook is triggered when a user logs out using the wp_logout() function.
+		 * The action is executed after the wp_clear_auth_cookie() function call.
+		 */
+		$this->loader->add_filter( 'wp_logout', $plugin_authenticate, 'logout' );
+
+		/**
+		 * Filter: clear_auth_cookie
+		 *
+		 * Fires just before the authentication cookies are cleared.
+		 */
+		$this->loader->add_filter( 'clear_auth_cookie', $plugin_authenticate, 'unset_cookie' );
 
 	}
 

@@ -12,36 +12,74 @@
  * @subpackage Hydro_Raindrop/public/partials
  */
 ?><!DOCTYPE html>
-<html <?php language_attributes(); ?> class="no-js">
+<!DOCTYPE html>
+<!--[if IE 8]>
+<html xmlns="http://www.w3.org/1999/xhtml" class="ie8" <?php language_attributes(); ?>>
+<![endif]-->
+<!--[if !(IE 8) ]><!-->
+<html xmlns="http://www.w3.org/1999/xhtml" <?php language_attributes(); ?>>
+<!--<![endif]-->
 <head>
-	<?php wp_head(); ?>
+	<meta http-equiv="Content-Type"
+			content="<?php bloginfo( 'html_type' ); ?>; charset=<?php bloginfo( 'charset' ); ?>"/>
+	<title>Hydro Raindrop MFA</title>
+	<?php
+		wp_enqueue_style( 'login' );
+		do_action( 'login_enqueue_scripts' );
+	?>
 </head>
-<body>
-<!-- This file should primarily consist of HTML with a little bit of PHP. -->
+<?php
+$classes[] = ' locale-' . sanitize_html_class( strtolower( str_replace( '_', '-', get_locale() ) ) );
 
-<h1>Hydro Raindrop MFA</h1>
-
-<p>Enter these 6-digits into the Hydro app.</p>
-
-<form action="" method="post">
-
-	<?php wp_nonce_field('hydro_raindrop_mfa') ?>
-
-	<div class="message-digits">
-		<span class="digit"><?php echo substr( $message, 0, 1 ); ?></span>
-		<span class="digit"><?php echo substr( $message, 1, 1 ); ?></span>
-		<span class="digit"><?php echo substr( $message, 2, 1 ); ?></span>
-		<span class="digit"><?php echo substr( $message, 3, 1 ); ?></span>
-		<span class="digit"><?php echo substr( $message, 4, 1 ); ?></span>
-		<span class="digit"><?php echo substr( $message, 5, 1 ); ?></span>
-	</div>
-
-	<input type="hidden" name="redirect_to" value="<?php echo esc_attr( $redirect_to ); ?>">
-
-	<button type="submit" name="hydro_raindrop" value="authenticate">Authenticate</button>
-
-</form>
-
+/**
+ * Filters the login page body classes.
+ *
+ * @since 3.5.0
+ *
+ * @param array $classes An array of body classes.
+ * @param string $action The action that brought the visitor to the login page.
+ */
+$classes = apply_filters( 'login_body_class', $classes, $action );
+?>
+<body class="login login-action-login wp-core-ui<?php echo esc_attr( implode( ' ', $classes ) ); ?>">
+<div id="login" class="hydro-raindrop-mfa">
+	<h1>
+		<img src="<?php echo $logo; ?>" height="46" alt="Hydro Raindrop MFA">
+	</h1>
+	<?php if ($error) { ?>
+	<div id="login_error"><?php echo $error; ?></div>
+	<?php } ?>
+	<form action="" method="post">
+		<p class="hydro-illustration">
+			<img src="<?php echo esc_attr( $image ) ?>" width="180" alt="">
+		</p>
+		<p>
+			<label for="hydro_digits">
+				Enter security code into the Hydro app.
+			</label>
+		</p>
+		<div id="hydro_digits" class="message-digits">
+			<span class="digit"><?php echo substr( $message, 0, 1 ); ?></span>
+			<span class="digit"><?php echo substr( $message, 1, 1 ); ?></span>
+			<span class="digit"><?php echo substr( $message, 2, 1 ); ?></span>
+			<span class="digit"><?php echo substr( $message, 3, 1 ); ?></span>
+			<span class="digit"><?php echo substr( $message, 4, 1 ); ?></span>
+			<span class="digit"><?php echo substr( $message, 5, 1 ); ?></span>
+		</div>
+		<p class="submit">
+			<?php wp_nonce_field( 'hydro_raindrop_mfa' ); ?>
+			<input type="hidden"
+					name="redirect_to"
+					value="<?php echo esc_attr( $redirect_to ); ?>">
+			<input type="submit"
+					name="hydro_raindrop"
+					class="button button-primary button-large"
+					value="Authenticate">
+		</p>
+	</form>
+</div>
+<div class="clear"></div>
+</body>
 <?php wp_footer(); ?>
 </body>
 </html>

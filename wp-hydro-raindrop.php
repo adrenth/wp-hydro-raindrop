@@ -15,13 +15,13 @@
  * @wordpress-plugin
  * Plugin Name:       Hydro Raindrop
  * Plugin URI:        https://github.com/adrenth/wp-hydro-raindrop
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Description:       A WordPress plugin to integrate Hydro Raindrop MFA
  * Version:           1.0.0
- * Author:            Alwin Drenth
+ * Author:            Alwin Drenth, Ronald Drenth
  * Author URI:        https://github.com/adrenth
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       hydro-raindrop
+ * Text Domain:       wp-hydro-raindrop
  * Domain Path:       /languages
  */
 
