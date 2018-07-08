@@ -18,7 +18,7 @@
  *
  * @package    Hydro_Raindrop
  * @subpackage Hydro_Raindrop/admin
- * @author     Alwin Drenth <adrenth@gmail.com>
+ * @author     Alwin Drenth <adrenth@gmail.com>, Ronald Drenth <ronalddrenth@gmail.com>
  */
 class Hydro_Raindrop_Admin {
 
@@ -46,7 +46,7 @@ class Hydro_Raindrop_Admin {
 	 * @since    1.0.0
 	 *
 	 * @param      string $plugin_name The name of this plugin.
-	 * @param      string $version The version of this plugin.
+	 * @param      string $version     The version of this plugin.
 	 */
 	public function __construct( $plugin_name, $version ) {
 
@@ -60,7 +60,7 @@ class Hydro_Raindrop_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() {
+	public function enqueue_styles() : void {
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -77,40 +77,55 @@ class Hydro_Raindrop_Admin {
 		wp_enqueue_style(
 			$this->plugin_name,
 			plugin_dir_url( __FILE__ ) . 'css/hydro-raindrop-admin.css',
-			array(),
+			[],
 			$this->version
 		);
 
 	}
 
-	public function admin_init() {
+	/**
+	 * Register settings.
+	 *
+	 * @return void
+	 */
+	public function admin_init() : void {
+
 		register_setting( 'hydro_api', 'application_id' );
 		register_setting( 'hydro_api', 'client_id' );
 		register_setting( 'hydro_api', 'client_secret' );
 		register_setting( 'hydro_api', 'environment' );
+
 	}
 
 	/**
 	 * Add options page.
+	 *
+	 * @return void
 	 */
-	public function admin_menu() {
+	public function admin_menu() : void {
+
 		add_options_page(
 			'Hydro Raindrop MFA',
 			'Hydro Raindrop MFA',
 			'manage_options',
 			$this->plugin_name . '-options',
-			array(
+			[
 				$this,
-				'admin_page'
-			)
+				'admin_page',
+			]
 		);
+
 	}
 
 	/**
 	 * Display the admin page.
+	 *
+	 * @return void
 	 */
-	public function admin_page() {
+	public function admin_page() : void {
+
 		include __DIR__ . '/../admin/partials/hydro-raindrop-admin-display.php';
+
 	}
 
 }

@@ -3,11 +3,6 @@
  * included in this file.
  */
 
-.hydro-logo {
-    position: absolute;
-    right: 10px;
-}
-
 .hydro td input#hydro_id {
     border: 1px solid #0971f5;
     padding: 10px 15px 5px 20px;

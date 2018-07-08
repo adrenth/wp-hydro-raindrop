@@ -1,19 +1,14 @@
 <?php
 
 /**
- * The plugin bootstrap file
- *
- * This file is read by WordPress to generate the plugin information in the plugin
- * admin area. This file also includes all of the dependencies used by the plugin,
- * registers the activation and deactivation functions, and defines a function
- * that starts the plugin.
+ * WP Hydro Raindrop
  *
  * @link              https://github.com/adrenth
  * @since             1.0.0
  * @package           Hydro_Raindrop
  *
  * @wordpress-plugin
- * Plugin Name:       Hydro Raindrop
+ * Plugin Name:       WP Hydro Raindrop
  * Plugin URI:        https://github.com/adrenth/wp-hydro-raindrop
  * Description:       A WordPress plugin to integrate Hydro Raindrop MFA
  * Version:           1.0.0

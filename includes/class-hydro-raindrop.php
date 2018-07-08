@@ -17,7 +17,6 @@ use Adrenth\Raindrop\ApiSettings;
 use Adrenth\Raindrop\Client;
 use Adrenth\Raindrop\Environment\ProductionEnvironment;
 use Adrenth\Raindrop\Environment\SandboxEnvironment;
-use Adrenth\Raindrop\TokenStorage\FileTokenStorage;
 
 /**
  * The core plugin class.
@@ -31,7 +30,7 @@ use Adrenth\Raindrop\TokenStorage\FileTokenStorage;
  * @since      1.0.0
  * @package    Hydro_Raindrop
  * @subpackage Hydro_Raindrop/includes
- * @author     Alwin Drenth <adrenth@gmail.com>
+ * @author     Alwin Drenth <adrenth@gmail.com>, Ronald Drenth <ronalddrenth@gmail.com>
  */
 class Hydro_Raindrop {
 
@@ -63,9 +62,11 @@ class Hydro_Raindrop {
 	 */
 	protected $version;
 
-    /**
-     * @var Client
-     */
+	/**
+	 * The Raindrop Client.
+	 *
+	 * @var Client $raindrop_client The Raindrop Client from the Hydro Raindrop SDK.
+	 */
 	private static $raindrop_client;
 
 	/**
@@ -78,11 +79,13 @@ class Hydro_Raindrop {
 	 * @since    1.0.0
 	 */
 	public function __construct() {
+
 		if ( defined( 'PLUGIN_NAME_VERSION' ) ) {
 			$this->version = PLUGIN_NAME_VERSION;
 		} else {
 			$this->version = '1.0.0';
 		}
+
 		$this->plugin_name = 'wp-hydro-raindrop';
 
 		$this->load_dependencies();
@@ -112,8 +115,7 @@ class Hydro_Raindrop {
 	private function load_dependencies() {
 
 		/**
-		 * The class responsible for orchestrating the actions and filters of the
-		 * core plugin.
+		 * The class responsible for orchestrating the actions and filters of the core plugin.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-hydro-raindrop-loader.php';
 
@@ -123,8 +125,7 @@ class Hydro_Raindrop {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-hydro-raindrop-token-storage.php';
 
 		/**
-		 * The class responsible for defining internationalization functionality
-		 * of the plugin.
+		 * The class responsible for defining internationalization functionality of the plugin.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-hydro-raindrop-i18n.php';
 
@@ -134,10 +135,13 @@ class Hydro_Raindrop {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-hydro-raindrop-admin.php';
 
 		/**
-		 * The class responsible for defining all actions that occur in the public-facing
-		 * side of the site.
+		 * The class responsible for defining all actions that occur in the public-facing side of the site.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-hydro-raindrop-public.php';
+
+		/**
+		 * The class responsible authentication.
+		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-hydro-raindrop-authenticate.php';
 
 		$this->loader = new Hydro_Raindrop_Loader();
@@ -190,12 +194,38 @@ class Hydro_Raindrop {
 
 		$plugin_public = new Hydro_Raindrop_Public( $this->get_plugin_name(), $this->get_version() );
 
-		// TODO: Add action documentation
+		/**
+		 * Action: wp_enqueue_scripts
+		 *
+		 * The wp_enqueue_scripts is the proper hook to use when enqueuing items that are meant to appear on the front
+		 * end. Despite the name, it is used for enqueuing both scripts and styles.
+		 */
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 		$this->loader->add_action( 'login_enqueue_scripts', $plugin_public, 'enqueue_login_styles' );
+
+		/**
+		 * Action: show_user_profile
+		 *
+		 * This action hook is typically used to output new fields or data to the bottom of WordPress's user profile
+		 * pages.
+		 */
 		$this->loader->add_action( 'show_user_profile', $plugin_public, 'custom_user_profile_fields' );
+
+		/**
+		 * Action: personal_options_update
+		 *
+		 * This hook only triggers when a user is viewing their own profile page. If you want to apply your hook to ALL
+		 * profile pages (including users other than the current one), then you also need to use the
+		 * edit_user_profile_update hook.
+		 */
 		$this->loader->add_action( 'personal_options_update', $plugin_public, 'custom_user_profile_update' );
+
+		/**
+		 * Action: user_profile_update_errors
+		 *
+		 * This hook runs AFTER edit_user_profile_update and personal_options_update. this same callback, after performing your validations, and save the data if it is empty.
+		 */
 		$this->loader->add_action( 'user_profile_update_errors', $plugin_public, 'custom_user_profile_validate' );
 
 		$plugin_authenticate = new Hydro_Raindrop_Authenticate(
@@ -226,7 +256,7 @@ class Hydro_Raindrop {
 	 *
 	 * @since    1.0.0
 	 */
-	public function run() {
+	public function run() : void {
 
 		$this->loader->run();
 
@@ -239,7 +269,7 @@ class Hydro_Raindrop {
 	 * @since     1.0.0
 	 * @return    string    The name of the plugin.
 	 */
-	public function get_plugin_name() {
+	public function get_plugin_name() : string {
 
 		return $this->plugin_name;
 
@@ -251,7 +281,7 @@ class Hydro_Raindrop {
 	 * @since     1.0.0
 	 * @return    Hydro_Raindrop_Loader    Orchestrates the hooks of the plugin.
 	 */
-	public function get_loader() {
+	public function get_loader() : Hydro_Raindrop_Loader {
 
 		return $this->loader;
 
@@ -263,36 +293,36 @@ class Hydro_Raindrop {
 	 * @since     1.0.0
 	 * @return    string    The version number of the plugin.
 	 */
-	public function get_version() {
+	public function get_version() : string {
 
 		return $this->version;
 
 	}
 
-    /**
-     * Retrieve the Raindrop Client.
-     *
-     * @since     1.0.0
-     * @return    Client    The version number of the plugin.
-     */
-	public static function get_raindrop_client() {
+	/**
+	 * Retrieve the Raindrop Client.
+	 *
+	 * @since     1.0.0
+	 * @return    Client    The version number of the plugin.
+	 */
+	public static function get_raindrop_client() : Client {
 
-        if (self::$raindrop_client === null) {
-            self::$raindrop_client = new Client(
-                new ApiSettings(
-                    get_option( 'client_id' ),
-                    get_option( 'client_secret' ),
-                    get_option( 'environment' ) === 'sandbox'
-                        ? new SandboxEnvironment()
-                        : new ProductionEnvironment()
-                ),
-	            new Hydro_Raindrop_TransientTokenStorage(),
-                get_option( 'application_id' )
-            );
-        }
+		if ( ! self::$raindrop_client ) {
+			self::$raindrop_client = new Client(
+				new ApiSettings(
+					get_option( 'client_id' ),
+					get_option( 'client_secret' ),
+					get_option( 'environment' ) === 'sandbox'
+						? new SandboxEnvironment()
+						: new ProductionEnvironment()
+				),
+				new Hydro_Raindrop_TransientTokenStorage(),
+				get_option( 'application_id' )
+			);
+		}
 
-        return self::$raindrop_client;
+		return self::$raindrop_client;
 
-    }
+	}
 
 }
