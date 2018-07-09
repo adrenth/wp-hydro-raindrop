@@ -46,7 +46,7 @@ class Hydro_Raindrop_Public {
 	 * @since    1.0.0
 	 *
 	 * @param      string $plugin_name The name of the plugin.
-	 * @param      string $version The version of this plugin.
+	 * @param      string $version     The version of this plugin.
 	 */
 	public function __construct( $plugin_name, $version ) {
 
@@ -60,7 +60,7 @@ class Hydro_Raindrop_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() {
+	public function enqueue_styles() : void {
 
 		wp_enqueue_style(
 			$this->plugin_name,
@@ -76,14 +76,15 @@ class Hydro_Raindrop_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_login_styles()
-	{
+	public function enqueue_login_styles() : void {
+
 		wp_enqueue_style(
 			$this->plugin_name,
 			plugin_dir_url( __FILE__ ) . 'css/hydro-raindrop-public.css',
-			array(),
+			[],
 			$this->version
 		);
+
 	}
 
 	/**
@@ -91,82 +92,138 @@ class Hydro_Raindrop_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Hydro_Raindrop_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Hydro_Raindrop_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+	public function enqueue_scripts() : void {
 
 		wp_enqueue_script(
 			$this->plugin_name,
 			plugin_dir_url( __FILE__ ) . 'js/hydro-raindrop-public.js',
-			array( 'jquery' ),
+			[
+				'jquery',
+			],
 			$this->version
 		);
 
 	}
 
 	/**
-	 * @param $user
+	 * @param WP_User $user
 	 */
-	public function custom_user_profile_fields( $user ) {
+	public function custom_user_profile_fields( WP_User $user ) : void {
+
 		include __DIR__ . '/partials/hydro-raindrop-public-user-profile.php';
+
 	}
 
-	public function custom_user_profile_update( $user_id ) {
-		if ( !current_user_can( 'edit_user', $user_id ) ) {
+	/**
+	 * Validate and process Hydro Raindrop MFA post data.
+	 *
+	 * @param WP_Error      $errors Error collection from edit_user().
+	 * @param bool|null     $update Wether the user profile is edited or not.
+	 * @param stdClass|null $user   User object being edited.
+	 *
+	 * @return void
+	 */
+	public function custom_user_profile_validate( &$errors, bool $update = null, &$user = null ) : void {
+
+		// Already errors present. Do nothing. User will not be updated to database.
+		if ( ! $user || ! $update || count( $errors->errors ) > 0 ) {
+
 			return;
+
 		}
 
-		if ( !empty( $_POST['hydro_id'] ) ) {
+		$user_has_hydro_id = $this->user_has_hydro_id( $user );
+
+		// @codingStandardsIgnoreLine
+		$hydro_id = sanitize_text_field((string) ($_POST['hydro_id'] ?? ''));
+
+		if ( ! empty( $hydro_id )
+				&& ! $user_has_hydro_id ) {
+
 			$client = Hydro_Raindrop::get_raindrop_client();
-			$hydroId = sanitize_text_field( $_POST['hydro_id'] );
+
+			if ( strlen( $hydro_id ) !== 7 ) {
+
+				$errors->add(
+					'hydro_id_invalid',
+					esc_html__( 'Please provide a valid HydroID.', 'wp-hydro-raindrop' )
+				);
+
+				return;
+
+			}
 
 			try {
-				$client->registerUser( sanitize_text_field( $_POST['hydro_id'] ) );
-				update_user_meta( $user_id, 'hydro_id', $hydroId );
-				update_user_meta( $user_id, 'hydro_mfa_enabled', 1 );
-				update_user_meta( $user_id, 'hydro_raindrop_confirmed', 1 );
+
+				$client->registerUser( sanitize_text_field( $hydro_id ) );
+
+				// @codingStandardsIgnoreLine
+				update_user_meta( $user->ID, 'hydro_id', $hydro_id );
+
+				// @codingStandardsIgnoreLine
+				update_user_meta( $user->ID, 'hydro_mfa_enabled', 1 );
+
+				// @codingStandardsIgnoreLine
+				update_user_meta( $user->ID, 'hydro_raindrop_confirmed', 1 );
+
 			} catch ( \Adrenth\Raindrop\Exception\RegisterUserFailed $e ) {
-				var_dump($e->getMessage());exit;
-				// @todo error handling
-				delete_user_meta( $user_id, 'hydro_id' );
-				update_user_meta( $user_id, 'hydro_mfa_enabled', 0 );
-				update_user_meta( $user_id, 'hydro_raindrop_confirmed', 0 );
+
+				$errors->add( 'hydro_register_failed', $e->getMessage() );
+
+				// @codingStandardsIgnoreLine
+				delete_user_meta( $user->ID, 'hydro_id' );
+
+				// @codingStandardsIgnoreLine
+				update_user_meta( $user->ID, 'hydro_mfa_enabled', 0 );
+
+				// @codingStandardsIgnoreLine
+				update_user_meta( $user->ID, 'hydro_raindrop_confirmed', 0 );
+
 			}
+
 		}
 
-		if ( isset( $_POST['disable_hydro_mfa'] ) ) {
-			$client = Hydro_Raindrop::get_raindrop_client();
-			$hydroId = (string) get_user_meta( $user_id , 'hydro_id', true );
+		// @codingStandardsIgnoreLine
+		$disable_hydro_mfa = isset( $_POST['disable_hydro_mfa'] );
 
-			// @todo empty hydroId check
+		if ( $disable_hydro_mfa && $user_has_hydro_id ) {
+
+			$client   = Hydro_Raindrop::get_raindrop_client();
+			$hydro_id = (string) get_user_meta( $user->ID, 'hydro_id', true );
 
 			try {
-				$client->unregisterUser( $hydroId );
-				delete_user_meta( $user_id, 'hydro_id', $hydroId );
-				delete_user_meta( $user_id, 'hydro_mfa_enabled' );
-				delete_user_meta( $user_id, 'hydro_raindrop_confirmed' );
+				$client->unregisterUser( $hydro_id );
+
+				// @codingStandardsIgnoreLine
+				delete_user_meta( $user->ID, 'hydro_id', $hydro_id );
+
+				// @codingStandardsIgnoreLine
+				delete_user_meta( $user->ID, 'hydro_mfa_enabled' );
+
+				// @codingStandardsIgnoreLine
+				delete_user_meta( $user->ID, 'hydro_raindrop_confirmed' );
+
 			} catch ( \Adrenth\Raindrop\Exception\UnregisterUserFailed $e ) {
-				var_dump($e->getMessage());exit;
-				// @todo error handling
+
+				$errors->add( 'hydro_unregister_failed', $e->getMessage() );
+
 			}
+
 		}
+
 	}
 
-	public function custom_user_profile_validate( &$errors, $update = null, &$user = null ) {
-		// @todo
-		// if ( empty( $_POST['hydro_id'] ) ) {
-		// 	 $errors->add( 'hydro_id', esc_html__( 'Please provide a HydroID.', $this->plugin_name ) );
-		// }
-	}
+	/**
+	 * @param stdClass $user
+	 *
+	 * @return bool
+	 */
+	private function user_has_hydro_id( stdClass $user ) : bool {
 
+		// @codingStandardsIgnoreLine
+		$hydro_id = (string) get_user_meta( $user->ID, 'hydro_id', true );
+
+		return ! empty( $hydro_id );
+
+	}
 }

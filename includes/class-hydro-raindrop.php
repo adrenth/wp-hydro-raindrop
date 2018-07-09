@@ -112,7 +112,7 @@ class Hydro_Raindrop {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function load_dependencies() {
+	private function load_dependencies() : void {
 
 		/**
 		 * The class responsible for orchestrating the actions and filters of the core plugin.
@@ -157,7 +157,7 @@ class Hydro_Raindrop {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function set_locale() {
+	private function set_locale() : void {
 
 		$plugin_i18n = new Hydro_Raindrop_i18n();
 
@@ -172,7 +172,7 @@ class Hydro_Raindrop {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_admin_hooks() {
+	private function define_admin_hooks() : void {
 
 		$plugin_admin = new Hydro_Raindrop_Admin( $this->get_plugin_name(), $this->get_version() );
 
@@ -190,7 +190,7 @@ class Hydro_Raindrop {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_public_hooks() {
+	private function define_public_hooks() : void {
 
 		$plugin_public = new Hydro_Raindrop_Public( $this->get_plugin_name(), $this->get_version() );
 
@@ -205,28 +205,20 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'login_enqueue_scripts', $plugin_public, 'enqueue_login_styles' );
 
 		/**
+		 * Action: user_profile_update_errors
+		 *
+		 * This hook runs AFTER edit_user_profile_update and personal_options_update.
+		 * This same callback, after performing your validations, and save the data if it is empty.
+		 */
+		$this->loader->add_action( 'user_profile_update_errors', $plugin_public, 'custom_user_profile_validate', 10, 3 );
+
+		/**
 		 * Action: show_user_profile
 		 *
 		 * This action hook is typically used to output new fields or data to the bottom of WordPress's user profile
 		 * pages.
 		 */
 		$this->loader->add_action( 'show_user_profile', $plugin_public, 'custom_user_profile_fields' );
-
-		/**
-		 * Action: personal_options_update
-		 *
-		 * This hook only triggers when a user is viewing their own profile page. If you want to apply your hook to ALL
-		 * profile pages (including users other than the current one), then you also need to use the
-		 * edit_user_profile_update hook.
-		 */
-		$this->loader->add_action( 'personal_options_update', $plugin_public, 'custom_user_profile_update' );
-
-		/**
-		 * Action: user_profile_update_errors
-		 *
-		 * This hook runs AFTER edit_user_profile_update and personal_options_update. this same callback, after performing your validations, and save the data if it is empty.
-		 */
-		$this->loader->add_action( 'user_profile_update_errors', $plugin_public, 'custom_user_profile_validate' );
 
 		$plugin_authenticate = new Hydro_Raindrop_Authenticate(
 			$this->get_plugin_name(),

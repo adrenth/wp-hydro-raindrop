@@ -38,6 +38,7 @@ $raindropConfirmed = (bool) get_user_meta( $user->ID, 'hydro_raindrop_confirmed'
 						id="hydro_id"
 						maxlength="7"
 						class="code"
+						value="<?php esc_attr($_POST['hydro_id'] ?? ''); ?>"
 						autocomplete="off"/>
 
 				<p class="description">Enter your HydroID, visible in the Hydro mobile app.</p>
