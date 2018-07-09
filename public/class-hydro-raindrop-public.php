@@ -188,8 +188,12 @@ class Hydro_Raindrop_Public {
 
 		if ( $disable_hydro_mfa && $user_has_hydro_id ) {
 
-			$client   = Hydro_Raindrop::get_raindrop_client();
-			$hydro_id = (string) get_user_meta( $user->ID, 'hydro_id', true );
+			$client       = Hydro_Raindrop::get_raindrop_client();
+			$hydro_id     = (string) get_user_meta( $user->ID, 'hydro_id', true );
+			$authenticate = new Hydro_Raindrop_Authenticate(
+				$this->plugin_name,
+				$this->version
+			);
 
 			try {
 				$client->unregisterUser( $hydro_id );
@@ -202,6 +206,8 @@ class Hydro_Raindrop_Public {
 
 				// @codingStandardsIgnoreLine
 				delete_user_meta( $user->ID, 'hydro_raindrop_confirmed' );
+
+				$authenticate->unset_cookie();
 
 			} catch ( \Adrenth\Raindrop\Exception\UnregisterUserFailed $e ) {
 
