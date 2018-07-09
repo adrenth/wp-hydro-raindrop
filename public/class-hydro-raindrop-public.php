@@ -136,7 +136,6 @@ class Hydro_Raindrop_Public {
 				update_user_meta( $user_id, 'hydro_mfa_enabled', 1 );
 				update_user_meta( $user_id, 'hydro_raindrop_confirmed', 1 );
 			} catch ( \Adrenth\Raindrop\Exception\RegisterUserFailed $e ) {
-				var_dump($e->getMessage());exit;
 				// @todo error handling
 				delete_user_meta( $user_id, 'hydro_id' );
 				update_user_meta( $user_id, 'hydro_mfa_enabled', 0 );
@@ -156,7 +155,6 @@ class Hydro_Raindrop_Public {
 				delete_user_meta( $user_id, 'hydro_mfa_enabled' );
 				delete_user_meta( $user_id, 'hydro_raindrop_confirmed' );
 			} catch ( \Adrenth\Raindrop\Exception\UnregisterUserFailed $e ) {
-				var_dump($e->getMessage());exit;
 				// @todo error handling
 			}
 		}
