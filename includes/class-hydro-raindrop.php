@@ -310,14 +310,14 @@ class Hydro_Raindrop {
 		if ( ! self::$raindrop_client ) {
 			self::$raindrop_client = new Client(
 				new ApiSettings(
-					get_option( 'client_id' ),
-					get_option( 'client_secret' ),
-					get_option( 'environment' ) === 'sandbox'
+					get_option( 'hydro_raindrop_client_id' ),
+					get_option( 'hydro_raindrop_client_secret' ),
+					get_option( 'hydro_raindrop_environment' ) === 'sandbox'
 						? new SandboxEnvironment()
 						: new ProductionEnvironment()
 				),
 				new Hydro_Raindrop_TransientTokenStorage(),
-				get_option( 'application_id' )
+				get_option( 'hydro_raindrop_application_id' )
 			);
 		}
 
