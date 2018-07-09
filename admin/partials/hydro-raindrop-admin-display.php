@@ -36,8 +36,8 @@ if ( ! current_user_can( 'manage_options' ) ) {
 				<td>
 					<input type="text"
 							class="regular-text code"
-							name="application_id"
-							value="<?php echo esc_attr( get_option( 'application_id' ) ); ?>"
+							name="hydro_raindrop_application_id"
+							value="<?php echo esc_attr( get_option( 'hydro_raindrop_application_id' ) ); ?>"
 							autocomplete="off"/>
 				</td>
 			</tr>
@@ -46,8 +46,8 @@ if ( ! current_user_can( 'manage_options' ) ) {
 				<td>
 					<input type="text"
 							class="regular-text code"
-							name="client_id"
-							value="<?php echo esc_attr( get_option( 'client_id' ) ); ?>"
+							name="hydro_raindrop_client_id"
+							value="<?php echo esc_attr( get_option( 'hydro_raindrop_client_id' ) ); ?>"
 							autocomplete="off"/>
 				</td>
 			</tr>
@@ -56,19 +56,19 @@ if ( ! current_user_can( 'manage_options' ) ) {
 				<td>
 					<input type="text"
 							class="regular-text code"
-							name="client_secret"
-							value="<?php echo esc_attr( get_option( 'client_secret' ) ); ?>"
+							name="hydro_raindrop_client_secret"
+							value="<?php echo esc_attr( get_option( 'hydro_raindrop_client_secret' ) ); ?>"
 							autocomplete="off"/>
 				</td>
 			</tr>
 			<tr valign="top">
 				<th scope="row">Environment</th>
 				<td>
-					<select name="environment" class="selection">
-						<option value="production"<?php if ( get_option( 'environment' ) === 'production' ): ?> selected<?php endif; ?>>
+					<select name="hydro_raindrop_environment" class="selection">
+						<option value="production"<?php if ( get_option( 'hydro_raindrop_environment' ) === 'production' ): ?> selected<?php endif; ?>>
 							Production
 						</option>
-						<option value="sandbox"<?php if ( get_option( 'environment' ) === 'sandbox' ): ?> selected<?php endif; ?>>
+						<option value="sandbox"<?php if ( get_option( 'hydro_raindrop_environment' ) === 'sandbox' ): ?> selected<?php endif; ?>>
 							Sandbox
 						</option>
 					</select>

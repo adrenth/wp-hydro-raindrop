@@ -90,10 +90,10 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function admin_init() : void {
 
-		register_setting( 'hydro_api', 'application_id' );
-		register_setting( 'hydro_api', 'client_id' );
-		register_setting( 'hydro_api', 'client_secret' );
-		register_setting( 'hydro_api', 'environment' );
+		register_setting( 'hydro_api', 'hydro_raindrop_application_id' );
+		register_setting( 'hydro_api', 'hydro_raindrop_client_id' );
+		register_setting( 'hydro_api', 'hydro_raindrop_client_secret' );
+		register_setting( 'hydro_api', 'hydro_raindrop_environment' );
 
 	}
 
