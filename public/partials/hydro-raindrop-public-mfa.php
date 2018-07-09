@@ -65,6 +65,10 @@ $classes = apply_filters( 'login_body_class', $classes );
 			<span class="digit"><?php echo substr( $message, 4, 1 ); ?></span>
 			<span class="digit"><?php echo substr( $message, 5, 1 ); ?></span>
 		</div>
+		<input type="submit"
+				name="cancel_hydro_raindrop"
+				class="button button-secondary button-large button-cancel"
+				value="Cancel">
 		<p class="submit">
 			<?php wp_nonce_field( 'hydro_raindrop_mfa' ); ?>
 			<input type="submit"

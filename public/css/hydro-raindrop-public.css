@@ -31,3 +31,8 @@
 .hydro-raindrop-mfa .hydro-illustration img {
     margin: 10px 0;
 }
+
+.hydro-raindrop-mfa .button-cancel {
+    float: left;
+    display: inline-block;
+}

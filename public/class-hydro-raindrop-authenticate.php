@@ -120,6 +120,24 @@ final class Hydro_Raindrop_Authenticate {
 
 		}
 
+		// Allow user to cancel the MFA. Which results in a logout.
+		// @codingStandardsIgnoreLine
+		if ( isset( $_POST['cancel_hydro_raindrop'] )
+				&& $is_post
+				&& is_ssl()
+				&& wp_verify_nonce( $retrieved_nonce, 'hydro_raindrop_mfa' )
+		) {
+
+			$this->unset_cookie();
+
+			wp_logout();
+
+			if ( wp_redirect( home_url() ) ) {
+				exit;
+			}
+
+		}
+
 		// @codingStandardsIgnoreLine
 		if ( isset( $_POST['hydro_raindrop'] )
 				&& $is_post
