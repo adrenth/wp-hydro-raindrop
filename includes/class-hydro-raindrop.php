@@ -317,4 +317,30 @@ class Hydro_Raindrop {
 
 	}
 
+	/**
+	 * Check if the required Raindrop Client options are present.
+	 *
+	 * @since  1.0.0
+	 * @return bool
+	 */
+	public static function has_valid_raindrop_client_options() : bool {
+
+		$options = [
+			'hydro_raindrop_client_id',
+			'hydro_raindrop_client_secret',
+			'hydro_raindrop_environment',
+			'hydro_raindrop_application_id',
+		];
+
+		foreach ( $options as $option ) {
+			$value = get_option( $option );
+
+			if ( empty( $value ) ) {
+				return false;
+			}
+		}
+
+		return true;
+
+	}
 }
