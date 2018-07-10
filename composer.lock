@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "30a9cf3d8ab474812a748dd41d50c331",
+    "content-hash": "1df22cee521d51c1bedec37910e5d098",
     "packages": [
         {
             "name": "adrenth/raindrop-sdk",
@@ -481,6 +481,8 @@
     },
     "prefer-stable": true,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": "^7.1"
+    },
     "platform-dev": []
 }
