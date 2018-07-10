@@ -10,6 +10,11 @@ The `WP Hydro Raindrop` plugin provides Hydro Raindrop Multi Factor Authenticati
 
 Download from wordpress.org.
 
+## Requirements
+
+* SSL MUST be enabled for MFA to work.
+* PHP 7.1 or higher is required.
+
 ## Documentation
 
 https://www.hydrogenplatform.com/developers
