@@ -1,4 +1,38 @@
-/**
- * All of the CSS for your public-facing functionality should be
- * included in this file.
- */
+.hydro-raindrop-mfa h1 {
+    margin: 0 0 15px 0;
+}
+
+.hydro-raindrop-mfa .message-digits {
+    text-align: center;
+    margin: 10px 0;
+    padding: 15px 15px 10px 15px;
+    background-color: #fbfbfb;
+    height: 32px;
+    display: block;
+    border: 1px solid #ddd;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.07);
+    outline: 0;
+    transition: 50ms border-color ease-in-out;
+}
+
+.hydro-raindrop-mfa .message-digits .digit {
+    font-family: "Courier New", sans-serif;
+    font-size: 32px;
+    font-weight: bold;
+    color: #0971f5;
+    margin: 0 5px;
+    line-height: 100%;
+}
+
+.hydro-raindrop-mfa .hydro-illustration {
+    text-align: center;
+}
+
+.hydro-raindrop-mfa .hydro-illustration img {
+    margin: 10px 0;
+}
+
+.hydro-raindrop-mfa .button-cancel {
+    float: left;
+    display: inline-block;
+}

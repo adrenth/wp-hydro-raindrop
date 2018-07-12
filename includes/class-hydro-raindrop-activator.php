@@ -18,18 +18,16 @@
  * @since      1.0.0
  * @package    Hydro_Raindrop
  * @subpackage Hydro_Raindrop/includes
- * @author     Alwin Drenth <adrenth@gmail.com>
+ * @author     Alwin Drenth <adrenth@gmail.com>, Ronald Drenth <ronalddrenth@gmail.com>
  */
 class Hydro_Raindrop_Activator {
 
 	/**
-	 * Short Description. (use period)
-	 *
-	 * Long Description.
+	 * Perform activation tasks.
 	 *
 	 * @since    1.0.0
 	 */
-	public static function activate() {
+	public static function activate() : void {
 
 	}
 

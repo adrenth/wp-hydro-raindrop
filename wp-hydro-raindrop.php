@@ -1,33 +1,33 @@
 <?php
 
 /**
- * The plugin bootstrap file
- *
- * This file is read by WordPress to generate the plugin information in the plugin
- * admin area. This file also includes all of the dependencies used by the plugin,
- * registers the activation and deactivation functions, and defines a function
- * that starts the plugin.
+ * WP Hydro Raindrop
  *
  * @link              https://github.com/adrenth
  * @since             1.0.0
  * @package           Hydro_Raindrop
  *
  * @wordpress-plugin
- * Plugin Name:       Hydro Raindrop
+ * Plugin Name:       WP Hydro Raindrop
  * Plugin URI:        https://github.com/adrenth/wp-hydro-raindrop
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Description:       A WordPress plugin to integrate Hydro Raindrop MFA
  * Version:           1.0.0
- * Author:            Alwin Drenth
+ * Author:            Alwin Drenth, Ronald Drenth
  * Author URI:        https://github.com/adrenth
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       hydro-raindrop
+ * Text Domain:       wp-hydro-raindrop
  * Domain Path:       /languages
  */
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;
+}
+
+// Require composer autoloader if installed on it's own
+if ( file_exists( $composer = __DIR__ . '/vendor/autoload.php' ) ) {
+	require_once $composer;
 }
 
 /**
@@ -42,8 +42,10 @@ define( 'PLUGIN_NAME_VERSION', '1.0.0' );
  * This action is documented in includes/class-hydro-raindrop-activator.php
  */
 function activate_hydro_raindrop() {
+
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-hydro-raindrop-activator.php';
 	Hydro_Raindrop_Activator::activate();
+
 }
 
 /**
@@ -51,8 +53,10 @@ function activate_hydro_raindrop() {
  * This action is documented in includes/class-hydro-raindrop-deactivator.php
  */
 function deactivate_hydro_raindrop() {
+
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-hydro-raindrop-deactivator.php';
 	Hydro_Raindrop_Deactivator::deactivate();
+
 }
 
 register_activation_hook( __FILE__, 'activate_hydro_raindrop' );

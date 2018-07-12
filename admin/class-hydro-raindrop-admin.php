@@ -18,7 +18,7 @@
  *
  * @package    Hydro_Raindrop
  * @subpackage Hydro_Raindrop/admin
- * @author     Alwin Drenth <adrenth@gmail.com>
+ * @author     Alwin Drenth <adrenth@gmail.com>, Ronald Drenth <ronalddrenth@gmail.com>
  */
 class Hydro_Raindrop_Admin {
 
@@ -46,9 +46,9 @@ class Hydro_Raindrop_Admin {
 	 * @since    1.0.0
 	 *
 	 * @param      string $plugin_name The name of this plugin.
-	 * @param      string $version The version of this plugin.
+	 * @param      string $version     The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct( string $plugin_name, string $version ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
@@ -60,7 +60,7 @@ class Hydro_Raindrop_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() {
+	public function enqueue_styles() : void {
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -77,68 +77,55 @@ class Hydro_Raindrop_Admin {
 		wp_enqueue_style(
 			$this->plugin_name,
 			plugin_dir_url( __FILE__ ) . 'css/hydro-raindrop-admin.css',
-			array(),
+			[],
 			$this->version
 		);
 
 	}
 
 	/**
-	 * Register the JavaScript for the admin area.
+	 * Register settings.
 	 *
-	 * @since    1.0.0
+	 * @return void
 	 */
-	public function enqueue_scripts() {
+	public function admin_init() : void {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Hydro_Raindrop_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Hydro_Raindrop_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+		register_setting( 'hydro_api', 'hydro_raindrop_application_id' );
+		register_setting( 'hydro_api', 'hydro_raindrop_client_id' );
+		register_setting( 'hydro_api', 'hydro_raindrop_client_secret' );
+		register_setting( 'hydro_api', 'hydro_raindrop_environment' );
 
-		wp_enqueue_script(
-			$this->plugin_name,
-			plugin_dir_url( __FILE__ ) . 'js/hydro-raindrop-admin.js',
-			array( 'jquery' ),
-			$this->version
-		);
-
-	}
-
-	public function admin_init() {
-		register_setting( 'hydro_api', 'application_id' );
-		register_setting( 'hydro_api', 'client_id' );
-		register_setting( 'hydro_api', 'client_secret' );
-		register_setting( 'hydro_api', 'environment' );
 	}
 
 	/**
 	 * Add options page.
+	 *
+	 * @return void
 	 */
-	public function admin_menu() {
+	public function admin_menu() : void {
+
 		add_options_page(
 			'Hydro Raindrop MFA',
 			'Hydro Raindrop MFA',
 			'manage_options',
 			$this->plugin_name . '-options',
-			array(
+			[
 				$this,
-				'admin_page'
-			)
+				'admin_page',
+			]
 		);
+
 	}
 
 	/**
 	 * Display the admin page.
+	 *
+	 * @return void
 	 */
-	public function admin_page() {
+	public function admin_page() : void {
+
 		include __DIR__ . '/../admin/partials/hydro-raindrop-admin-display.php';
+
 	}
 
 }

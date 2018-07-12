@@ -1,23 +1,6 @@
 <?php
-
 /**
  * Fired when the plugin is uninstalled.
- *
- * When populating this file, consider the following flow
- * of control:
- *
- * - This method should be static
- * - Check if the $_REQUEST content actually is the plugin name
- * - Run an admin referrer check to make sure it goes through authentication
- * - Verify the output of $_GET makes sense
- * - Repeat with other user roles. Best directly by using the links/query string parameters.
- * - Repeat things for multisite. Once for a single site in the network, once sitewide.
- *
- * This file may be updated more in future version of the Boilerplate; however, this is the
- * general skeleton and outline for how the file should work.
- *
- * For more information, see the following discussion:
- * https://github.com/tommcfarlin/WordPress-Plugin-Boilerplate/pull/123#issuecomment-28541913
  *
  * @link       https://github.com/adrenth
  * @since      1.0.0
@@ -29,3 +12,31 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
+
+/**
+ * Setup composer autoloading
+ */
+require_once __DIR__ . '/vendor/autoload.php';
+
+/**
+ * Delete options used by this plugin.
+ */
+delete_option( 'hydro_raindrop_application_id' );
+delete_option( 'hydro_raindrop_client_id' );
+delete_option( 'hydro_raindrop_client_secret' );
+delete_option( 'hydro_raindrop_environment' );
+
+/**
+ * Delete user metadata by for this plugin.
+ */
+delete_metadata( 'user', 0, 'hydro_id', '', true );
+delete_metadata( 'user', 0, 'hydro_mfa_enabled', '', true );
+delete_metadata( 'user', 0, 'hydro_raindrop_confirmed', '', true );
+
+/**
+ * Delete access token from the transient token storage.
+ */
+require_once __DIR__ . '/includes/class-hydro-raindrop-token-storage.php';
+
+$storage = new Hydro_Raindrop_TransientTokenStorage();
+$storage->unsetAccessToken();
