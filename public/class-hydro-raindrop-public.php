@@ -164,7 +164,11 @@ class Hydro_Raindrop_Public {
 				update_user_meta( $user->ID, 'hydro_mfa_enabled', 1 );
 
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, 'hydro_raindrop_confirmed', 1 );
+				update_user_meta( $user->ID, 'hydro_raindrop_confirmed', 0 );
+
+				if ( wp_redirect( self_admin_url( 'profile.php?hydro-raindrop-verify=1' ) ) ) {
+					exit;
+				}
 
 			} catch ( \Adrenth\Raindrop\Exception\RegisterUserFailed $e ) {
 

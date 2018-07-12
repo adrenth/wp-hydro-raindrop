@@ -7,6 +7,7 @@
  */
 
 $hydro_id                          = (string) $user->hydro_id;
+$hydro_mfa_enabled                 = (bool) $user->hydro_mfa_enabled;
 $hydro_raindrop_confirmed          = (bool) $user->hydro_raindrop_confirmed;
 $has_valid_raindrop_client_options = Hydro_Raindrop::has_valid_raindrop_client_options();
 ?>
@@ -15,7 +16,9 @@ $has_valid_raindrop_client_options = Hydro_Raindrop::has_valid_raindrop_client_o
     <p class="error-message">
 		<?php if ( current_user_can( 'manage_options' ) ) : ?>
             The Hydro Raindrop MFA plugin is not properly configured, please review the
-            <a href="options-general.php?page=<?php echo $this->plugin_name; ?>-options">Hydro Raindrop MFA Settings</a>
+            <a href="<?php echo self_admin_url( 'options-general.php?page=' . $this->plugin_name ); ?>-options">
+                Hydro Raindrop MFA Settings
+            </a>
             and try again.
 		<?php else : ?>
             The Hydro Raindrop MFA plugin is not properly configured.
@@ -23,17 +26,24 @@ $has_valid_raindrop_client_options = Hydro_Raindrop::has_valid_raindrop_client_o
     </p>
 <?php else : ?>
 
-	<?php if ( ! $hydro_raindrop_confirmed ) : ?>
-        <p class="error-message">Your account <strong>does not</strong> have Raindrop MFA enabled.</p>
+	<?php if ( ! $hydro_mfa_enabled ) : ?>
+        <p class="error-message">Your account does not have Hydro Raindrop MFA enabled.</p>
+	<?php endif ?>
+
+	<?php if ( $hydro_mfa_enabled && ! $hydro_raindrop_confirmed ) : ?>
+        <p class="error-message">
+            Your account does have Hydro Raindrop MFA enabled, but it is unconfirmed.
+            <a href="<?php echo self_admin_url( 'profile.php?hydro-raindrop-verify=1 ' ); ?>">Click here</a> to confirm.
+        </p>
 	<?php endif ?>
 
     <table class="form-table hydro">
-		<?php if ( $hydro_raindrop_confirmed ) : ?>
+		<?php if ( $hydro_mfa_enabled ) : ?>
             <tr>
-                <th scope="row">Disable</th>
+                <th scope="row">Unregister</th>
                 <td>
                     <button type="submit" class="button" name="disable_hydro_mfa" id="disable_hydro_mfa_button">
-                        Disable and unregister Raindrop MFA
+                        Unregister Raindrop MFA
                     </button>
                 </td>
             </tr>
@@ -43,7 +53,7 @@ $has_valid_raindrop_client_options = Hydro_Raindrop::has_valid_raindrop_client_o
                 <label for="hydro_id">HydroID</label>
             </th>
             <td>
-				<?php if ( $hydro_raindrop_confirmed ) : ?>
+				<?php if ( $hydro_mfa_enabled ) : ?>
                     <code><?php echo esc_html( $hydro_id ); ?></code>
 				<?php else : ?>
                     <input type="text"
