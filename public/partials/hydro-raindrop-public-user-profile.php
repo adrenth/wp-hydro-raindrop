@@ -37,6 +37,12 @@ $has_valid_raindrop_client_options = Hydro_Raindrop::has_valid_raindrop_client_o
         </p>
 	<?php endif ?>
 
+	<?php if ( $hydro_mfa_enabled && $hydro_raindrop_confirmed ) : ?>
+        <p style="color: #46b450; font-weight: 600;">
+            Your account has Hydro Raindrop MFA enabled and confirmed.
+        </p>
+	<?php endif ?>
+
     <table class="form-table hydro">
 		<?php if ( $hydro_mfa_enabled ) : ?>
             <tr>
