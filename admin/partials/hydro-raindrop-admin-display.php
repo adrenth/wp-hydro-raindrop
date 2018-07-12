@@ -65,10 +65,10 @@ if ( ! current_user_can( 'manage_options' ) ) {
 				<th scope="row">Environment</th>
 				<td>
 					<select name="hydro_raindrop_environment" class="selection">
-						<option value="production"<?php if ( get_option( 'hydro_raindrop_environment' ) === 'production' ): ?> selected<?php endif; ?>>
+						<option value="production"<?php if ( get_option( 'hydro_raindrop_environment' ) === 'production' ) { ?> selected<?php } ?>>
 							Production
 						</option>
-						<option value="sandbox"<?php if ( get_option( 'hydro_raindrop_environment' ) === 'sandbox' ): ?> selected<?php endif; ?>>
+						<option value="sandbox"<?php if ( get_option( 'hydro_raindrop_environment' ) === 'sandbox' ) { ?> selected<?php } ?>>
 							Sandbox
 						</option>
 					</select>

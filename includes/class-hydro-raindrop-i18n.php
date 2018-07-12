@@ -35,7 +35,7 @@ class Hydro_Raindrop_i18n {
 	public function load_plugin_textdomain() : void {
 
 		load_plugin_textdomain(
-			'hydro-raindrop',
+			'wp-hydro-raindrop',
 			false,
 			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
 		);
