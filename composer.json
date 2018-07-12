@@ -19,6 +19,6 @@
         "php": "^7.1",
         "composer/installers": "^1.0",
         "hashids/hashids": "^3.0",
-        "adrenth/raindrop-sdk": "dev-develop"
+        "adrenth/raindrop-sdk": "^1.0"
     }
 }
