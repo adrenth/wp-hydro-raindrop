@@ -130,7 +130,9 @@ final class Hydro_Raindrop_Authenticate {
 
 			$this->unset_cookie();
 
-			wp_logout();
+			if ( ! $this->is_first_time_verify() ) {
+				wp_logout();
+			}
 
 			if ( wp_redirect( home_url() ) ) {
 				exit;
@@ -424,7 +426,21 @@ final class Hydro_Raindrop_Authenticate {
 		// @codingStandardsIgnoreLine
 		$hydro_raindrop_confirmed = (bool) get_user_meta( $user->ID, 'hydro_raindrop_confirmed', true );
 
-		return ! empty( $hydro_id ) && $hydro_mfa_enabled && $hydro_raindrop_confirmed;
+		return ! empty( $hydro_id )
+			&& $hydro_mfa_enabled
+			&& ( $hydro_raindrop_confirmed || $this->is_first_time_verify() );
+
+	}
+
+	/**
+	 * Whether this is the first time verification.
+	 *
+	 * @return bool
+	 */
+	private function is_first_time_verify() : bool {
+
+		// @codingStandardsIgnoreLine
+		return (int) ($_GET['hydro-raindrop-verify'] ?? 0) === 1;
 
 	}
 
@@ -474,6 +490,11 @@ final class Hydro_Raindrop_Authenticate {
 			$client->verifySignature( $hydro_id, $message );
 
 			$this->delete_transient_data();
+
+			if ( $this->is_first_time_verify() ) {
+				// @codingStandardsIgnoreLine
+				update_user_meta( $user->ID, 'hydro_raindrop_confirmed', 1 );
+			}
 
 			return true;
 		} catch ( VerifySignatureFailed $e ) {
