@@ -181,6 +181,8 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_menu' );
 		$this->loader->add_action( 'before_delete_post', $plugin_admin, 'before_delete_post' );
 
+		$this->loader->add_action( 'update_option', $plugin_admin, 'update_option' );
+
 	}
 
 	/**

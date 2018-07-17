@@ -130,6 +130,8 @@ final class Hydro_Raindrop_Authenticate {
 
 			$this->unset_cookie();
 
+			$this->delete_transient_data();
+
 			if ( ! $this->is_first_time_verify() ) {
 				wp_logout();
 			}

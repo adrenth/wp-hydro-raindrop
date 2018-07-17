@@ -10,6 +10,9 @@
  * @subpackage Hydro_Raindrop/public
  */
 
+use Adrenth\Raindrop\Exception\RegisterUserFailed;
+use Adrenth\Raindrop\Exception\UserAlreadyMappedToApplication;
+
 /**
  * The public-facing functionality of the plugin.
  *
@@ -172,7 +175,35 @@ class Hydro_Raindrop_Public {
 					exit;
 				}
 
-			} catch ( \Adrenth\Raindrop\Exception\RegisterUserFailed $e ) {
+			} catch ( UserAlreadyMappedToApplication $e) {
+				/*
+				 * User is already mapped to this application.
+				 *
+				 * Edge case: A user tries to re-register with Hydro ID. If the user meta has been deleted, the
+				 *            user can re-use his Hydro ID but needs to verify it again.
+				 */
+
+				$authenticate = new Hydro_Raindrop_Authenticate(
+					$this->plugin_name,
+					$this->version
+				);
+
+				$authenticate->unset_cookie();
+
+				// @codingStandardsIgnoreLine
+				update_user_meta( $user->ID, 'hydro_id', $hydro_id );
+
+				// @codingStandardsIgnoreLine
+				update_user_meta( $user->ID, 'hydro_mfa_enabled', 1 );
+
+				// @codingStandardsIgnoreLine
+				update_user_meta( $user->ID, 'hydro_raindrop_confirmed', 0 );
+
+				if ( wp_redirect( self_admin_url( 'profile.php?hydro-raindrop-verify=1' ) ) ) {
+					exit;
+				}
+
+			} catch ( RegisterUserFailed $e ) {
 
 				$errors->add( 'hydro_register_failed', $e->getMessage() );
 
@@ -184,9 +215,7 @@ class Hydro_Raindrop_Public {
 
 				// @codingStandardsIgnoreLine
 				update_user_meta( $user->ID, 'hydro_raindrop_confirmed', 0 );
-
 			}
-
 		}
 
 		// @codingStandardsIgnoreLine
