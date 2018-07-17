@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d05aa7992af7f4c3e7925926e27c1f6f",
+    "content-hash": "14454179b703f50e18c554be3f2874ca",
     "packages": [
         {
             "name": "adrenth/raindrop-sdk",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/adrenth/raindrop-sdk.git",
-                "reference": "823d630928b2baa254a51f70428e5aece7f9b468"
+                "reference": "ae46cb5e456545e1b0440b11d11be706b39c74db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/adrenth/raindrop-sdk/zipball/823d630928b2baa254a51f70428e5aece7f9b468",
-                "reference": "823d630928b2baa254a51f70428e5aece7f9b468",
+                "url": "https://api.github.com/repos/adrenth/raindrop-sdk/zipball/ae46cb5e456545e1b0440b11d11be706b39c74db",
+                "reference": "ae46cb5e456545e1b0440b11d11be706b39c74db",
                 "shasum": ""
             },
             "require": {
@@ -53,7 +53,7 @@
                 }
             ],
             "description": "Hydro Raindrop SDK",
-            "time": "2018-07-12T19:24:01+00:00"
+            "time": "2018-07-17T14:38:50+00:00"
         },
         {
             "name": "composer/installers",
