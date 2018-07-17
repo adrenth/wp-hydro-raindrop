@@ -142,7 +142,9 @@ class Hydro_Raindrop_Public {
 
 			$client = Hydro_Raindrop::get_raindrop_client();
 
-			if ( strlen( $hydro_id ) !== 7 ) {
+			$length = strlen( $hydro_id );
+
+			if ( $length < 3 || $length > 32 ) {
 
 				$errors->add(
 					'hydro_id_invalid',
