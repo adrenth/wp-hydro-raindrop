@@ -80,12 +80,7 @@ class Hydro_Raindrop {
 	 */
 	public function __construct() {
 
-		if ( defined( 'PLUGIN_NAME_VERSION' ) ) {
-			$this->version = PLUGIN_NAME_VERSION;
-		} else {
-			$this->version = '1.0.0';
-		}
-
+		$this->version     = PLUGIN_NAME_VERSION;
 		$this->plugin_name = 'wp-hydro-raindrop';
 
 		$this->load_dependencies();
@@ -180,6 +175,8 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'admin_init' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_menu' );
 		$this->loader->add_action( 'before_delete_post', $plugin_admin, 'before_delete_post' );
+
+		$this->loader->add_action( 'update_option', $plugin_admin, 'update_option' );
 
 	}
 

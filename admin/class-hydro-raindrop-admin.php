@@ -10,6 +10,8 @@
  * @subpackage Hydro_Raindrop/admin
  */
 
+use Adrenth\Raindrop\Exception\RefreshTokenFailed;
+
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -118,6 +120,37 @@ class Hydro_Raindrop_Admin {
 	}
 
 	/**
+	 * Hydro Raindrop environment options have been changed.
+	 *
+	 * @param mixed $option Option which has been updated.
+	 *
+	 * @return void
+	 */
+	public function update_option( $option ) : void {
+
+		switch ( $option ) {
+			case 'hydro_raindrop_application_id':
+			case 'hydro_raindrop_client_id':
+			case 'hydro_raindrop_client_secret':
+			case 'hydro_raindrop_environment':
+				$token_storage = new Hydro_Raindrop_TransientTokenStorage();
+				$token_storage->unsetAccessToken();
+
+				$authenticate = new Hydro_Raindrop_Authenticate( $this->plugin_name, $this->version );
+				$authenticate->unset_cookie();
+
+				delete_option( 'hydro_raindrop_access_token_success' );
+
+				delete_metadata( 'user', 0, 'hydro_id', '', true );
+				delete_metadata( 'user', 0, 'hydro_mfa_enabled', '', true );
+				delete_metadata( 'user', 0, 'hydro_raindrop_confirmed', '', true );
+
+				break;
+		}
+
+	}
+
+	/**
 	 * Display the admin page.
 	 *
 	 * @return void
@@ -125,6 +158,31 @@ class Hydro_Raindrop_Admin {
 	public function admin_page() : void {
 
 		include __DIR__ . '/../admin/partials/hydro-raindrop-admin-display.php';
+
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function options_are_valid() : bool {
+
+		$token_success = (string) get_option( 'hydro_raindrop_access_token_success', '' );
+
+		if ( empty( $token_success ) && Hydro_Raindrop::has_valid_raindrop_client_options() ) {
+			try {
+				$client       = Hydro_Raindrop::get_raindrop_client();
+				$access_token = $client->getAccessToken();
+
+				if ( $access_token ) {
+					update_option( 'hydro_raindrop_access_token_success', 1 );
+					return true;
+				}
+			} catch ( RefreshTokenFailed $e ) {
+				return false;
+			}
+		}
+
+		return true;
 
 	}
 

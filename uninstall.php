@@ -25,6 +25,7 @@ delete_option( 'hydro_raindrop_application_id' );
 delete_option( 'hydro_raindrop_client_id' );
 delete_option( 'hydro_raindrop_client_secret' );
 delete_option( 'hydro_raindrop_environment' );
+delete_option( 'hydro_raindrop_access_token_success' );
 
 /**
  * Delete user metadata by for this plugin.
