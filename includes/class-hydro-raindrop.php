@@ -80,7 +80,7 @@ class Hydro_Raindrop {
 	 */
 	public function __construct() {
 
-		$this->version     = PLUGIN_NAME_VERSION;
+		$this->version     = HYDRO_RAINDROP_VERSION;
 		$this->plugin_name = 'wp-hydro-raindrop';
 
 		$this->load_dependencies();
