@@ -4,7 +4,6 @@
 
 - Rename PLUGIN_NAME_VERSION constant to HYDRO_RAINDROP_VERSION.
 
-
 ## 1.1.0
 
 - Fix API authentication issue: Unset API authentication token when switching environment.
