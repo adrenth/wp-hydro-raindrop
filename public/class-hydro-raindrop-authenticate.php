@@ -157,6 +157,7 @@ final class Hydro_Raindrop_Authenticate {
 			$this->delete_transient_data();
 
 			return;
+
 		}
 
 		if ( is_user_logged_in() ) {
@@ -395,6 +396,7 @@ final class Hydro_Raindrop_Authenticate {
 		}
 
 		return true;
+
 	}
 
 	/**
@@ -502,6 +504,7 @@ final class Hydro_Raindrop_Authenticate {
 		} catch ( VerifySignatureFailed $e ) {
 			return false;
 		}
+
 	}
 
 }
