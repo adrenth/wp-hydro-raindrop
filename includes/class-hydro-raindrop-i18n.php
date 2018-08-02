@@ -32,7 +32,7 @@ class Hydro_Raindrop_i18n {
 	 *
 	 * @since    1.0.0
 	 */
-	public function load_plugin_textdomain() : void {
+	public function load_plugin_textdomain() {
 
 		load_plugin_textdomain(
 			'wp-hydro-raindrop',

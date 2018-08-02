@@ -62,7 +62,7 @@ class Hydro_Raindrop_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() : void {
+	public function enqueue_styles() {
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -90,7 +90,7 @@ class Hydro_Raindrop_Admin {
 	 *
 	 * @return void
 	 */
-	public function admin_init() : void {
+	public function admin_init() {
 
 		register_setting( 'hydro_api', 'hydro_raindrop_application_id' );
 		register_setting( 'hydro_api', 'hydro_raindrop_client_id' );
@@ -104,7 +104,7 @@ class Hydro_Raindrop_Admin {
 	 *
 	 * @return void
 	 */
-	public function admin_menu() : void {
+	public function admin_menu() {
 
 		add_options_page(
 			'Hydro Raindrop MFA',
@@ -126,7 +126,7 @@ class Hydro_Raindrop_Admin {
 	 *
 	 * @return void
 	 */
-	public function update_option( $option ) : void {
+	public function update_option( $option ) {
 
 		switch ( $option ) {
 			case 'hydro_raindrop_application_id':
@@ -155,7 +155,7 @@ class Hydro_Raindrop_Admin {
 	 *
 	 * @return void
 	 */
-	public function admin_page() : void {
+	public function admin_page() {
 
 		include __DIR__ . '/../admin/partials/hydro-raindrop-admin-display.php';
 
@@ -170,13 +170,12 @@ class Hydro_Raindrop_Admin {
 
 		if ( empty( $token_success ) && Hydro_Raindrop::has_valid_raindrop_client_options() ) {
 			try {
-				$client       = Hydro_Raindrop::get_raindrop_client();
-				$access_token = $client->getAccessToken();
+				$client = Hydro_Raindrop::get_raindrop_client();
+				$client->getAccessToken();
 
-				if ( $access_token ) {
-					update_option( 'hydro_raindrop_access_token_success', 1 );
-					return true;
-				}
+				update_option( 'hydro_raindrop_access_token_success', 1 );
+
+				return true;
 			} catch ( RefreshTokenFailed $e ) {
 				return false;
 			}

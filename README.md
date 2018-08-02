@@ -39,7 +39,7 @@ Site Editors / Authors / etc. can enable the Hydro Raindrop MFA from their profi
 ## Requirements
 
 * **SSL MUST be enabled for MFA to work.**
-* PHP 7.1 or higher is required.
+* PHP 7.0 or higher is required.
 
 ## Documentation
 

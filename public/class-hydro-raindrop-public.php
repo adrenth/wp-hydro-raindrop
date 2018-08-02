@@ -63,7 +63,7 @@ class Hydro_Raindrop_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() : void {
+	public function enqueue_styles() {
 
 		wp_enqueue_style(
 			$this->plugin_name,
@@ -79,7 +79,7 @@ class Hydro_Raindrop_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_login_styles() : void {
+	public function enqueue_login_styles() {
 
 		wp_enqueue_style(
 			$this->plugin_name,
@@ -95,7 +95,7 @@ class Hydro_Raindrop_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts() : void {
+	public function enqueue_scripts() {
 
 		wp_enqueue_script(
 			$this->plugin_name,
@@ -111,7 +111,7 @@ class Hydro_Raindrop_Public {
 	/**
 	 * @param WP_User $user
 	 */
-	public function custom_user_profile_fields( WP_User $user ) : void {
+	public function custom_user_profile_fields( WP_User $user ) {
 
 		include __DIR__ . '/partials/hydro-raindrop-public-user-profile.php';
 
@@ -126,7 +126,7 @@ class Hydro_Raindrop_Public {
 	 *
 	 * @return void
 	 */
-	public function custom_user_profile_validate( &$errors, bool $update = null, &$user = null ) : void {
+	public function custom_user_profile_validate( &$errors, bool $update = null, &$user = null ) {
 
 		// Already errors present. Do nothing. User will not be updated to database.
 		if ( ! $user || ! $update || count( $errors->errors ) > 0 ) {

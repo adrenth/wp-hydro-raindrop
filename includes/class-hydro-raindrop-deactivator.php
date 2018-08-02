@@ -29,7 +29,7 @@ class Hydro_Raindrop_Deactivator {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function deactivate() : void {
+	public static function deactivate() {
 
 	}
 

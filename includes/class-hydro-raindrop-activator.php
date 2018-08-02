@@ -27,7 +27,7 @@ class Hydro_Raindrop_Activator {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function activate() : void {
+	public static function activate() {
 
 	}
 
