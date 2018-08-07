@@ -1,12 +1,14 @@
 <?php
 
+declare( strict_types=1 );
+
 /**
  * Define the internationalization functionality
  *
  * Loads and defines the internationalization files for this plugin
  * so that it is ready for translation.
  *
- * @link       https://github.com/adrenth
+ * @link       https://github.com/adrenth/wp-hydro-raindrop
  * @since      1.0.0
  *
  * @package    Hydro_Raindrop

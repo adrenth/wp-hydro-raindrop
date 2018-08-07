@@ -7,7 +7,7 @@ Tested up to: 3.4
 Stable tag: 4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Requires PHP: 7.1
+Requires PHP: 7.0
 
 Provides Hydro Raindrop Multi Factor Authentication to your WordPress website.
 
@@ -20,7 +20,7 @@ For the MFA to work you need to register for an account at https://www.hydrogenp
 Requirements:
 
 * IMPORTANT: SSL (HTTPS) MUST be enabled for MFA to work.
-* PHP 7.1 or higher is required.
+* PHP 7.0 or higher is required.
 
 == Installation ==
 
@@ -31,6 +31,8 @@ Download plugin from WordPress.org.
 Issues can be reported here: https://github.com/adrenth/wp-hydro-raindrop/issues
 
 == Changelog ==
+= 1.2.0 =
+* Set PHP 7.0 requirement
 
 = 1.1.1 =
 * Rename PLUGIN_NAME_VERSION constant to HYDRO_RAINDROP_VERSION.

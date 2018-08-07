@@ -1,16 +1,19 @@
 <?php
 
+declare( strict_types=1 );
+
 /**
  * Provide a public-facing view for the plugin
  *
  * This file is used to markup the public-facing aspects of the plugin.
  *
- * @link       https://github.com/adrenth
+ * @link       https://github.com/adrenth/wp-hydro-raindrop
  * @since      1.0.0
  *
  * @package    Hydro_Raindrop
  * @subpackage Hydro_Raindrop/public/partials
  */
+
 ?><!DOCTYPE html>
 <!DOCTYPE html>
 <!--[if IE 8]>
@@ -58,12 +61,12 @@ $classes = apply_filters( 'login_body_class', $classes );
 			</label>
 		</p>
 		<div id="hydro_digits" class="message-digits">
-			<span class="digit"><?php echo substr( $message, 0, 1 ); ?></span>
-			<span class="digit"><?php echo substr( $message, 1, 1 ); ?></span>
-			<span class="digit"><?php echo substr( $message, 2, 1 ); ?></span>
-			<span class="digit"><?php echo substr( $message, 3, 1 ); ?></span>
-			<span class="digit"><?php echo substr( $message, 4, 1 ); ?></span>
-			<span class="digit"><?php echo substr( $message, 5, 1 ); ?></span>
+			<span class="digit"><?php echo substr( (string) $message, 0, 1 ); ?></span>
+			<span class="digit"><?php echo substr( (string) $message, 1, 1 ); ?></span>
+			<span class="digit"><?php echo substr( (string) $message, 2, 1 ); ?></span>
+			<span class="digit"><?php echo substr( (string) $message, 3, 1 ); ?></span>
+			<span class="digit"><?php echo substr( (string) $message, 4, 1 ); ?></span>
+			<span class="digit"><?php echo substr( (string) $message, 5, 1 ); ?></span>
 		</div>
 		<input type="submit"
 				name="cancel_hydro_raindrop"

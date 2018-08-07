@@ -1,8 +1,8 @@
 # wp-hydro-raindrop
 
-## Unreleased
+## 1.2.0
 
-- Lower PHP requirement to 7.0.
+- Set PHP 7.0 requirement
 
 ## 1.1.1
 

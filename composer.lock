@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ae2daf99d69072a060c96e23254f829e",
+    "content-hash": "61137a7cfcfa146deee9fad7464b5336",
     "packages": [
         {
             "name": "adrenth/raindrop-sdk",
@@ -358,32 +358,32 @@
         },
         {
             "name": "hashids/hashids",
-            "version": "3.0.0",
+            "version": "2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ivanakimov/hashids.php.git",
-                "reference": "b6c61142bfe36d43740a5419d11c351dddac0458"
+                "reference": "7a945a5192d4a5c8888364970feece9bc26179df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ivanakimov/hashids.php/zipball/b6c61142bfe36d43740a5419d11c351dddac0458",
-                "reference": "b6c61142bfe36d43740a5419d11c351dddac0458",
+                "url": "https://api.github.com/repos/ivanakimov/hashids.php/zipball/7a945a5192d4a5c8888364970feece9bc26179df",
+                "reference": "7a945a5192d4a5c8888364970feece9bc26179df",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1.3"
+                "php": "^5.6.4 || ^7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^7.0"
+                "phpunit/phpunit": "^5.7 || ^6.3"
             },
             "suggest": {
-                "ext-bcmath": "Required to use BC Math arbitrary precision mathematics (*).",
+                "ext-bcmatch": "Required to use BC Math arbitrary precision mathematics (*).",
                 "ext-gmp": "Required to use GNU multiple precision mathematics (*)."
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.0-dev"
+                    "dev-master": "2.1-dev"
                 }
             },
             "autoload": {
@@ -420,7 +420,7 @@
                 "obfuscate",
                 "youtube"
             ],
-            "time": "2018-03-12T16:30:09+00:00"
+            "time": "2017-10-28T11:24:20+00:00"
         },
         {
             "name": "psr/http-message",

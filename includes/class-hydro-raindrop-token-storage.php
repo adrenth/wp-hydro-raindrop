@@ -6,8 +6,6 @@ use Adrenth\Raindrop\ApiAccessToken;
 use Adrenth\Raindrop\Exception\UnableToAcquireAccessToken;
 use Adrenth\Raindrop\TokenStorage\TokenStorage;
 
-/** @noinspection AutoloadingIssuesInspection */
-
 /**
  * Class Hydro_Raindrop_TransientTokenStorage
  *
@@ -33,6 +31,7 @@ final class Hydro_Raindrop_TransientTokenStorage implements TokenStorage {
 		}
 
 		throw new UnableToAcquireAccessToken( 'Access Token is not found in the storage.' );
+
 	}
 
 	/**

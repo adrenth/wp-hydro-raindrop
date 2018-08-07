@@ -1,9 +1,11 @@
 <?php
 
+declare( strict_types=1 );
+
 /**
  * The admin-specific functionality of the plugin.
  *
- * @link       https://github.com/adrenth
+ * @link       https://github.com/adrenth/wp-hydro-raindrop
  * @since      1.0.0
  *
  * @package    Hydro_Raindrop

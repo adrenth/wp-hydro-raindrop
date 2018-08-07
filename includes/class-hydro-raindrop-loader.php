@@ -1,9 +1,11 @@
 <?php
 
+declare( strict_types=1 );
+
 /**
  * Register all actions and filters for the plugin
  *
- * @link       https://github.com/adrenth
+ * @link       https://github.com/adrenth/wp-hydro-raindrop
  * @since      1.0.0
  *
  * @package    Hydro_Raindrop
