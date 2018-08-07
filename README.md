@@ -28,7 +28,7 @@ And finally login with an admin account to your WordPress site and activate the 
 1. Login to your WordPress site as administrator.
 2. Go to `Plugins` and search for the `WP Hydro Raindrop` plugin. Click `Activate` to activate the plugin.
 
-If you don't have a **Hydrogen Developer Account**, go to [www.hydrogenplaform.com](https://www.hydrogenplaform.com) to register an account.
+If you don't have a **Hydrogen Developer Account**, go to [www.hydrogenplatform.com](https://www.hydrogenplatform.com) to register an account.
 
 1. Under `Settings` navigate to the `Hydro Raindrop MFA` section and input your Application information to enable Hydro Raindrop MFA to your WordPress site. 
 2. Under `Edit My Profile`, enter your HydroID in the `Hydro Raindrop MFA` section.
