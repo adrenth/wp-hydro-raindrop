@@ -16,9 +16,9 @@
     ],
     "prefer-stable": true,
     "require": {
-        "php": "^7.1",
+        "php": "^7.0",
         "composer/installers": "^1.0",
-        "hashids/hashids": "^3.0",
-        "adrenth/raindrop-sdk": "^1.1"
+        "hashids/hashids": "^2.0",
+        "adrenth/raindrop-sdk": "^1.2"
     }
 }

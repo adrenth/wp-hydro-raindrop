@@ -11,11 +11,11 @@ use Adrenth\Raindrop\Exception\VerifySignatureFailed;
  */
 final class Hydro_Raindrop_Authenticate {
 
-	private const MESSAGE_TRANSIENT_ID = 'HydroRaindropMessage_%s';
+	const MESSAGE_TRANSIENT_ID = 'HydroRaindropMessage_%s';
 
-	private const COOKIE_NAME = 'HydroRaindropMfa';
+	const COOKIE_NAME = 'HydroRaindropMfa';
 
-	private const TIME_OUT = 90;
+	const TIME_OUT = 90;
 
 	/**
 	 * The ID of this plugin.
@@ -78,7 +78,7 @@ final class Hydro_Raindrop_Authenticate {
 	 *
 	 * @return void
 	 */
-	private function log( string $message ) : void {
+	private function log( string $message ) {
 
 		if ( WP_DEBUG && WP_DEBUG_LOG ) {
 			// @codingStandardsIgnoreLine
@@ -93,7 +93,7 @@ final class Hydro_Raindrop_Authenticate {
 	 * @return void
 	 * @throws Exception When MFA could not be started.
 	 */
-	public function verify() : void {
+	public function verify() {
 
 		if ( ! $this->is_hydro_raindrop_mfa_enabled() ) {
 			return;
@@ -204,7 +204,7 @@ final class Hydro_Raindrop_Authenticate {
 	 *
 	 * @throws Exception If message could not be generated.
 	 */
-	public function start_mfa( WP_User $user ) : void {
+	public function start_mfa( WP_User $user ) {
 
 		$this->log( 'Start MFA.' );
 
@@ -252,7 +252,7 @@ final class Hydro_Raindrop_Authenticate {
 	 *
 	 * @throws \Hashids\HashidsException When hashing fails.
 	 */
-	private function set_cookie( WP_User $user ) : void {
+	private function set_cookie( WP_User $user ) {
 
 		$this->log( 'Setting SSL cookie.' );
 
@@ -318,7 +318,7 @@ final class Hydro_Raindrop_Authenticate {
 	 *
 	 * @return void
 	 */
-	public function unset_cookie() : void {
+	public function unset_cookie() {
 
 		$this->log( 'Unsetting cookies (force).' );
 
@@ -357,7 +357,7 @@ final class Hydro_Raindrop_Authenticate {
 		}
 
 		// @codingStandardsIgnoreLine
-		[ $b64_value, $cookie_signature ] = $cookie_list;
+		list ( $b64_value, $cookie_signature ) = $cookie_list;
 
 		$signature = $this->hash_mac( $b64_value );
 
@@ -376,7 +376,7 @@ final class Hydro_Raindrop_Authenticate {
 			return false;
 		}
 
-		[ $name, $user_id, $hydro_id, $expire ] = $cookie_content;
+		list ( $name, $user_id, $hydro_id, $expire ) = $cookie_content;
 
 		$user_hash = ( new \Hashids\Hashids( $this->get_salt(), 64 ) )->decode( $user_id );
 
@@ -453,7 +453,7 @@ final class Hydro_Raindrop_Authenticate {
 	 *
 	 * @return void
 	 */
-	private function delete_transient_data() : void {
+	private function delete_transient_data() {
 
 		$user = wp_get_current_user();
 

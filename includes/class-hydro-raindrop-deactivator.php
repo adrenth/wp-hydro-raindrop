@@ -1,9 +1,11 @@
 <?php
 
+declare( strict_types=1 );
+
 /**
  * Fired during plugin deactivation
  *
- * @link       https://github.com/adrenth
+ * @link       https://github.com/adrenth/wp-hydro-raindrop
  * @since      1.0.0
  *
  * @package    Hydro_Raindrop
@@ -29,7 +31,7 @@ class Hydro_Raindrop_Deactivator {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function deactivate() : void {
+	public static function deactivate() {
 
 	}
 

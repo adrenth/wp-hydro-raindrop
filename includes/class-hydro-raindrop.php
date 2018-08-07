@@ -1,12 +1,14 @@
 <?php
 
+declare( strict_types=1 );
+
 /**
  * The file that defines the core plugin class
  *
  * A class definition that includes attributes and functions used across both the
  * public-facing side of the site and the admin area.
  *
- * @link       https://github.com/adrenth
+ * @link       https://github.com/adrenth/wp-hydro-raindrop
  * @since      1.0.0
  *
  * @package    Hydro_Raindrop
@@ -107,7 +109,7 @@ class Hydro_Raindrop {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function load_dependencies() : void {
+	private function load_dependencies() {
 
 		/**
 		 * The class responsible for orchestrating the actions and filters of the core plugin.
@@ -152,7 +154,7 @@ class Hydro_Raindrop {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function set_locale() : void {
+	private function set_locale() {
 
 		$plugin_i18n = new Hydro_Raindrop_i18n();
 
@@ -167,7 +169,7 @@ class Hydro_Raindrop {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_admin_hooks() : void {
+	private function define_admin_hooks() {
 
 		$plugin_admin = new Hydro_Raindrop_Admin( $this->get_plugin_name(), $this->get_version() );
 
@@ -187,7 +189,7 @@ class Hydro_Raindrop {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_public_hooks() : void {
+	private function define_public_hooks() {
 
 		$plugin_public = new Hydro_Raindrop_Public( $this->get_plugin_name(), $this->get_version() );
 
@@ -245,7 +247,7 @@ class Hydro_Raindrop {
 	 *
 	 * @since    1.0.0
 	 */
-	public function run() : void {
+	public function run() {
 
 		$this->loader->run();
 

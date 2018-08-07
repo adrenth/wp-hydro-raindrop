@@ -1,9 +1,12 @@
 # wp-hydro-raindrop
 
+## 1.2.0
+
+- Set PHP 7.0 requirement
+
 ## 1.1.1
 
 - Rename PLUGIN_NAME_VERSION constant to HYDRO_RAINDROP_VERSION.
-
 
 ## 1.1.0
 

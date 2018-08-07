@@ -1,9 +1,11 @@
 <?php
 
+declare( strict_types=1 );
+
 /**
  * Fired during plugin activation
  *
- * @link       https://github.com/adrenth
+ * @link       https://github.com/adrenth/wp-hydro-raindrop
  * @since      1.0.0
  *
  * @package    Hydro_Raindrop
@@ -27,7 +29,7 @@ class Hydro_Raindrop_Activator {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function activate() : void {
+	public static function activate() {
 
 	}
 

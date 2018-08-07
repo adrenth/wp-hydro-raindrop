@@ -3,9 +3,8 @@
 declare( strict_types=1 );
 
 use Adrenth\Raindrop\ApiAccessToken;
+use Adrenth\Raindrop\Exception\UnableToAcquireAccessToken;
 use Adrenth\Raindrop\TokenStorage\TokenStorage;
-
-/** @noinspection AutoloadingIssuesInspection */
 
 /**
  * Class Hydro_Raindrop_TransientTokenStorage
@@ -16,12 +15,12 @@ use Adrenth\Raindrop\TokenStorage\TokenStorage;
  */
 final class Hydro_Raindrop_TransientTokenStorage implements TokenStorage {
 
-	private const TRANSIENT_ID = 'HydroRaindropTokenStorage';
+	const TRANSIENT_ID = 'HydroRaindropTokenStorage';
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getAccessToken() : ?ApiAccessToken {
+	public function getAccessToken() : ApiAccessToken {
 
 		$data = get_transient( self::TRANSIENT_ID );
 
@@ -31,18 +30,19 @@ final class Hydro_Raindrop_TransientTokenStorage implements TokenStorage {
 			return ApiAccessToken::create( $data[0] ?? '', (int) ( $data[1] ?? 0 ) );
 		}
 
-		return null;
+		throw new UnableToAcquireAccessToken( 'Access Token is not found in the storage.' );
+
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function setAccessToken( ApiAccessToken $token ) : void {
+	public function setAccessToken( ApiAccessToken $token ) {
 
 		set_transient(
 			self::TRANSIENT_ID,
-			$token->getToken() . '|' . $token->getExpiresIn(),
-			$token->getExpiresIn()
+			$token->getToken() . '|' . $token->getExpiresAt(),
+			$token->getExpiresAt() - time()
 		);
 
 	}
@@ -50,7 +50,7 @@ final class Hydro_Raindrop_TransientTokenStorage implements TokenStorage {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function unsetAccessToken() : void {
+	public function unsetAccessToken() {
 
 		delete_transient( self::TRANSIENT_ID );
 

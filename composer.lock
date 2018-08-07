@@ -4,30 +4,30 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "14454179b703f50e18c554be3f2874ca",
+    "content-hash": "61137a7cfcfa146deee9fad7464b5336",
     "packages": [
         {
             "name": "adrenth/raindrop-sdk",
-            "version": "1.1.2",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/adrenth/raindrop-sdk.git",
-                "reference": "51ee3116aa7920bc2fe46114c02175cfb48465a0"
+                "reference": "ff5bca7c30dd6b6936dace980782174148dd1d01"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/adrenth/raindrop-sdk/zipball/51ee3116aa7920bc2fe46114c02175cfb48465a0",
-                "reference": "51ee3116aa7920bc2fe46114c02175cfb48465a0",
+                "url": "https://api.github.com/repos/adrenth/raindrop-sdk/zipball/ff5bca7c30dd6b6936dace980782174148dd1d01",
+                "reference": "ff5bca7c30dd6b6936dace980782174148dd1d01",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.3",
-                "php": "^7.1"
+                "php": "^7.0"
             },
             "require-dev": {
-                "illuminate/support": "5.6.*",
+                "illuminate/support": "^5.5",
                 "mikey179/vfsstream": "^1.6",
-                "phpunit/phpunit": "^7.0"
+                "phpunit/phpunit": "^6.0"
             },
             "type": "library",
             "autoload": {
@@ -53,7 +53,7 @@
                 }
             ],
             "description": "Hydro Raindrop SDK",
-            "time": "2018-07-17T18:02:09+00:00"
+            "time": "2018-08-02T16:52:30+00:00"
         },
         {
             "name": "composer/installers",
@@ -358,32 +358,32 @@
         },
         {
             "name": "hashids/hashids",
-            "version": "3.0.0",
+            "version": "2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ivanakimov/hashids.php.git",
-                "reference": "b6c61142bfe36d43740a5419d11c351dddac0458"
+                "reference": "7a945a5192d4a5c8888364970feece9bc26179df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ivanakimov/hashids.php/zipball/b6c61142bfe36d43740a5419d11c351dddac0458",
-                "reference": "b6c61142bfe36d43740a5419d11c351dddac0458",
+                "url": "https://api.github.com/repos/ivanakimov/hashids.php/zipball/7a945a5192d4a5c8888364970feece9bc26179df",
+                "reference": "7a945a5192d4a5c8888364970feece9bc26179df",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1.3"
+                "php": "^5.6.4 || ^7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^7.0"
+                "phpunit/phpunit": "^5.7 || ^6.3"
             },
             "suggest": {
-                "ext-bcmath": "Required to use BC Math arbitrary precision mathematics (*).",
+                "ext-bcmatch": "Required to use BC Math arbitrary precision mathematics (*).",
                 "ext-gmp": "Required to use GNU multiple precision mathematics (*)."
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.0-dev"
+                    "dev-master": "2.1-dev"
                 }
             },
             "autoload": {
@@ -420,7 +420,7 @@
                 "obfuscate",
                 "youtube"
             ],
-            "time": "2018-03-12T16:30:09+00:00"
+            "time": "2017-10-28T11:24:20+00:00"
         },
         {
             "name": "psr/http-message",
@@ -480,7 +480,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.1"
+        "php": "^7.0"
     },
     "platform-dev": []
 }

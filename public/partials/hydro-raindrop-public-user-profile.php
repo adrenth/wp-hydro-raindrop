@@ -1,4 +1,7 @@
 <?php
+
+declare( strict_types=1 );
+
 /**
  * Hydro Raindrop MFA user profile form extension.
  *
