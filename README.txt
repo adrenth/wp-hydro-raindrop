@@ -3,8 +3,8 @@ Contributors: adrenth
 Donate link: https://github.com/adrenth
 Tags: hydro, raindrop, mfa, 2fa
 Requires at least: 3.0.1
-Tested up to: 3.4
-Stable tag: 4.3
+Tested up to: 4.9.8
+Stable tag: 4.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.0
@@ -31,6 +31,9 @@ Download plugin from WordPress.org.
 Issues can be reported here: https://github.com/adrenth/wp-hydro-raindrop/issues
 
 == Changelog ==
+= 1.2.1 =
+* Update WP readme.txt
+
 = 1.2.0 =
 * Set PHP 7.0 requirement
 

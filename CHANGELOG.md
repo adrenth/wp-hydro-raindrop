@@ -1,5 +1,9 @@
 # wp-hydro-raindrop
 
+## 1.2.1
+
+- Update WP readme.txt
+
 ## 1.2.0
 
 - Set PHP 7.0 requirement
