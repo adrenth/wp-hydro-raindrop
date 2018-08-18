@@ -267,7 +267,7 @@ final class Hydro_Raindrop_Authenticate {
 			set_transient( $transient_id, $message, self::TIME_OUT );
 		}
 
-		return $message;
+		return (int) $message;
 
 	}
 
