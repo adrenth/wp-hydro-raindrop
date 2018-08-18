@@ -220,7 +220,7 @@ final class Hydro_Raindrop_Authenticate {
 
 		$custom_mfa_page = (int) get_option( 'hydro_raindrop_custom_mfa_page' );
 
-		if ( $custom_mfa_page > 0 ) {
+		if ( $custom_mfa_page > 0 && get_post_status( $custom_mfa_page ) === 'publish' ) {
 			$current_uri                   = home_url( add_query_arg( null, null ) );
 			$custom_hydro_raindrop_mfa_uri = get_permalink( $custom_mfa_page );
 
