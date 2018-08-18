@@ -66,18 +66,6 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function enqueue_styles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Hydro_Raindrop_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Hydro_Raindrop_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_style(
 			$this->plugin_name,
 			plugin_dir_url( __FILE__ ) . 'css/hydro-raindrop-admin.css',
@@ -98,6 +86,7 @@ class Hydro_Raindrop_Admin {
 		register_setting( 'hydro_api', 'hydro_raindrop_client_id' );
 		register_setting( 'hydro_api', 'hydro_raindrop_client_secret' );
 		register_setting( 'hydro_api', 'hydro_raindrop_environment' );
+			register_setting( 'hydro_api', 'hydro_raindrop_custom_mfa_page' );
 
 	}
 
@@ -158,6 +147,27 @@ class Hydro_Raindrop_Admin {
 	 * @return void
 	 */
 	public function admin_page() {
+
+		$args = array(
+			'post_type'      => 'page',
+			'posts_per_page' => -1,
+			'order'          => 'ASC',
+			'orderby'        => 'menu_order',
+		);
+
+		$parent = new WP_Query( $args );
+
+		$posts = [];
+
+		while ( $parent->have_posts() ) {
+			$parent->the_post();
+
+			$id = get_the_ID();
+
+			if ( $id ) {
+				$posts[ $id ] = get_the_title() . ' - ' . get_the_permalink();
+			}
+		}
 
 		include __DIR__ . '/../admin/partials/hydro-raindrop-admin-display.php';
 

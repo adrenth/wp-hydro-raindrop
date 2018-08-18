@@ -111,13 +111,9 @@ final class Hydro_Raindrop_Authenticate {
 				&& is_ssl()
 				&& ! wp_verify_nonce( $retrieved_nonce, 'hydro_raindrop_mfa' )
 		) {
-
 			$this->log( 'Nonce verification failed. Logging out.' );
-
 			wp_logout();
-
 			return;
-
 		}
 
 		// Allow user to cancel the MFA. Which results in a logout.
@@ -127,19 +123,20 @@ final class Hydro_Raindrop_Authenticate {
 				&& is_ssl()
 				&& wp_verify_nonce( $retrieved_nonce, 'hydro_raindrop_mfa' )
 		) {
-
+			// Unset the MFA cookie.
 			$this->unset_cookie();
 
+			// Delete all transient data which is used during the MFA process.
 			$this->delete_transient_data();
 
+			// When this is not the first time verification; the "Cancel button" will logout the user.
 			if ( ! $this->is_first_time_verify() ) {
 				wp_logout();
 			}
 
-			if ( wp_redirect( home_url() ) ) {
-				exit;
-			}
-
+			// @codingStandardsIgnoreLine
+			wp_redirect( home_url() );
+			exit;
 		}
 
 		// @codingStandardsIgnoreLine
@@ -149,39 +146,34 @@ final class Hydro_Raindrop_Authenticate {
 				&& is_user_logged_in()
 				&& $this->verify_signature_login()
 		) {
-
 			$user = wp_get_current_user();
 
+			// Set the MFA cookie for current user.
 			$this->set_cookie( $user );
 
+			// Delete all transient data which is used during the MFA process.
 			$this->delete_transient_data();
 
-			return;
-
+			// Redirect the user to it's intended location.
+			$this->redirect( $user );
 		}
 
 		if ( is_user_logged_in() ) {
-
 			$user = wp_get_current_user();
 
 			$user_requires_mfa = $this->user_requires_mfa( $user );
 
+			// MFA is enabled, but the current request is not SSL.
 			if ( $user_requires_mfa && ! is_ssl() ) {
-
 				$this->log( 'Non-SSL detected.' );
-
 				die( 'Non-SSL WordPress sites are not supported to perform Hydro Raindrop MFA.' );
-
 			}
 
+			// MFA is enabled, but there's not cookie present. Start the MFA flow.
 			if ( $user_requires_mfa && ! $this->verify_cookie( $user ) ) {
-
 				$this->log( 'Cookie not valid or not set.' );
-
 				$this->unset_cookie();
-
 				$this->start_mfa( $user );
-
 			}
 		}
 	}
@@ -210,17 +202,59 @@ final class Hydro_Raindrop_Authenticate {
 
 		$error = null;
 
-		// The authentication failed. Delete transient data to make sure a new message will be generated.
+		/*
+		 * The authentication failed. Delete transient data to make sure a new message will be generated.
+		 */
 		// @codingStandardsIgnoreLine
 		if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_REQUEST['hydro_raindrop'] ) ) {
-
 			$this->log( 'Authentication failed.' );
 
 			$error = 'Authentication failed.';
 
 			$this->delete_transient_data();
-
 		}
+
+		/*
+		 * Redirect to the Custom MFA page (if applicable).
+		 */
+
+		$custom_mfa_page = (int) get_option( 'hydro_raindrop_custom_mfa_page' );
+
+		if ( $custom_mfa_page > 0 ) {
+			$current_uri                   = home_url( add_query_arg( null, null ) );
+			$custom_hydro_raindrop_mfa_uri = get_permalink( $custom_mfa_page );
+
+			if ( $custom_hydro_raindrop_mfa_uri !== $current_uri ) {
+				// @codingStandardsIgnoreLine
+				wp_redirect( $custom_hydro_raindrop_mfa_uri );
+				exit;
+			}
+
+			return;
+		}
+
+		/*
+		 * Display the default (non customizable) MFA page.
+		 */
+
+		$message = self::get_message( $user );
+		$logo    = plugin_dir_url( __FILE__ ) . 'images/logo.svg';
+		$image   = plugin_dir_url( __FILE__ ) . 'images/security-code.png';
+
+		require __DIR__ . '/partials/hydro-raindrop-public-mfa.php';
+		exit;
+
+	}
+
+	/**
+	 * Get the Raindrop MFA message.
+	 *
+	 * @param WP_User $user Current logged in user.
+	 *
+	 * @return int
+	 * @throws Exception When message could not be generated.
+	 */
+	public static function get_message( WP_User $user ) : int {
 
 		$client = Hydro_Raindrop::get_raindrop_client();
 
@@ -229,18 +263,64 @@ final class Hydro_Raindrop_Authenticate {
 		$message = get_transient( $transient_id );
 
 		if ( ! $message ) {
-			$this->log( 'Generating new message.' );
-
 			$message = $client->generateMessage();
-
 			set_transient( $transient_id, $message, self::TIME_OUT );
 		}
 
-		$logo  = plugin_dir_url( __FILE__ ) . 'images/logo.svg';
-		$image = plugin_dir_url( __FILE__ ) . 'images/security-code.png';
+		return $message;
 
-		require __DIR__ . '/partials/hydro-raindrop-public-mfa.php';
+	}
 
+	/**
+	 * Redirects user after successful login and MFA.
+	 *
+	 * @param WP_User $user Current logged in user.
+	 *
+	 * @return void
+	 */
+	private function redirect( WP_User $user ) {
+
+		// @codingStandardsIgnoreLine
+		if ( isset( $_REQUEST['redirect_to'] ) ) {
+			// @codingStandardsIgnoreLine
+			$redirect_to = $_REQUEST['redirect_to'];
+		} else {
+			$redirect_to = admin_url();
+		}
+
+		// @codingStandardsIgnoreLine
+		$requested_redirect_to = $_REQUEST['redirect_to'] ?? '';
+
+		/**
+		 * Filters the login redirect URL.
+		 *
+		 * @since 3.0.0
+		 *
+		 * @param string           $redirect_to           The redirect destination URL.
+		 * @param string           $requested_redirect_to The requested redirect destination URL passed as a parameter.
+		 * @param WP_User|WP_Error $user                  WP_User object if login was successful, WP_Error object otherwise.
+		 */
+		$redirect_to = apply_filters( 'login_redirect', $redirect_to, $requested_redirect_to, $user );
+
+		if ( ( empty( $redirect_to ) || $redirect_to === 'wp-admin/' || $redirect_to === admin_url() ) ) {
+			/*
+			 * If the user doesn't belong to a blog, send them to user admin.
+			 * If the user can't edit posts, send them to their profile.
+			 */
+			if ( is_multisite() && ! get_active_blog_for_user( $user->ID ) && ! is_super_admin( $user->ID ) ) {
+				$redirect_to = user_admin_url();
+			} elseif ( is_multisite() && ! $user->has_cap( 'read' ) ) {
+				$redirect_to = get_dashboard_url( $user->ID );
+			} elseif ( ! $user->has_cap( 'edit_posts' ) ) {
+				$redirect_to = $user->has_cap( 'read' ) ? admin_url( 'profile.php' ) : home_url();
+			}
+
+			// @codingStandardsIgnoreLine
+			wp_redirect( $redirect_to );
+			exit();
+		}
+
+		wp_safe_redirect( $redirect_to );
 		exit;
 
 	}

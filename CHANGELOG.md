@@ -1,5 +1,9 @@
 # wp-hydro-raindrop
 
+## 1.3.0
+
+- Allow developers to make their own custom MFA page (with shortcodes).
+
 ## 1.2.1
 
 - Update WP readme.txt

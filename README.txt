@@ -31,6 +31,9 @@ Download plugin from WordPress.org.
 Issues can be reported here: https://github.com/adrenth/wp-hydro-raindrop/issues
 
 == Changelog ==
+= 1.3.0 =
+* Allow developers to make their own custom MFA page (with shortcodes).
+
 = 1.2.1 =
 * Update WP readme.txt
 

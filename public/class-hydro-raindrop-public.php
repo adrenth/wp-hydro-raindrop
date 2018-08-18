@@ -132,9 +132,7 @@ class Hydro_Raindrop_Public {
 
 		// Already errors present. Do nothing. User will not be updated to database.
 		if ( ! $user || ! $update || count( $errors->errors ) > 0 ) {
-
 			return;
-
 		}
 
 		$user_has_hydro_id = $this->user_has_hydro_id( $user );
@@ -142,22 +140,18 @@ class Hydro_Raindrop_Public {
 		// @codingStandardsIgnoreLine
 		$hydro_id = sanitize_text_field((string) ($_POST['hydro_id'] ?? ''));
 
-		if ( ! empty( $hydro_id )
-				&& ! $user_has_hydro_id ) {
+		if ( ! empty( $hydro_id ) && ! $user_has_hydro_id ) {
 
 			$client = Hydro_Raindrop::get_raindrop_client();
 
 			$length = strlen( $hydro_id );
 
 			if ( $length < 3 || $length > 32 ) {
-
 				$errors->add(
 					'hydro_id_invalid',
 					esc_html__( 'Please provide a valid HydroID.', 'wp-hydro-raindrop' )
 				);
-
 				return;
-
 			}
 
 			try {
@@ -173,9 +167,9 @@ class Hydro_Raindrop_Public {
 				// @codingStandardsIgnoreLine
 				update_user_meta( $user->ID, 'hydro_raindrop_confirmed', 0 );
 
-				if ( wp_redirect( self_admin_url( 'profile.php?hydro-raindrop-verify=1' ) ) ) {
-					exit;
-				}
+				// @codingStandardsIgnoreLine
+				wp_redirect( self_admin_url( 'profile.php?hydro-raindrop-verify=1' ) );
+				exit;
 
 			} catch ( UserAlreadyMappedToApplication $e) {
 				/*
@@ -201,9 +195,9 @@ class Hydro_Raindrop_Public {
 				// @codingStandardsIgnoreLine
 				update_user_meta( $user->ID, 'hydro_raindrop_confirmed', 0 );
 
-				if ( wp_redirect( self_admin_url( 'profile.php?hydro-raindrop-verify=1' ) ) ) {
-					exit;
-				}
+				// @codingStandardsIgnoreLine
+				wp_redirect( self_admin_url( 'profile.php?hydro-raindrop-verify=1' ) );
+				exit;
 
 			} catch ( RegisterUserFailed $e ) {
 
@@ -257,16 +251,79 @@ class Hydro_Raindrop_Public {
 	}
 
 	/**
-	 * @param stdClass $user
+	 * Open <form> tag for the custom MFA page.
+	 *
+	 * @return string
+	 */
+	public function shortcode_form_open(): string {
+		return '<form action="" method="post">';
+	}
+
+	/**
+	 * Closing </form> tag for the custom MFA page.
+	 *
+	 * @return string
+	 */
+	public function shortcode_form_close(): string {
+		return wp_nonce_field( 'hydro_raindrop_mfa' ) . '</form>';
+	}
+
+	/**
+	 * MFA digits for the custom MFA page.
+	 *
+	 * @return string
+	 * @throws Exception
+	 */
+	public function shortcode_digits(): string {
+		if ( ! is_user_logged_in() ) {
+			return '';
+		}
+
+		$user = wp_get_current_user();
+
+		return (string) Hydro_Raindrop_Authenticate::get_message( $user );
+	}
+
+	/**
+	 * MFA authorize button for the custom MFA page.
+	 *
+	 * @return string
+	 */
+	public function shortcode_button_authorize(): string {
+		return sprintf(
+			'<input type="submit" name="%s" class="%s" value="%s">',
+			'hydro_raindrop',
+			'hydro-raindrop-mfa-button-authorize',
+			'Authenticate'
+		);
+	}
+
+	/**
+	 * MFA cancel button for the custom MFA page.
+	 *
+	 * @return string
+	 */
+	public function shortcode_button_cancel(): string {
+		return sprintf(
+			'<input type="submit" name="%s" class="%s" value="%s">',
+			'cancel_hydro_raindrop',
+			'hydro-raindrop-mfa-button-cancel',
+			'Cancel'
+		);
+	}
+
+	/**
+	 * Whether given user has a Hydro ID.
+	 *
+	 * @param stdClass $user WP User object.
 	 *
 	 * @return bool
 	 */
 	private function user_has_hydro_id( stdClass $user ) : bool {
-
 		// @codingStandardsIgnoreLine
 		$hydro_id = (string) get_user_meta( $user->ID, 'hydro_id', true );
 
 		return ! empty( $hydro_id );
-
 	}
+
 }

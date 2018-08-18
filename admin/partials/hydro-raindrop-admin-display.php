@@ -43,46 +43,99 @@ if ( ! current_user_can( 'manage_options' ) ) {
 
 		<table class="form-table">
 			<tr valign="top">
-				<th scope="row">Application ID</th>
+				<th scope="row">
+					<label for="hydro_raindrop_application_id">
+						Application ID
+					</label>
+				</th>
 				<td>
 					<input type="text"
 							class="regular-text code"
+							id="hydro_raindrop_application_id"
 							name="hydro_raindrop_application_id"
 							value="<?php echo esc_attr( get_option( 'hydro_raindrop_application_id' ) ); ?>"
 							autocomplete="off"/>
 				</td>
 			</tr>
 			<tr valign="top">
-				<th scope="row">Client ID</th>
+				<th scope="row">
+					<label for="hydro_raindrop_client_id">
+						Client ID
+					</label>
+				</th>
 				<td>
 					<input type="text"
 							class="regular-text code"
+							id="hydro_raindrop_client_id"
 							name="hydro_raindrop_client_id"
 							value="<?php echo esc_attr( get_option( 'hydro_raindrop_client_id' ) ); ?>"
 							autocomplete="off"/>
 				</td>
 			</tr>
 			<tr valign="top">
-				<th scope="row">Client Secret</th>
+				<th scope="row">
+					<label for="hydro_raindrop_client_secret">
+						Client Secret
+					</label>
+				</th>
 				<td>
 					<input type="text"
 							class="regular-text code"
+							id="hydro_raindrop_client_secret"
 							name="hydro_raindrop_client_secret"
 							value="<?php echo esc_attr( get_option( 'hydro_raindrop_client_secret' ) ); ?>"
 							autocomplete="off"/>
 				</td>
 			</tr>
 			<tr valign="top">
-				<th scope="row">Environment</th>
+				<th scope="row">
+					<label for="hydro_raindrop_environment">
+						Environment
+					</label>
+				</th>
 				<td>
-					<select name="hydro_raindrop_environment" class="selection">
-						<option value="production"<?php if ( get_option( 'hydro_raindrop_environment' ) === 'production' ) { ?> selected<?php } ?>>
+					<select id="hydro_raindrop_environment"
+							name="hydro_raindrop_environment"
+							class="selection">
+						<option value="production"<?php if ( get_option( 'hydro_raindrop_environment' ) === 'production' ) : ?> selected<?php endif; ?>>
 							Production
 						</option>
-						<option value="sandbox"<?php if ( get_option( 'hydro_raindrop_environment' ) === 'sandbox' ) { ?> selected<?php } ?>>
+						<option value="sandbox"<?php if ( get_option( 'hydro_raindrop_environment' ) === 'sandbox' ) : ?> selected<?php endif; ?>>
 							Sandbox
 						</option>
 					</select>
+				</td>
+			</tr>
+		</table>
+
+		<h2 class="title">Customization</h2>
+
+		<table class="form-table">
+			<tr valign="top">
+				<th scope="row">
+					<label for="hydro_raindrop_custom_mfa_page">
+						Custom MFA page
+					</label>
+				</th>
+				<td>
+					<select id="hydro_raindrop_custom_mfa_page" name="hydro_raindrop_custom_mfa_page" class="selection">
+						<option value="0">Use default Hydro Raindrop MFA page</option>
+						<option value="0">---</option>
+						<?php
+						/**
+						 * Type hinting.
+						 *
+						 * @var array $posts
+						 */
+						foreach ( $posts as $post_id => $post ) :
+							?>
+							<?php $selected = (int) get_option( 'hydro_raindrop_custom_mfa_page' ) === $post_id ? ' selected' : ''; ?>
+							<option value="<?php echo esc_attr( $post_id ); ?>"<?php echo esc_attr( $selected ); ?>>
+								<?php echo esc_html( $post ); ?>
+							</option>
+						<?php endforeach; ?>
+					</select>
+					<p class="description">Please make sure you have implemented the <a href="#">documented</a> shortcodes on the Custom MFA page.</p>
 				</td>
 			</tr>
 		</table>

@@ -240,6 +240,17 @@ class Hydro_Raindrop {
 		 */
 		$this->loader->add_filter( 'clear_auth_cookie', $plugin_authenticate, 'unset_cookie' );
 
+		/**
+		 * Shortcodes
+		 *
+		 * @see https://codex.wordpress.org/Shortcode_API
+		 */
+		add_shortcode( 'hydro_raindrop_mfa_form_open', [ $plugin_public, 'shortcode_form_open' ] );
+		add_shortcode( 'hydro_raindrop_mfa_form_close', [ $plugin_public, 'shortcode_form_close' ] );
+		add_shortcode( 'hydro_raindrop_mfa_digits', [ $plugin_public, 'shortcode_digits' ] );
+		add_shortcode( 'hydro_raindrop_mfa_button_authorize', [ $plugin_public, 'shortcode_button_authorize' ] );
+		add_shortcode( 'hydro_raindrop_mfa_button_cancel', [ $plugin_public, 'shortcode_button_cancel' ] );
+
 	}
 
 	/**
@@ -301,14 +312,14 @@ class Hydro_Raindrop {
 		if ( ! self::$raindrop_client ) {
 			self::$raindrop_client = new Client(
 				new ApiSettings(
-					get_option( 'hydro_raindrop_client_id' ),
-					get_option( 'hydro_raindrop_client_secret' ),
+					(string) get_option( 'hydro_raindrop_client_id' ),
+					(string) get_option( 'hydro_raindrop_client_secret' ),
 					get_option( 'hydro_raindrop_environment' ) === 'sandbox'
 						? new SandboxEnvironment()
 						: new ProductionEnvironment()
 				),
 				new Hydro_Raindrop_TransientTokenStorage(),
-				get_option( 'hydro_raindrop_application_id' )
+				(string) get_option( 'hydro_raindrop_application_id' )
 			);
 		}
 
