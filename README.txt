@@ -1,6 +1,6 @@
 === WP Hydro Raindrop ===
 Contributors: adrenth
-Donate link: https://github.com/adrenth
+Donate link: https://www.paypal.me/adrenth
 Tags: hydro, raindrop, mfa, 2fa
 Requires at least: 3.0.1
 Tested up to: 4.9.8

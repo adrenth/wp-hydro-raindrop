@@ -8,13 +8,15 @@
  * @package    Hydro_Raindrop
  */
 
-// If uninstall not called from WordPress, then exit.
+/**
+ * If uninstall not called from WordPress, then exit.
+ */
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
 /**
- * Setup composer autoloading
+ * Setup composer autoloading.
  */
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -26,6 +28,7 @@ delete_option( 'hydro_raindrop_client_id' );
 delete_option( 'hydro_raindrop_client_secret' );
 delete_option( 'hydro_raindrop_environment' );
 delete_option( 'hydro_raindrop_access_token_success' );
+delete_option( 'hydro_raindrop_custom_mfa_page' );
 
 /**
  * Delete user metadata by for this plugin.
