@@ -183,7 +183,10 @@ final class Hydro_Raindrop_Authenticate {
 		// If user is logged in and visits the MFA page: redirect to home.
 		$custom_mfa_page = (int) get_option( 'hydro_raindrop_custom_mfa_page' );
 
-		if ( $custom_mfa_page > 0 && get_post_status( $custom_mfa_page ) === 'publish' ) {
+		if ( $custom_mfa_page > 0
+			&& get_post_status( $custom_mfa_page ) === 'publish'
+			&& $this->verify_cookie( $user )
+		) {
 			$current_uri                   = home_url( add_query_arg( null, null ) );
 			$custom_hydro_raindrop_mfa_uri = get_permalink( $custom_mfa_page );
 
@@ -242,7 +245,7 @@ final class Hydro_Raindrop_Authenticate {
 			$current_uri                   = home_url( add_query_arg( null, null ) );
 			$custom_hydro_raindrop_mfa_uri = get_permalink( $custom_mfa_page );
 
-			if ( $custom_hydro_raindrop_mfa_uri !== $current_uri ) {
+			if ( strpos( $current_uri, $custom_hydro_raindrop_mfa_uri ) !== 0 ) {
 				// @codingStandardsIgnoreLine
 				wp_redirect( $custom_hydro_raindrop_mfa_uri );
 				exit;
