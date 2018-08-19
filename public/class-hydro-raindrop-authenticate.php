@@ -139,6 +139,7 @@ final class Hydro_Raindrop_Authenticate {
 			exit;
 		}
 
+		// Verify MFA message
 		// @codingStandardsIgnoreLine
 		if ( isset( $_POST['hydro_raindrop'] )
 				&& $is_post
@@ -158,24 +159,41 @@ final class Hydro_Raindrop_Authenticate {
 			$this->redirect( $user );
 		}
 
-		if ( is_user_logged_in() ) {
-			$user = wp_get_current_user();
+		if ( ! is_user_logged_in() ) {
+			return;
+		}
 
-			$user_requires_mfa = $this->user_requires_mfa( $user );
+		$user = wp_get_current_user();
 
-			// MFA is enabled, but the current request is not SSL.
-			if ( $user_requires_mfa && ! is_ssl() ) {
-				$this->log( 'Non-SSL detected.' );
-				die( 'Non-SSL WordPress sites are not supported to perform Hydro Raindrop MFA.' );
-			}
+		$user_requires_mfa = $this->user_requires_mfa( $user );
 
-			// MFA is enabled, but there's not cookie present. Start the MFA flow.
-			if ( $user_requires_mfa && ! $this->verify_cookie( $user ) ) {
-				$this->log( 'Cookie not valid or not set.' );
-				$this->unset_cookie();
-				$this->start_mfa( $user );
+		// MFA is enabled, but the current request is not SSL.
+		if ( $user_requires_mfa && ! is_ssl() ) {
+			$this->log( 'Non-SSL detected.' );
+			die( 'Non-SSL WordPress sites are not supported to perform Hydro Raindrop MFA.' );
+		}
+
+		// MFA is enabled, but there's not cookie present. Start the MFA flow.
+		if ( $user_requires_mfa && ! $this->verify_cookie( $user ) ) {
+			$this->log( 'Cookie not valid or not set.' );
+			$this->unset_cookie();
+			$this->start_mfa( $user );
+		}
+
+		// If user is logged in and visits the MFA page: redirect to home.
+		$custom_mfa_page = (int) get_option( 'hydro_raindrop_custom_mfa_page' );
+
+		if ( $custom_mfa_page > 0 && get_post_status( $custom_mfa_page ) === 'publish' ) {
+			$current_uri                   = home_url( add_query_arg( null, null ) );
+			$custom_hydro_raindrop_mfa_uri = get_permalink( $custom_mfa_page );
+
+			if ( $custom_hydro_raindrop_mfa_uri === $current_uri ) {
+				// @codingStandardsIgnoreLine
+				wp_redirect( home_url() );
+				exit;
 			}
 		}
+
 	}
 
 	/**
