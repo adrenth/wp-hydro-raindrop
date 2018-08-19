@@ -51,43 +51,6 @@ final class Hydro_Raindrop_Authenticate {
 	}
 
 	/**
-	 * Generates the salt which will be used for hashing and encrypting.
-	 *
-	 * @return string
-	 */
-	private function get_salt() : string {
-
-		if ( defined( 'AUTH_SALT' ) ) {
-			return AUTH_SALT;
-		}
-
-		$salt = get_option( 'hydro_raindrop_salt', '' );
-
-		if ( empty( $salt ) ) {
-			$salt = wp_generate_password( 64, true, true );
-			update_option( 'hydro_raindrop_salt', $salt );
-		}
-
-		return $salt;
-	}
-
-	/**
-	 * Log message.
-	 *
-	 * @param string $message The message to log.
-	 *
-	 * @return void
-	 */
-	private function log( string $message ) {
-
-		if ( WP_DEBUG && WP_DEBUG_LOG ) {
-			// @codingStandardsIgnoreLine
-			error_log( $this->plugin_name . ' (' . $this->version . '): ' . $message );
-		}
-
-	}
-
-	/**
 	 * Verify request.
 	 *
 	 * @return void
@@ -99,6 +62,81 @@ final class Hydro_Raindrop_Authenticate {
 			return;
 		}
 
+		$this->verify_post_request();
+
+		if ( ! is_user_logged_in() ) {
+			// Disallow anonymous access to the custom MFA page.
+			if ( $this->is_hydro_raindrop_mfa_custom_page_enabled()
+					&& $this->get_custom_mfa_page_url() === $this->get_current_url()
+			) {
+				// @codingStandardsIgnoreLine
+				wp_redirect( home_url() );
+				exit;
+			}
+
+			return;
+		}
+
+		$user = wp_get_current_user();
+
+		$user_requires_mfa = $this->user_requires_mfa( $user );
+
+		// MFA is enabled, but the current request is not SSL.
+		if ( $user_requires_mfa && ! is_ssl() ) {
+			$this->log( 'Non-SSL detected.' );
+			die( 'Non-SSL WordPress sites are not supported to perform Hydro Raindrop MFA.' );
+		}
+
+		// MFA is enabled, but there's not cookie present. Start the MFA flow.
+		if ( $user_requires_mfa && ! $this->verify_cookie( $user ) ) {
+			$this->log( 'Cookie not valid or not set.' );
+			$this->unset_cookie();
+			$this->start_mfa( $user );
+		}
+
+		// If user is logged in and visits the MFA page: redirect to home.
+		if ( $this->is_hydro_raindrop_mfa_custom_page_enabled()
+				&& $this->verify_cookie( $user )
+				&& $this->get_custom_mfa_page_url() === $this->get_current_url()
+		) {
+			// @codingStandardsIgnoreLine
+			wp_redirect( home_url() );
+			exit;
+		}
+
+	}
+
+	/**
+	 * Get the Raindrop MFA message.
+	 *
+	 * @param WP_User $user Current logged in user.
+	 *
+	 * @return int
+	 * @throws Exception When message could not be generated.
+	 */
+	public static function get_message( WP_User $user ) : int {
+
+		$client = Hydro_Raindrop::get_raindrop_client();
+
+		$transient_id = sprintf( self::MESSAGE_TRANSIENT_ID, $user->ID );
+
+		$message = get_transient( $transient_id );
+
+		if ( ! $message ) {
+			$message = $client->generateMessage();
+			set_transient( $transient_id, $message, self::TIME_OUT );
+		}
+
+		return (int) $message;
+
+	}
+
+	/**
+	 * Verify POST request for Hydro Raindrop specifics.
+	 *
+	 * @return void
+	 */
+	private function verify_post_request() {
 		// @codingStandardsIgnoreLine
 		$is_post = $_SERVER['REQUEST_METHOD'] === 'POST';
 
@@ -112,7 +150,9 @@ final class Hydro_Raindrop_Authenticate {
 				&& ! wp_verify_nonce( $retrieved_nonce, 'hydro_raindrop_mfa' )
 		) {
 			$this->log( 'Nonce verification failed. Logging out.' );
+
 			wp_logout();
+
 			return;
 		}
 
@@ -159,55 +199,6 @@ final class Hydro_Raindrop_Authenticate {
 			$this->redirect( $user );
 		}
 
-		if ( ! is_user_logged_in() ) {
-			return;
-		}
-
-		$user = wp_get_current_user();
-
-		$user_requires_mfa = $this->user_requires_mfa( $user );
-
-		// MFA is enabled, but the current request is not SSL.
-		if ( $user_requires_mfa && ! is_ssl() ) {
-			$this->log( 'Non-SSL detected.' );
-			die( 'Non-SSL WordPress sites are not supported to perform Hydro Raindrop MFA.' );
-		}
-
-		// MFA is enabled, but there's not cookie present. Start the MFA flow.
-		if ( $user_requires_mfa && ! $this->verify_cookie( $user ) ) {
-			$this->log( 'Cookie not valid or not set.' );
-			$this->unset_cookie();
-			$this->start_mfa( $user );
-		}
-
-		// If user is logged in and visits the MFA page: redirect to home.
-		$custom_mfa_page = (int) get_option( 'hydro_raindrop_custom_mfa_page' );
-
-		if ( $custom_mfa_page > 0
-			&& get_post_status( $custom_mfa_page ) === 'publish'
-			&& $this->verify_cookie( $user )
-		) {
-			$current_uri                   = home_url( add_query_arg( null, null ) );
-			$custom_hydro_raindrop_mfa_uri = get_permalink( $custom_mfa_page );
-
-			if ( $custom_hydro_raindrop_mfa_uri === $current_uri ) {
-				// @codingStandardsIgnoreLine
-				wp_redirect( home_url() );
-				exit;
-			}
-		}
-
-	}
-
-	/**
-	 * Whether the Hydro Raindrop MFA is enabled.
-	 *
-	 * @return bool
-	 */
-	public function is_hydro_raindrop_mfa_enabled() : bool {
-
-		return true;
-
 	}
 
 	/**
@@ -217,7 +208,7 @@ final class Hydro_Raindrop_Authenticate {
 	 *
 	 * @throws Exception If message could not be generated.
 	 */
-	public function start_mfa( WP_User $user ) {
+	private function start_mfa( WP_User $user ) {
 
 		$this->log( 'Start MFA.' );
 
@@ -238,16 +229,10 @@ final class Hydro_Raindrop_Authenticate {
 		/*
 		 * Redirect to the Custom MFA page (if applicable).
 		 */
-
-		$custom_mfa_page = (int) get_option( 'hydro_raindrop_custom_mfa_page' );
-
-		if ( $custom_mfa_page > 0 && get_post_status( $custom_mfa_page ) === 'publish' ) {
-			$current_uri                   = home_url( add_query_arg( null, null ) );
-			$custom_hydro_raindrop_mfa_uri = get_permalink( $custom_mfa_page );
-
-			if ( strpos( $current_uri, $custom_hydro_raindrop_mfa_uri ) !== 0 ) {
+		if ( $this->is_hydro_raindrop_mfa_custom_page_enabled() ) {
+			if ( strpos( $this->get_current_url(), $this->get_custom_mfa_page_url() ) !== 0 ) {
 				// @codingStandardsIgnoreLine
-				wp_redirect( $custom_hydro_raindrop_mfa_uri );
+				wp_redirect( $this->get_custom_mfa_page_url() );
 				exit;
 			}
 
@@ -257,38 +242,12 @@ final class Hydro_Raindrop_Authenticate {
 		/*
 		 * Display the default (non customizable) MFA page.
 		 */
-
 		$message = self::get_message( $user );
 		$logo    = plugin_dir_url( __FILE__ ) . 'images/logo.svg';
 		$image   = plugin_dir_url( __FILE__ ) . 'images/security-code.png';
 
 		require __DIR__ . '/partials/hydro-raindrop-public-mfa.php';
 		exit;
-
-	}
-
-	/**
-	 * Get the Raindrop MFA message.
-	 *
-	 * @param WP_User $user Current logged in user.
-	 *
-	 * @return int
-	 * @throws Exception When message could not be generated.
-	 */
-	public static function get_message( WP_User $user ) : int {
-
-		$client = Hydro_Raindrop::get_raindrop_client();
-
-		$transient_id = sprintf( self::MESSAGE_TRANSIENT_ID, $user->ID );
-
-		$message = get_transient( $transient_id );
-
-		if ( ! $message ) {
-			$message = $client->generateMessage();
-			set_transient( $transient_id, $message, self::TIME_OUT );
-		}
-
-		return (int) $message;
 
 	}
 
@@ -350,14 +309,17 @@ final class Hydro_Raindrop_Authenticate {
 	 * Set cookie for current user.
 	 *
 	 * @param WP_User $user Current logged in user.
-	 *
-	 * @throws \Hashids\HashidsException When hashing fails.
 	 */
 	private function set_cookie( WP_User $user ) {
 
 		$this->log( 'Setting SSL cookie.' );
 
-		$cookie = $this->get_cookie_value( $user, self::COOKIE_NAME );
+		try {
+			$cookie = $this->get_cookie_value( $user, self::COOKIE_NAME );
+		} catch ( \Hashids\HashidsException $e ) {
+			$this->log( 'Could not hash data for cookie. Setting cookie failed.' );
+			return;
+		}
 
 		// @codingStandardsIgnoreLine
 		$result = setcookie( self::COOKIE_NAME, $cookie, 0, COOKIEPATH, (string) COOKIE_DOMAIN, true, true );
@@ -374,43 +336,6 @@ final class Hydro_Raindrop_Authenticate {
 				$this->log( 'Could not set cookie.' );
 			}
 		}
-
-	}
-
-	/**
-	 * Get HTTP cookie value.
-	 *
-	 * @param WP_User $user        Currently logged in user.
-	 * @param string  $cookie_name Cookie name.
-	 *
-	 * @return string
-	 * @throws \Hashids\HashidsException When user ID could not be hashed.
-	 */
-	private function get_cookie_value( WP_User $user, string $cookie_name ) : string {
-
-		$salt = $this->get_salt();
-
-		// @codingStandardsIgnoreLine
-		$hydro_id  = $this->get_user_hydro_id( $user );
-		$user_hash = ( new \Hashids\Hashids( $salt, 64 ) )->encode( $user->ID );
-		$expire    = strtotime( '+24 hours' );
-		$value     = base64_encode( sprintf( '%s|%s|%s|%s', $cookie_name, $user_hash, $hydro_id, $expire ) );
-		$signature = $this->hash_mac( $value );
-
-		return $value . '|' . $signature;
-	}
-
-	/**
-	 * Get the users' Hydro ID.
-	 *
-	 * @param WP_User $user Current logged in user.
-	 *
-	 * @return string
-	 */
-	private function get_user_hydro_id( WP_User $user ) : string {
-
-		// @codingStandardsIgnoreLine
-		return (string) get_user_meta( $user->ID, 'hydro_id', true );
 
 	}
 
@@ -460,9 +385,9 @@ final class Hydro_Raindrop_Authenticate {
 		// @codingStandardsIgnoreLine
 		list ( $b64_value, $cookie_signature ) = $cookie_list;
 
-		$signature = $this->hash_mac( $b64_value );
+		$signature = $this->get_hash_hmac( $b64_value );
 
-		if ( $this->hash_mac( $signature ) !== $this->hash_mac( $cookie_signature ) ) {
+		if ( $this->get_hash_hmac( $signature ) !== $this->get_hash_hmac( $cookie_signature ) ) {
 			$this->log( 'Cookie signature invalid.' );
 
 			return false;
@@ -501,13 +426,132 @@ final class Hydro_Raindrop_Authenticate {
 	}
 
 	/**
+	 * Get HTTP cookie value.
+	 *
+	 * @param WP_User $user        Currently logged in user.
+	 * @param string  $cookie_name Cookie name.
+	 *
+	 * @return string
+	 * @throws \Hashids\HashidsException When user ID could not be hashed.
+	 */
+	private function get_cookie_value( WP_User $user, string $cookie_name ) : string {
+
+		$salt = $this->get_salt();
+
+		// @codingStandardsIgnoreLine
+		$hydro_id  = $this->get_user_hydro_id( $user );
+		$user_hash = ( new \Hashids\Hashids( $salt, 64 ) )->encode( $user->ID );
+		$expire    = strtotime( '+24 hours' );
+		$value     = base64_encode( sprintf( '%s|%s|%s|%s', $cookie_name, $user_hash, $hydro_id, $expire ) );
+		$signature = $this->get_hash_hmac( $value );
+
+		return $value . '|' . $signature;
+	}
+
+	/**
+	 * Get the users' Hydro ID.
+	 *
+	 * @param WP_User $user Current logged in user.
+	 *
+	 * @return string
+	 */
+	private function get_user_hydro_id( WP_User $user ) : string {
+
+		// @codingStandardsIgnoreLine
+		return (string) get_user_meta( $user->ID, 'hydro_id', true );
+
+	}
+
+	/**
+	 * Get the custom MFA page URL.
+	 *
+	 * @return string
+	 */
+	private function get_custom_mfa_page_url() : string {
+
+		$custom_mfa_page = (int) get_option( 'hydro_raindrop_custom_mfa_page' );
+
+		return $custom_mfa_page > 0 ? get_permalink( $custom_mfa_page ) : '';
+
+	}
+
+	/**
+	 * Get the current URL.
+	 *
+	 * @return string
+	 */
+	private function get_current_url() : string {
+
+		return home_url( add_query_arg( null, null ) );
+
+	}
+
+	/**
+	 * Generates the salt which will be used for hashing and encrypting.
+	 *
+	 * @return string
+	 */
+	private function get_salt() : string {
+
+		if ( defined( 'AUTH_SALT' ) ) {
+			return AUTH_SALT;
+		}
+
+		$salt = get_option( 'hydro_raindrop_salt', '' );
+
+		if ( empty( $salt ) ) {
+			$salt = wp_generate_password( 64, true, true );
+			update_option( 'hydro_raindrop_salt', $salt );
+		}
+
+		return $salt;
+
+	}
+
+	/**
+	 * Whether the Hydro Raindrop MFA is enabled.
+	 *
+	 * @return bool
+	 */
+	private function is_hydro_raindrop_mfa_enabled() : bool {
+
+		return true;
+
+	}
+
+	/**
+	 * Checks if MFA page is configured as custom.
+	 *
+	 * @return bool
+	 */
+	private function is_hydro_raindrop_mfa_custom_page_enabled() : bool {
+
+		$custom_mfa_page = (int) get_option( 'hydro_raindrop_custom_mfa_page' );
+
+		return $custom_mfa_page > 0 && get_post_status( $custom_mfa_page ) === 'publish';
+
+	}
+
+	/**
+	 * Whether this is the first time verification.
+	 *
+	 * @return bool
+	 */
+	private function is_first_time_verify() : bool {
+
+		// @codingStandardsIgnoreLine
+		return (int) ($_GET['hydro-raindrop-verify'] ?? 0) === 1;
+
+	}
+
+	/**
 	 * Perform Hash Mac on data and return hash.
 	 *
 	 * @param string $data Data to hash.
 	 *
 	 * @return string
 	 */
-	private function hash_mac( string $data ) : string {
+	private function get_hash_hmac( string $data ) : string {
 
 		return hash_hmac( 'sha1', $data, $this->get_salt() );
 
@@ -534,18 +578,6 @@ final class Hydro_Raindrop_Authenticate {
 		return ! empty( $hydro_id )
 			&& $hydro_mfa_enabled
 			&& ( $hydro_raindrop_confirmed || $this->is_first_time_verify() );
-
-	}
-
-	/**
-	 * Whether this is the first time verification.
-	 *
-	 * @return bool
-	 */
-	private function is_first_time_verify() : bool {
-
-		// @codingStandardsIgnoreLine
-		return (int) ($_GET['hydro-raindrop-verify'] ?? 0) === 1;
 
 	}
 
@@ -604,6 +636,22 @@ final class Hydro_Raindrop_Authenticate {
 			return true;
 		} catch ( VerifySignatureFailed $e ) {
 			return false;
+		}
+
+	}
+
+	/**
+	 * Log message.
+	 *
+	 * @param string $message The message to log.
+	 *
+	 * @return void
+	 */
+	private function log( string $message ) {
+
+		if ( WP_DEBUG && WP_DEBUG_LOG ) {
+			// @codingStandardsIgnoreLine
+			error_log( $this->plugin_name . ' (' . $this->version . '): ' . $message );
 		}
 
 	}
