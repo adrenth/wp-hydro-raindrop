@@ -86,7 +86,7 @@ class Hydro_Raindrop_Admin {
 		register_setting( 'hydro_api', 'hydro_raindrop_client_id' );
 		register_setting( 'hydro_api', 'hydro_raindrop_client_secret' );
 		register_setting( 'hydro_api', 'hydro_raindrop_environment' );
-			register_setting( 'hydro_api', 'hydro_raindrop_custom_mfa_page' );
+		register_setting( 'hydro_api', 'hydro_raindrop_custom_mfa_page' );
 
 	}
 

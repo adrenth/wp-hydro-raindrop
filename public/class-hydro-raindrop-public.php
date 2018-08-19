@@ -255,7 +255,7 @@ class Hydro_Raindrop_Public {
 	 *
 	 * @return string
 	 */
-	public function shortcode_form_open(): string {
+	public function shortcode_form_open() : string {
 		return '<form action="" method="post">';
 	}
 
@@ -264,7 +264,7 @@ class Hydro_Raindrop_Public {
 	 *
 	 * @return string
 	 */
-	public function shortcode_form_close(): string {
+	public function shortcode_form_close() : string {
 		return wp_nonce_field( 'hydro_raindrop_mfa' ) . '</form>';
 	}
 
@@ -274,7 +274,7 @@ class Hydro_Raindrop_Public {
 	 * @return string
 	 * @throws Exception
 	 */
-	public function shortcode_digits(): string {
+	public function shortcode_digits() : string {
 		if ( ! is_user_logged_in() ) {
 			return '';
 		}
@@ -289,7 +289,7 @@ class Hydro_Raindrop_Public {
 	 *
 	 * @return string
 	 */
-	public function shortcode_button_authorize(): string {
+	public function shortcode_button_authorize() : string {
 		return sprintf(
 			'<input type="submit" name="%s" class="%s" value="%s">',
 			'hydro_raindrop',
@@ -303,7 +303,7 @@ class Hydro_Raindrop_Public {
 	 *
 	 * @return string
 	 */
-	public function shortcode_button_cancel(): string {
+	public function shortcode_button_cancel() : string {
 		return sprintf(
 			'<input type="submit" name="%s" class="%s" value="%s">',
 			'cancel_hydro_raindrop',
