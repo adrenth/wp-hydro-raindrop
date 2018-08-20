@@ -232,6 +232,7 @@ class Hydro_Raindrop {
 		 * on it for all sorts of reasons (e.g. they need a user, a taxonomy, etc.).
 		 */
 		$this->loader->add_filter( 'init', $plugin_authenticate, 'verify' );
+		$this->loader->add_filter( 'init', $plugin_public, 'manage_hydro_id' );
 
 		/**
 		 * Filter: clear_auth_cookie
@@ -250,7 +251,7 @@ class Hydro_Raindrop {
 		add_shortcode( 'hydro_raindrop_mfa_digits', [ $plugin_public, 'shortcode_digits' ] );
 		add_shortcode( 'hydro_raindrop_mfa_button_authorize', [ $plugin_public, 'shortcode_button_authorize' ] );
 		add_shortcode( 'hydro_raindrop_mfa_button_cancel', [ $plugin_public, 'shortcode_button_cancel' ] );
-
+		add_shortcode( 'hydro_raindrop_manage_hydro_id', [ $plugin_public, 'shortcode_manage_hydro_id' ] );
 	}
 
 	/**

@@ -46,6 +46,14 @@ class Hydro_Raindrop_Public {
 	private $version;
 
 	/**
+	 * Errors occurred when managing Hydro ID.
+	 *
+	 * @var WP_Error|null
+	 * @since 1.3.0
+	 */
+	private $manage_hydro_id_errors;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
@@ -135,6 +143,45 @@ class Hydro_Raindrop_Public {
 			return;
 		}
 
+		$this->handle_hydro_id_form( $errors, $user );
+
+	}
+
+	/**
+	 * Handles saving of the Hydro ID.
+	 *
+	 * @return string
+	 */
+	public function manage_hydro_id() {
+
+		if ( ! is_user_logged_in() ) {
+			return '';
+		}
+
+		$user = wp_get_current_user();
+
+		// @codingStandardsIgnoreLine
+		$retrieved_nonce = $_POST['_hydro_id_nonce'] ?? null;
+
+		$errors = new WP_Error();
+
+		// @codingStandardsIgnoreLine
+		if ( $retrieved_nonce && wp_verify_nonce( $retrieved_nonce, 'hydro_raindrop_hydro_id' ) ) {
+			$this->handle_hydro_id_form( $errors, $user->data );
+		}
+
+		$this->manage_hydro_id_errors = $errors;
+
+	}
+
+	/**
+	 * Handle the Hydro ID form. Must be handled before the headers are sent.
+	 *
+	 * @param WP_Error $errors Error collection from edit_user().
+	 * @param stdClass $user   User object being edited.
+	 */
+	public function handle_hydro_id_form( &$errors, stdClass $user ) {
+
 		$user_has_hydro_id = $this->user_has_hydro_id( $user );
 
 		// @codingStandardsIgnoreLine
@@ -154,6 +201,17 @@ class Hydro_Raindrop_Public {
 				return;
 			}
 
+			$hydro_raindrop_custom_mfa_page = (int) get_option( 'hydro_raindrop_custom_mfa_page' );
+			$hydro_raindrop_custom_mfa_url  = get_permalink( $hydro_raindrop_custom_mfa_page );
+
+			if ( $hydro_raindrop_custom_mfa_page > 0
+					&& get_post_status( $hydro_raindrop_custom_mfa_page ) === 'publish'
+			) {
+				$redirect_url = $hydro_raindrop_custom_mfa_url . '?hydro-raindrop-verify=1';
+			} else {
+				$redirect_url = self_admin_url( 'profile.php?hydro-raindrop-verify=1' );
+			}
+
 			try {
 
 				$client->registerUser( sanitize_text_field( $hydro_id ) );
@@ -168,7 +226,7 @@ class Hydro_Raindrop_Public {
 				update_user_meta( $user->ID, 'hydro_raindrop_confirmed', 0 );
 
 				// @codingStandardsIgnoreLine
-				wp_redirect( self_admin_url( 'profile.php?hydro-raindrop-verify=1' ) );
+				wp_redirect( $redirect_url );
 				exit;
 
 			} catch ( UserAlreadyMappedToApplication $e) {
@@ -196,7 +254,7 @@ class Hydro_Raindrop_Public {
 				update_user_meta( $user->ID, 'hydro_raindrop_confirmed', 0 );
 
 				// @codingStandardsIgnoreLine
-				wp_redirect( self_admin_url( 'profile.php?hydro-raindrop-verify=1' ) );
+				wp_redirect( $redirect_url );
 				exit;
 
 			} catch ( RegisterUserFailed $e ) {
@@ -294,7 +352,7 @@ class Hydro_Raindrop_Public {
 			'<input type="submit" name="%s" class="%s" value="%s">',
 			'hydro_raindrop',
 			'hydro-raindrop-mfa-button-authorize',
-			'Authenticate'
+			esc_html__( 'Authenticate', 'wp-hydro-raindrop' )
 		);
 	}
 
@@ -308,8 +366,35 @@ class Hydro_Raindrop_Public {
 			'<input type="submit" name="%s" class="%s" value="%s">',
 			'cancel_hydro_raindrop',
 			'hydro-raindrop-mfa-button-cancel',
-			'Cancel'
+			esc_html__( 'Cancel', 'wp-hydro-raindrop' )
 		);
+	}
+
+	/**
+	 * Manage Hydro ID.
+	 *
+	 * @return string
+	 */
+	public function shortcode_manage_hydro_id() : string {
+
+		if ( ! is_user_logged_in() ) {
+			return '';
+		}
+
+		$user = wp_get_current_user();
+
+		$errors = $this->manage_hydro_id_errors;
+
+		ob_start();
+
+		include __DIR__ . '/partials/hydro-raindrop-public-manage-hydro-id.php';
+
+		$output = ob_get_contents();
+
+		ob_end_clean();
+
+		return $output;
+
 	}
 
 	/**

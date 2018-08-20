@@ -25,7 +25,7 @@ declare( strict_types=1 );
 <head>
 	<meta http-equiv="Content-Type"
 			content="<?php bloginfo( 'html_type' ); ?>; charset=<?php bloginfo( 'charset' ); ?>"/>
-	<title>Hydro Raindrop MFA</title>
+	<title><?php esc_html_e( 'Hydro Raindrop MFA', 'wp-hydro-raindrop' ); ?></title>
 	<?php
 		wp_enqueue_style( 'login' );
 		do_action( 'login_enqueue_scripts' );
@@ -57,7 +57,7 @@ $classes = apply_filters( 'login_body_class', $classes );
 		</p>
 		<p>
 			<label for="hydro_digits">
-				Enter security code into the Hydro app.
+				<?php esc_html_e( 'Enter security code into the Hydro app.', 'wp-hydro-raindrop' ); ?>
 			</label>
 		</p>
 		<div id="hydro_digits" class="message-digits">
@@ -71,13 +71,13 @@ $classes = apply_filters( 'login_body_class', $classes );
 		<input type="submit"
 				name="cancel_hydro_raindrop"
 				class="button button-secondary button-large button-cancel"
-				value="Cancel">
+				value="<?php esc_html_e( 'Cancel', 'wp-hydro-raindrop' ); ?>">
 		<p class="submit">
 			<?php wp_nonce_field( 'hydro_raindrop_mfa' ); ?>
 			<input type="submit"
 					name="hydro_raindrop"
 					class="button button-primary button-large"
-					value="Authenticate">
+					value="<?php esc_html_e( 'Authenticate', 'wp-hydro-raindrop' ); ?>">
 		</p>
 	</form>
 </div>
