@@ -3,7 +3,7 @@
 declare( strict_types=1 );
 
 /**
- * Sub-partial: Hydro Raindrop Hydro ID form.
+ * Sub-partial: Hydro Raindrop HydroID form.
  *
  * @package    Hydro_Raindrop
  * @author     Alwin Drenth <adrenth@gmail.com>, Ronald Drenth <ronalddrenth@gmail.com>

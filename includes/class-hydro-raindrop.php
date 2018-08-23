@@ -95,52 +95,38 @@ class Hydro_Raindrop {
 	/**
 	 * Load the required dependencies for this plugin.
 	 *
-	 * Include the following files that make up the plugin:
-	 *
-	 * - Hydro_Raindrop_Loader. Orchestrates the hooks of the plugin.
-	 * - Hydro_Raindrop_TransientTokenStorage. Implements the TokenStorage from the Raindrop SDK package.
-	 * - Hydro_Raindrop_i18n. Defines internationalization functionality.
-	 * - Hydro_Raindrop_Admin. Defines all hooks for the admin area.
-	 * - Hydro_Raindrop_Public. Defines all hooks for the public side of the site.
-	 *
-	 * Create an instance of the loader which will be used to register the hooks
-	 * with WordPress.
-	 *
 	 * @since    1.0.0
 	 * @access   private
 	 */
 	private function load_dependencies() {
 
-		/**
-		 * The class responsible for orchestrating the actions and filters of the core plugin.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-hydro-raindrop-loader.php';
+		$includes = [
+			// The class responsible for orchestrating the actions and filters of the core plugin.
+			__DIR__ . '/class-hydro-raindrop-loader.php',
+			// The class responsible for storing the access token from the Raindrop API.
+			__DIR__ . '/class-hydro-raindrop-token-storage.php',
+			// The class responsible for defining internationalization functionality of the plugin.
+			__DIR__ . '/class-hydro-raindrop-i18n.php',
+			// The class with some convenient helper methods.
+			__DIR__ . '/class-hydro-raindrop-helper.php',
+			// The class responsible for defining all actions that occur in the admin area.
+			__DIR__ . '/../admin/class-hydro-raindrop-admin.php',
+			// The class responsible for defining all actions that occur in the public-facing side of the site.
+			__DIR__ . '/../public/class-hydro-raindrop-public.php',
+			// The class responsible for Hydro Raindrop authentication.
+			__DIR__ . '/../public/class-hydro-raindrop-authenticate.php',
+		];
 
-		/**
-		 * The class responsible for storing the access token from the Raindrop API
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-hydro-raindrop-token-storage.php';
+		foreach ( $includes as $include ) {
+			/**
+			 * Dynamic include expressions like there are not being analysed.
+			 *
+			 * @noinspection PhpIncludeInspection
+			 */
+			require_once $include;
+		}
 
-		/**
-		 * The class responsible for defining internationalization functionality of the plugin.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-hydro-raindrop-i18n.php';
-
-		/**
-		 * The class responsible for defining all actions that occur in the admin area.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-hydro-raindrop-admin.php';
-
-		/**
-		 * The class responsible for defining all actions that occur in the public-facing side of the site.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-hydro-raindrop-public.php';
-
-		/**
-		 * The class responsible authentication.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-hydro-raindrop-authenticate.php';
-
+		// Create an instance of the loader which will be used to register the hooks with WordPress.
 		$this->loader = new Hydro_Raindrop_Loader();
 
 	}

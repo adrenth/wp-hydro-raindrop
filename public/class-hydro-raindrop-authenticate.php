@@ -21,7 +21,6 @@ final class Hydro_Raindrop_Authenticate {
 	 * The ID of this plugin.
 	 *
 	 * @since    1.0.0
-	 * @access   private
 	 * @var      string $plugin_name The ID of this plugin.
 	 */
 	private $plugin_name;
@@ -30,10 +29,17 @@ final class Hydro_Raindrop_Authenticate {
 	 * The version of this plugin.
 	 *
 	 * @since    1.0.0
-	 * @access   private
 	 * @var      string $version The current version of this plugin.
 	 */
 	private $version;
+
+	/**
+	 * Helper.
+	 *
+	 * @since    1.3.0
+	 * @var Hydro_Raindrop_Helper
+	 */
+	private $helper;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -47,6 +53,7 @@ final class Hydro_Raindrop_Authenticate {
 
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
+		$this->helper      = new Hydro_Raindrop_Helper();
 
 	}
 
@@ -66,11 +73,11 @@ final class Hydro_Raindrop_Authenticate {
 
 		if ( ! is_user_logged_in() ) {
 			// Disallow anonymous access to the custom MFA page.
-			if ( $this->is_hydro_raindrop_mfa_custom_page_enabled()
-					&& $this->get_custom_mfa_page_url() === $this->get_current_url()
+			if ( $this->helper->is_custom_mfa_page_enabled()
+					&& $this->helper->get_custom_mfa_page_url() === $this->helper->get_current_url()
 			) {
 				// @codingStandardsIgnoreLine
-				wp_redirect( home_url() );
+				wp_redirect( $this->helper->get_home_url() );
 				exit;
 			}
 
@@ -95,12 +102,12 @@ final class Hydro_Raindrop_Authenticate {
 		}
 
 		// If user is logged in and visits the MFA page: redirect to home.
-		if ( $this->is_hydro_raindrop_mfa_custom_page_enabled()
+		if ( $this->helper->is_custom_mfa_page_enabled()
 				&& $this->verify_cookie( $user )
-				&& $this->get_custom_mfa_page_url() === $this->get_current_url()
+				&& $this->helper->get_custom_mfa_page_url() === $this->helper->get_current_url()
 		) {
 			// @codingStandardsIgnoreLine
-			wp_redirect( home_url() );
+			wp_redirect( $this->helper->get_home_url() );
 			exit;
 		}
 
@@ -229,10 +236,10 @@ final class Hydro_Raindrop_Authenticate {
 		/*
 		 * Redirect to the Custom MFA page (if applicable).
 		 */
-		if ( $this->is_hydro_raindrop_mfa_custom_page_enabled() ) {
-			if ( strpos( $this->get_current_url(), $this->get_custom_mfa_page_url() ) !== 0 ) {
+		if ( $this->helper->is_custom_mfa_page_enabled() ) {
+			if ( strpos( $this->helper->get_current_url(), $this->helper->get_custom_mfa_page_url() ) !== 0 ) {
 				// @codingStandardsIgnoreLine
-				wp_redirect( $this->get_custom_mfa_page_url() );
+				wp_redirect( $this->helper->get_custom_mfa_page_url() );
 				exit;
 			}
 
@@ -259,6 +266,14 @@ final class Hydro_Raindrop_Authenticate {
 	 * @return void
 	 */
 	private function redirect( WP_User $user ) {
+
+		if ( $this->is_first_time_verify() && $this->helper->is_custom_hydro_id_page_enabled() ) {
+
+			// @codingStandardsIgnoreLine
+			wp_redirect( $this->helper->get_custom_hydro_id_page_url() );
+			exit;
+
+		}
 
 		// @codingStandardsIgnoreLine
 		if ( isset( $_REQUEST['redirect_to'] ) ) {
@@ -292,12 +307,12 @@ final class Hydro_Raindrop_Authenticate {
 			} elseif ( is_multisite() && ! $user->has_cap( 'read' ) ) {
 				$redirect_to = get_dashboard_url( $user->ID );
 			} elseif ( ! $user->has_cap( 'edit_posts' ) ) {
-				$redirect_to = $user->has_cap( 'read' ) ? admin_url( 'profile.php' ) : home_url();
+				$redirect_to = $user->has_cap( 'read' ) ? admin_url( 'profile.php' ) : $this->helper->get_home_url();
 			}
 
 			// @codingStandardsIgnoreLine
 			wp_redirect( $redirect_to );
-			exit();
+			exit;
 		}
 
 		wp_safe_redirect( $redirect_to );
@@ -449,7 +464,7 @@ final class Hydro_Raindrop_Authenticate {
 	}
 
 	/**
-	 * Get the users' Hydro ID.
+	 * Get the users' HydroID.
 	 *
 	 * @param WP_User $user Current logged in user.
 	 *
@@ -459,30 +474,6 @@ final class Hydro_Raindrop_Authenticate {
 
 		// @codingStandardsIgnoreLine
 		return (string) get_user_meta( $user->ID, 'hydro_id', true );
-
-	}
-
-	/**
-	 * Get the custom MFA page URL.
-	 *
-	 * @return string
-	 */
-	private function get_custom_mfa_page_url() : string {
-
-		$custom_mfa_page = (int) get_option( 'hydro_raindrop_custom_mfa_page' );
-
-		return $custom_mfa_page > 0 ? get_permalink( $custom_mfa_page ) : '';
-
-	}
-
-	/**
-	 * Get the current URL.
-	 *
-	 * @return string
-	 */
-	private function get_current_url() : string {
-
-		return home_url( add_query_arg( null, null ) );
 
 	}
 
@@ -516,19 +507,6 @@ final class Hydro_Raindrop_Authenticate {
 	private function is_hydro_raindrop_mfa_enabled() : bool {
 
 		return true;
-
-	}
-
-	/**
-	 * Checks if MFA page is configured as custom.
-	 *
-	 * @return bool
-	 */
-	private function is_hydro_raindrop_mfa_custom_page_enabled() : bool {
-
-		$custom_mfa_page = (int) get_option( 'hydro_raindrop_custom_mfa_page' );
-
-		return $custom_mfa_page > 0 && get_post_status( $custom_mfa_page ) === 'publish';
 
 	}
 
@@ -618,8 +596,7 @@ final class Hydro_Raindrop_Authenticate {
 		$client = Hydro_Raindrop::get_raindrop_client();
 
 		try {
-			$user = wp_get_current_user();
-
+			$user         = wp_get_current_user();
 			$hydro_id     = $this->get_user_hydro_id( $user );
 			$transient_id = sprintf( self::MESSAGE_TRANSIENT_ID, $user->ID );
 			$message      = (int) get_transient( $transient_id );

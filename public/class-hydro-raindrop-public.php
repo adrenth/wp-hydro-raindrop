@@ -46,7 +46,7 @@ class Hydro_Raindrop_Public {
 	private $version;
 
 	/**
-	 * Errors occurred when managing Hydro ID.
+	 * Errors occurred when managing HydroID.
 	 *
 	 * @var WP_Error|null
 	 * @since 1.3.0
@@ -148,7 +148,7 @@ class Hydro_Raindrop_Public {
 	}
 
 	/**
-	 * Handles saving of the Hydro ID.
+	 * Handles saving of the HydroID.
 	 *
 	 * @return string
 	 */
@@ -175,7 +175,7 @@ class Hydro_Raindrop_Public {
 	}
 
 	/**
-	 * Handle the Hydro ID form. Must be handled before the headers are sent.
+	 * Handle the HydroID form. Must be handled before the headers are sent.
 	 *
 	 * @param WP_Error $errors Error collection from edit_user().
 	 * @param stdClass $user   User object being edited.
@@ -371,7 +371,7 @@ class Hydro_Raindrop_Public {
 	}
 
 	/**
-	 * Manage Hydro ID.
+	 * Manage HydroID.
 	 *
 	 * @return string
 	 */
@@ -398,7 +398,7 @@ class Hydro_Raindrop_Public {
 	}
 
 	/**
-	 * Whether given user has a Hydro ID.
+	 * Whether given user has a HydroID.
 	 *
 	 * @param stdClass $user WP User object.
 	 *

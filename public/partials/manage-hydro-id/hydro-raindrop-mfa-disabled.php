@@ -17,7 +17,7 @@ $hydro_raindrop_mfa_disabled = ! ( (bool) $user->hydro_mfa_enabled );
 ?>
 
 <?php if ( $hydro_raindrop_mfa_disabled ) : ?>
-	<p class="success-message">
+	<p class="error-message">
 		<?php esc_html_e( 'Your account does not have Hydro Raindrop MFA enabled.', 'wp-hydro-raindrop' ); ?>
 	</p>
 <?php endif ?>

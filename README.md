@@ -45,6 +45,8 @@ Site Editors / Authors / etc. can enable the Hydro Raindrop MFA from their profi
 
 ### Custom MFA page
 
+Follow the instructions below to create your own Hydro Raindrop MFA page:
+
 * Login as a Site Editor
 * Create a page (programmatically)
 * Use the following shortcodes on this page (required!):
@@ -53,6 +55,15 @@ Site Editors / Authors / etc. can enable the Hydro Raindrop MFA from their profi
     - `[hydro_raindrop_mfa_digits]`: renders 6 digits which should be entered into the Hydro app.
     - `[hydro_raindrop_mfa_button_authorize]`: renders the "Authorize" button; customize the look of the button using CSS class `hydro-raindrop-mfa-button-authorize`.
     - `[hydro_raindrop_mfa_button_cancel]`: renders the "Cancel" button; customize the look of the button using CSS class `hydro-raindrop-mfa-button-cancel`.
+* Under `Setting` navigate to the `Hydro Raindro MFA` section and select the page you created.
+
+### Custom HydroID page
+
+Follow the instructions below to create your own Hydro Raindrop MFA page:
+
+* Login as a Site Editor
+* Create a page (programmatically)
+* Use the `[hydro_raindrop_manage_hydro_id]` shortcode on this page (required!).
 * Under `Setting` navigate to the `Hydro Raindro MFA` section and select the page you created.
 
 ## Documentation

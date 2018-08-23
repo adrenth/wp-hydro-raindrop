@@ -118,7 +118,9 @@ if ( ! current_user_can( 'manage_options' ) ) {
 					</label>
 				</th>
 				<td>
-					<select id="hydro_raindrop_custom_mfa_page" name="hydro_raindrop_custom_mfa_page" class="selection">
+					<select id="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE ); ?>"
+							name="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE ); ?>"
+							class="selection">
 						<option value="0">Use default Hydro Raindrop MFA page</option>
 						<option value="0">---</option>
 						<?php
@@ -129,13 +131,42 @@ if ( ! current_user_can( 'manage_options' ) ) {
 						 */
 						foreach ( $posts as $post_id => $post ) :
 							?>
-							<?php $selected = (int) get_option( 'hydro_raindrop_custom_mfa_page' ) === $post_id ? ' selected' : ''; ?>
+							<?php $selected = (int) get_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE ) === $post_id ? ' selected' : ''; ?>
 							<option value="<?php echo esc_attr( $post_id ); ?>"<?php echo esc_attr( $selected ); ?>>
 								<?php echo esc_html( $post ); ?>
 							</option>
 						<?php endforeach; ?>
 					</select>
 					<p class="description">Please make sure you have implemented the <a href="#">documented</a> shortcodes on the Custom MFA page.</p>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row">
+					<label for="hydro_raindrop_custom_mfa_page">
+						Custom HydroID page
+					</label>
+				</th>
+				<td>
+					<select id="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ); ?>"
+							name="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ); ?>"
+							class="selection">
+						<option value="0">Use default HydroID page</option>
+						<option value="0">---</option>
+						<?php
+						/**
+						 * Type hinting.
+						 *
+						 * @var array $posts
+						 */
+						foreach ( $posts as $post_id => $post ) :
+							?>
+							<?php $selected = (int) get_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ) === $post_id ? ' selected' : ''; ?>
+							<option value="<?php echo esc_attr( $post_id ); ?>"<?php echo esc_attr( $selected ); ?>>
+								<?php echo esc_html( $post ); ?>
+							</option>
+						<?php endforeach; ?>
+					</select>
+					<p class="description">Please make sure you have implemented the <a href="#">documented</a> shortcodes on the Custom HydroID page.</p>
 				</td>
 			</tr>
 		</table>

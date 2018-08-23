@@ -3,7 +3,7 @@
 declare( strict_types=1 );
 
 /**
- * Hydro Raindrop Hydro ID management form.
+ * Hydro Raindrop HydroID management form.
  *
  * This template will be exposed through the WordPress shortcode API.
  * Use shortcode [hydro_raindrop_manage_hydro_id].
@@ -20,6 +20,8 @@ if ( ! defined( 'HYDRO_RAINDROP_MANAGE_HYDRO_ID' ) ) {
 	define( 'HYDRO_RAINDROP_MANAGE_HYDRO_ID', true );
 }
 
+/** @var WP_Error $errors */
+
 $hydro_mfa_disabled = ! ( (bool) $user->hydro_mfa_enabled );
 ?>
 
@@ -28,7 +30,7 @@ $hydro_mfa_disabled = ! ( (bool) $user->hydro_mfa_enabled );
 
 	<?php if ( Hydro_Raindrop::has_valid_raindrop_client_options() ) : ?>
 
-		<?php if ( is_wp_error( $errors ) ) : ?>
+		<?php if ( is_wp_error( $errors ) && count( $errors->errors ) > 0 ) : ?>
 
 			<p class="error-message">
 				<?php echo esc_html( $errors->get_error_message() ); ?>
@@ -47,7 +49,7 @@ $hydro_mfa_disabled = ! ( (bool) $user->hydro_mfa_enabled );
 
 			<?php if ( $hydro_mfa_disabled ) : ?>
 				<button type="submit" class="button" name="save_hydro_id">
-					<?php esc_html_e( 'Hydro Raindrop MFA', 'wp-hydro-raindrop' ); ?>
+					<?php esc_html_e( 'Update HydroID', 'wp-hydro-raindrop' ); ?>
 				</button>
 			<?php endif; ?>
 

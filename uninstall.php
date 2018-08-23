@@ -20,15 +20,19 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
  */
 require_once __DIR__ . '/vendor/autoload.php';
 
+
 /**
  * Delete options used by this plugin.
  */
+require_once __DIR__ . '/includes/class-hydro-raindrop-helper.php';
+
 delete_option( 'hydro_raindrop_application_id' );
 delete_option( 'hydro_raindrop_client_id' );
 delete_option( 'hydro_raindrop_client_secret' );
 delete_option( 'hydro_raindrop_environment' );
 delete_option( 'hydro_raindrop_access_token_success' );
-delete_option( 'hydro_raindrop_custom_mfa_page' );
+delete_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE );
+delete_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE );
 
 /**
  * Delete user metadata by for this plugin.
