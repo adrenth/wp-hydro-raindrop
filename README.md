@@ -40,6 +40,7 @@ Site Editors / Authors / etc. can enable the Hydro Raindrop MFA from their profi
 
 * **SSL MUST be enabled for MFA to work.**
 * PHP 7.0 or higher is required.
+* PHP extensions `gmp_mod` (GMP) or `bcadd` (BC Math)
 
 ## Customization
 

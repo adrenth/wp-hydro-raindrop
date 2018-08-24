@@ -21,6 +21,7 @@ Requirements:
 
 * IMPORTANT: SSL (HTTPS) MUST be enabled for MFA to work.
 * PHP 7.0 or higher is required.
+* PHP extensions `gmp_mod` (GMP) or `bcadd` (BC Math)
 
 == Installation ==
 
@@ -33,6 +34,7 @@ Issues can be reported here: https://github.com/adrenth/wp-hydro-raindrop/issues
 == Changelog ==
 = 1.3.0 =
 * Allow developers to make their own custom MFA page (with shortcodes).
+* Improve MFA flow
 
 = 1.2.1 =
 * Update WP readme.txt
