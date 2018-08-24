@@ -13,9 +13,18 @@ final class Hydro_Raindrop_Authenticate {
 
 	const MESSAGE_TRANSIENT_ID = 'HydroRaindropMessage_%s';
 
-	const COOKIE_NAME = 'HydroRaindropMfa';
+	const COOKIE_MFA = 'HydroRaindropMfa';
 
-	const TIME_OUT = 90;
+	const COOKIE_MFA_USER = 'HydroRaindropMfaUser';
+
+	/**
+	 * Multi Factor Timeout in seconds.
+	 *
+	 * The user needs to verify the MFA message within MFA_TIME_OUT seconds.
+	 *
+	 * @var int
+	 */
+	const MFA_TIME_OUT = 90;
 
 	/**
 	 * The ID of this plugin.
@@ -58,6 +67,48 @@ final class Hydro_Raindrop_Authenticate {
 	}
 
 	/**
+	 * Hook into the WordPress sign-on flow.
+	 *
+	 * @param string      $user_login    Username which was entered in the sign-on form.
+	 * @param string|null $user_password The password which was entered in the sign-on form.
+	 *
+	 * @throws Exception
+	 */
+	public function authenticate( string $user_login = null, string $user_password = null ) {
+		/*
+		 * Force unset the cookie before authentication.
+		 */
+		$this->unset_cookies();
+
+		if ( ! $user_login || ! username_exists( $user_login ) ) {
+			return;
+		}
+
+		if ( ! $this->is_hydro_raindrop_mfa_enabled() ) {
+			return;
+		}
+
+		if ( ! is_ssl() ) {
+			$this->log( 'SSL disabled, skipping Hydro Raindrop MFA.' );
+			return;
+		}
+
+		$user = wp_authenticate( $user_login, $user_password );
+
+		if ( ! ( $user instanceof WP_User ) ) {
+			return;
+		}
+
+		if ( $this->user_requires_mfa( $user ) ) {
+			$this->log( 'User authenticates and requires Hydro Raindrop MFA.' );
+			$this->delete_transient_data( $user );
+			$this->set_cookies( $user );
+			$this->start_mfa( $user );
+		}
+
+	}
+
+	/**
 	 * Verify request.
 	 *
 	 * @return void
@@ -65,51 +116,67 @@ final class Hydro_Raindrop_Authenticate {
 	 */
 	public function verify() {
 
-		if ( ! $this->is_hydro_raindrop_mfa_enabled() ) {
-			return;
-		}
-
 		$this->verify_post_request();
 
-		if ( ! is_user_logged_in() ) {
-			// Disallow anonymous access to the custom MFA page.
+		$user = self::get_current_mfa_user();
+
+		// Perform first time verification.
+		if ( ! $user && $this->is_first_time_verify() && is_user_logged_in() ) {
+			$user = wp_get_current_user();
+
+			$this->delete_transient_data( $user );
+			$this->set_cookies( $user );
+
+			// @codingStandardsIgnoreLine
+			wp_redirect( $this->helper->get_current_url() );
+			exit;
+		}
+
+		if ( $user && $this->verify_cookie( $user ) ) {
+			// Redirect to MFA page if not already.
 			if ( $this->helper->is_custom_mfa_page_enabled()
-					&& $this->helper->get_custom_mfa_page_url() === $this->helper->get_current_url()
-			) {
+					&& $this->helper->get_custom_mfa_page_url() !== $this->helper->get_current_url() ) {
+				$this->log( 'User not on Hydro Raindrop MFA page. Redirecting...' );
 				// @codingStandardsIgnoreLine
-				wp_redirect( $this->helper->get_home_url() );
+				wp_redirect( $this->helper->get_custom_mfa_page_url() );
 				exit;
 			}
 
-			return;
+			// Render MFA page if not on login page.
+			if ( ! $this->helper->is_custom_mfa_page_enabled()
+					&& strpos( $this->helper->get_current_url(), 'wp-login.php' ) === false
+			) {
+				$this->log( 'User not on Hydro Raindrop MFA page. Render MFA page.' );
+				$this->start_mfa( $user );
+			}
 		}
 
-		$user = wp_get_current_user();
+	}
 
-		$user_requires_mfa = $this->user_requires_mfa( $user );
+	/**
+	 * Get's the current MFA user from cookie.
+	 *
+	 * @return WP_User|null
+	 */
+	public static function get_current_mfa_user() {
 
-		// MFA is enabled, but the current request is not SSL.
-		if ( $user_requires_mfa && ! is_ssl() ) {
-			$this->log( 'Non-SSL detected.' );
-			die( 'Non-SSL WordPress sites are not supported to perform Hydro Raindrop MFA.' );
+		// @codingStandardsIgnoreLine
+		if ( ! isset( $_COOKIE[ self::COOKIE_MFA_USER ] ) ) {
+			return null;
 		}
 
-		// MFA is enabled, but there's not cookie present. Start the MFA flow.
-		if ( $user_requires_mfa && ! $this->verify_cookie( $user ) ) {
-			$this->log( 'Cookie not valid or not set.' );
-			$this->unset_cookie();
-			$this->start_mfa( $user );
+		// @codingStandardsIgnoreLine
+		$user_hash = $_COOKIE[ self::COOKIE_MFA_USER ];
+
+		$user_id = ( new \Hashids\Hashids( self::get_salt(), 64 ) )->decode( $user_hash );
+
+		$user = get_user_by( 'ID', $user_id[0] );
+
+		if ( ! ( $user instanceof WP_User ) ) {
+			return null;
 		}
 
-		// If user is logged in and visits the MFA page: redirect to home.
-		if ( $this->helper->is_custom_mfa_page_enabled()
-				&& $this->verify_cookie( $user )
-				&& $this->helper->get_custom_mfa_page_url() === $this->helper->get_current_url()
-		) {
-			// @codingStandardsIgnoreLine
-			wp_redirect( $this->helper->get_home_url() );
-			exit;
-		}
+		return $user;
 
 	}
 
@@ -131,7 +198,7 @@ final class Hydro_Raindrop_Authenticate {
 
 		if ( ! $message ) {
 			$message = $client->generateMessage();
-			set_transient( $transient_id, $message, self::TIME_OUT );
+			set_transient( $transient_id, $message, self::MFA_TIME_OUT );
 		}
 
 		return (int) $message;
@@ -150,6 +217,8 @@ final class Hydro_Raindrop_Authenticate {
 		// @codingStandardsIgnoreLine
 		$retrieved_nonce = $_POST['_wpnonce'] ?? null;
 
+		$user = self::get_current_mfa_user();
+
 		// @codingStandardsIgnoreLine
 		if ( isset( $_POST['hydro_raindrop'] )
 				&& $is_post
@@ -158,27 +227,11 @@ final class Hydro_Raindrop_Authenticate {
 		) {
 			$this->log( 'Nonce verification failed. Logging out.' );
 
-			wp_logout();
-
-			return;
-		}
-
-		// Allow user to cancel the MFA. Which results in a logout.
-		// @codingStandardsIgnoreLine
-		if ( isset( $_POST['cancel_hydro_raindrop'] )
-				&& $is_post
-				&& is_ssl()
-				&& wp_verify_nonce( $retrieved_nonce, 'hydro_raindrop_mfa' )
-		) {
-			// Unset the MFA cookie.
-			$this->unset_cookie();
+			$this->unset_cookies();
 
 			// Delete all transient data which is used during the MFA process.
-			$this->delete_transient_data();
-
-			// When this is not the first time verification; the "Cancel button" will logout the user.
-			if ( ! $this->is_first_time_verify() ) {
-				wp_logout();
+			if ( $user ) {
+				$this->delete_transient_data( $user );
 			}
 
 			// @codingStandardsIgnoreLine
@@ -190,20 +243,41 @@ final class Hydro_Raindrop_Authenticate {
 		// @codingStandardsIgnoreLine
 		if ( isset( $_POST['hydro_raindrop'] )
 				&& $is_post
+				&& $user
 				&& is_ssl()
-				&& is_user_logged_in()
-				&& $this->verify_signature_login()
+				&& $this->verify_signature_login( $user )
 		) {
-			$user = wp_get_current_user();
-
-			// Set the MFA cookie for current user.
-			$this->set_cookie( $user );
+			$this->unset_cookies();
 
 			// Delete all transient data which is used during the MFA process.
-			$this->delete_transient_data();
+			if ( $user ) {
+				$this->delete_transient_data( $user );
+			}
+
+			wp_set_auth_cookie( $user->ID ); // TODO: Remember login parameter.
 
 			// Redirect the user to it's intended location.
 			$this->redirect( $user );
+		}
+
+		// Allow user to cancel the MFA. Which results in a logout.
+		// @codingStandardsIgnoreLine
+		if ( isset( $_POST['cancel_hydro_raindrop'] )
+				&& $is_post
+				&& is_ssl()
+				&& wp_verify_nonce( $retrieved_nonce, 'hydro_raindrop_mfa' )
+		) {
+			// Unset the MFA cookie.
+			$this->unset_cookies();
+
+			// Delete all transient data which is used during the MFA process.
+			if ( $user ) {
+				$this->delete_transient_data( $user );
+			}
+
+			// @codingStandardsIgnoreLine
+			wp_redirect( home_url() );
+			exit;
 		}
 
 	}
@@ -230,13 +304,16 @@ final class Hydro_Raindrop_Authenticate {
 
 			$error = 'Authentication failed.';
 
-			$this->delete_transient_data();
+			$this->delete_transient_data( $user );
 		}
 
 		/*
 		 * Redirect to the Custom MFA page (if applicable).
 		 */
 		if ( $this->helper->is_custom_mfa_page_enabled() ) {
+
+			$this->log( 'Custom MFA page is enabled.' );
+
 			if ( strpos( $this->helper->get_current_url(), $this->helper->get_custom_mfa_page_url() ) !== 0 ) {
 				// @codingStandardsIgnoreLine
 				wp_redirect( $this->helper->get_custom_mfa_page_url() );
@@ -323,32 +400,62 @@ final class Hydro_Raindrop_Authenticate {
 	/**
 	 * Set cookie for current user.
 	 *
-	 * @param WP_User $user Current logged in user.
+	 * @param WP_User $user Authenticated user.
 	 */
-	private function set_cookie( WP_User $user ) {
+	public function set_cookies( WP_User $user ) {
 
 		$this->log( 'Setting SSL cookie.' );
 
 		try {
-			$cookie = $this->get_cookie_value( $user, self::COOKIE_NAME );
+			list( $cookie, $cookie_user ) = $this->get_cookie_values( $user, self::COOKIE_MFA );
 		} catch ( \Hashids\HashidsException $e ) {
 			$this->log( 'Could not hash data for cookie. Setting cookie failed.' );
 			return;
 		}
 
 		// @codingStandardsIgnoreLine
-		$result = setcookie( self::COOKIE_NAME, $cookie, 0, COOKIEPATH, (string) COOKIE_DOMAIN, true, true );
+		$result = setcookie( self::COOKIE_MFA, $cookie, 0, COOKIEPATH, (string) COOKIE_DOMAIN, true, true );
 
 		if ( ! $result ) {
-			$this->log( 'Could not set cookie.' );
+			$this->log( 'Could not set MFA cookie.' );
+		}
+
+		// @codingStandardsIgnoreLine
+		$result = setcookie(
+			self::COOKIE_MFA_USER,
+			$cookie_user,
+			0,
+			COOKIEPATH,
+			(string) COOKIE_DOMAIN,
+			true,
+			true
+		);
+
+		if ( ! $result ) {
+			$this->log( 'Could not set MFA User cookie.' );
 		}
 
 		if ( COOKIEPATH !== SITECOOKIEPATH ) {
 			// @codingStandardsIgnoreLine
-			$result = setcookie( self::COOKIE_NAME, $cookie, 0, SITECOOKIEPATH, (string) COOKIE_DOMAIN, true, true );
+			$result = setcookie( self::COOKIE_MFA, $cookie, 0, SITECOOKIEPATH, (string) COOKIE_DOMAIN, true, true );
 
 			if ( ! $result ) {
-				$this->log( 'Could not set cookie.' );
+				$this->log( 'Could not set MFA cookie.' );
+			}
+
+			// @codingStandardsIgnoreLine
+			$result = setcookie(
+				self::COOKIE_MFA_USER,
+				$cookie_user,
+				0,
+				SITECOOKIEPATH,
+				(string) COOKIE_DOMAIN,
+				true,
+				true
+			);
+
+			if ( ! $result ) {
+				$this->log( 'Could not set MFA User cookie.' );
 			}
 		}
 
@@ -359,22 +466,25 @@ final class Hydro_Raindrop_Authenticate {
 	 *
 	 * @return void
 	 */
-	public function unset_cookie() {
+	public function unset_cookies() {
 
-		$this->log( 'Unsetting cookies (force).' );
-
-		// @codingStandardsIgnoreLine
-		setcookie( self::COOKIE_NAME, '', strtotime( '-1 day' ), (string) COOKIEPATH, (string) COOKIE_DOMAIN );
+		$this->log( 'Unsetting MFA cookies.' );
 
 		// @codingStandardsIgnoreLine
-		setcookie( self::COOKIE_NAME, '', strtotime( '-1 day' ), (string) SITECOOKIEPATH, (string) COOKIE_DOMAIN );
+		setcookie( self::COOKIE_MFA, '', strtotime( '-1 day' ), (string) COOKIEPATH, (string) COOKIE_DOMAIN );
+		// @codingStandardsIgnoreLine
+		setcookie( self::COOKIE_MFA_USER, '', strtotime( '-1 day' ), (string) COOKIEPATH, (string) COOKIE_DOMAIN );
+		// @codingStandardsIgnoreLine
+		setcookie( self::COOKIE_MFA, '', strtotime( '-1 day' ), (string) SITECOOKIEPATH, (string) COOKIE_DOMAIN );
+		// @codingStandardsIgnoreLine
+		setcookie( self::COOKIE_MFA_USER, '', strtotime( '-1 day' ), (string) SITECOOKIEPATH, (string) COOKIE_DOMAIN );
 
 	}
 
 	/**
 	 * Verify Hydro Raindrop MFA cookie.
 	 *
-	 * @param WP_User $user Verify cookie for current user.
+	 * @param WP_User $user User.
 	 *
 	 * @return bool
 	 * @throws \Hashids\HashidsException When hashing fails.
@@ -382,14 +492,14 @@ final class Hydro_Raindrop_Authenticate {
 	private function verify_cookie( WP_User $user ) : bool {
 
 		// @codingStandardsIgnoreLine
-		if ( ! isset( $_COOKIE[ self::COOKIE_NAME ] ) ) {
+		if ( ! isset( $_COOKIE[ self::COOKIE_MFA ] ) ) {
 			$this->log( 'Cookie is not set.' );
 
 			return false;
 		}
 
 		// @codingStandardsIgnoreLine
-		$cookie_list = explode( '|', $_COOKIE[ self::COOKIE_NAME ] );
+		$cookie_list = explode( '|', $_COOKIE[ self::COOKIE_MFA ] );
 
 		if ( count( $cookie_list ) !== 2 ) {
 			$this->log( 'Cookie contents are not valid (2).' );
@@ -419,9 +529,9 @@ final class Hydro_Raindrop_Authenticate {
 
 		list ( $name, $user_id, $hydro_id, $expire ) = $cookie_content;
 
-		$user_hash = ( new \Hashids\Hashids( $this->get_salt(), 64 ) )->decode( $user_id );
+		$user_hash = ( new \Hashids\Hashids( self::get_salt(), 64 ) )->decode( $user_id );
 
-		$is_valid = self::COOKIE_NAME === $name
+		$is_valid = self::COOKIE_MFA === $name
 					|| $user->ID === $user_hash[0]
 					|| $hydro_id === $this->get_user_hydro_id( $user );
 
@@ -443,24 +553,27 @@ final class Hydro_Raindrop_Authenticate {
 	/**
 	 * Get HTTP cookie value.
 	 *
-	 * @param WP_User $user        Currently logged in user.
+	 * @param WP_User $user        User.
 	 * @param string  $cookie_name Cookie name.
 	 *
-	 * @return string
+	 * @return array
 	 * @throws \Hashids\HashidsException When user ID could not be hashed.
 	 */
-	private function get_cookie_value( WP_User $user, string $cookie_name ) : string {
+	private function get_cookie_values( WP_User $user, string $cookie_name ) : array {
 
-		$salt = $this->get_salt();
+		$salt = self::get_salt();
 
 		// @codingStandardsIgnoreLine
 		$hydro_id  = $this->get_user_hydro_id( $user );
 		$user_hash = ( new \Hashids\Hashids( $salt, 64 ) )->encode( $user->ID );
-		$expire    = strtotime( '+24 hours' );
+		$expire    = time() + self::MFA_TIME_OUT;
 		$value     = base64_encode( sprintf( '%s|%s|%s|%s', $cookie_name, $user_hash, $hydro_id, $expire ) );
 		$signature = $this->get_hash_hmac( $value );
 
-		return $value . '|' . $signature;
+		return [
+			$value . '|' . $signature,
+			$user_hash,
+		];
 	}
 
 	/**
@@ -482,7 +595,7 @@ final class Hydro_Raindrop_Authenticate {
 	 *
 	 * @return string
 	 */
-	private function get_salt() : string {
+	private static function get_salt() : string {
 
 		if ( defined( 'AUTH_SALT' ) ) {
 			return AUTH_SALT;
@@ -531,12 +644,12 @@ final class Hydro_Raindrop_Authenticate {
 	 */
 	private function get_hash_hmac( string $data ) : string {
 
-		return hash_hmac( 'sha1', $data, $this->get_salt() );
+		return hash_hmac( 'sha1', $data, self::get_salt() );
 
 	}
 
 	/**
-	 * Checks whether current user requires Hydro Raindro MFA.
+	 * Checks whether current user requires Hydro Raindrop MFA.
 	 *
 	 * @param WP_User $user Currently logged in user.
 	 *
@@ -562,17 +675,11 @@ final class Hydro_Raindrop_Authenticate {
 	/**
 	 * Delete any transient data for current user.
 	 *
+	 * @param WP_User $user User.
+	 *
 	 * @return void
 	 */
-	private function delete_transient_data() {
-
-		$user = wp_get_current_user();
-
-		if ( ! $user instanceof WP_User ) {
-			$this->log( 'No current user; skipping deletion of transient data.' );
-
-			return;
-		}
+	private function delete_transient_data( WP_User $user ) {
 
 		$transient_id = sprintf( self::MESSAGE_TRANSIENT_ID, $user->ID );
 
@@ -585,25 +692,22 @@ final class Hydro_Raindrop_Authenticate {
 	/**
 	 * Perform Hydro Raindrop signature verification.
 	 *
+	 * @param WP_User $user The user to verify the signature login for.
+	 *
 	 * @return bool
 	 */
-	private function verify_signature_login() : bool {
-
-		if ( ! is_user_logged_in() ) {
-			return false;
-		}
+	private function verify_signature_login( WP_User $user ) : bool {
 
 		$client = Hydro_Raindrop::get_raindrop_client();
 
 		try {
-			$user         = wp_get_current_user();
 			$hydro_id     = $this->get_user_hydro_id( $user );
 			$transient_id = sprintf( self::MESSAGE_TRANSIENT_ID, $user->ID );
 			$message      = (int) get_transient( $transient_id );
 
 			$client->verifySignature( $hydro_id, $message );
 
-			$this->delete_transient_data();
+			$this->delete_transient_data( $user );
 
 			if ( $this->is_first_time_verify() ) {
 				// @codingStandardsIgnoreLine

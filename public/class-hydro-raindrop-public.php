@@ -242,7 +242,7 @@ class Hydro_Raindrop_Public {
 					$this->version
 				);
 
-				$authenticate->unset_cookie();
+				$authenticate->unset_cookies();
 
 				// @codingStandardsIgnoreLine
 				update_user_meta( $user->ID, 'hydro_id', $hydro_id );
@@ -296,7 +296,7 @@ class Hydro_Raindrop_Public {
 				// @codingStandardsIgnoreLine
 				delete_user_meta( $user->ID, 'hydro_raindrop_confirmed' );
 
-				$authenticate->unset_cookie();
+				$authenticate->unset_cookies();
 
 			} catch ( \Adrenth\Raindrop\Exception\UnregisterUserFailed $e ) {
 
@@ -330,14 +330,14 @@ class Hydro_Raindrop_Public {
 	 * MFA digits for the custom MFA page.
 	 *
 	 * @return string
-	 * @throws Exception
+	 * @throws Exception When message cannot be generated.
 	 */
 	public function shortcode_digits() : string {
-		if ( ! is_user_logged_in() ) {
+		$user = Hydro_Raindrop_Authenticate::get_current_mfa_user();
+
+		if ( ! ( $user instanceof WP_User ) ) {
 			return '';
 		}
-
-		$user = wp_get_current_user();
 
 		return (string) Hydro_Raindrop_Authenticate::get_message( $user );
 	}

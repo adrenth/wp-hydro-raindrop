@@ -211,14 +211,22 @@ class Hydro_Raindrop {
 		);
 
 		/**
+		 * Action: wp_authenticate
+		 *
+		 * This action is located inside of `wp_signon`. In contrast to the `wp_login` action, it is executed before
+		 * the WordPress authentication process.
+		 */
+		$this->loader->add_action( 'wp_authenticate', $plugin_authenticate, 'authenticate', 0, 2 );
+
+		/**
 		 * Filter: init
 		 *
 		 * Most of WP is loaded at this stage, and the user is authenticated.
 		 * WP continues to load on the init hook that follows (e.g. widgets), and many plugins instantiate themselves
 		 * on it for all sorts of reasons (e.g. they need a user, a taxonomy, etc.).
 		 */
-		$this->loader->add_filter( 'init', $plugin_authenticate, 'verify' );
-		$this->loader->add_filter( 'init', $plugin_public, 'manage_hydro_id' );
+		$this->loader->add_filter( 'init', $plugin_authenticate, 'verify', 0 );
+		$this->loader->add_filter( 'init', $plugin_public, 'manage_hydro_id', 0 );
 
 		/**
 		 * Filter: clear_auth_cookie

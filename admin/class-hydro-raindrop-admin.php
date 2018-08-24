@@ -129,7 +129,7 @@ class Hydro_Raindrop_Admin {
 				$token_storage->unsetAccessToken();
 
 				$authenticate = new Hydro_Raindrop_Authenticate( $this->plugin_name, $this->version );
-				$authenticate->unset_cookie();
+				$authenticate->unset_cookies();
 
 				delete_option( 'hydro_raindrop_access_token_success' );
 
