@@ -333,7 +333,8 @@ class Hydro_Raindrop_Public {
 	 * @throws Exception When message cannot be generated.
 	 */
 	public function shortcode_digits() : string {
-		$user = Hydro_Raindrop_Authenticate::get_current_mfa_user();
+		$authenticate = new Hydro_Raindrop_Authenticate( $this->plugin_name, $this->version );
+		$user         = $authenticate->get_current_mfa_user();
 
 		if ( ! ( $user instanceof WP_User ) ) {
 			return '';

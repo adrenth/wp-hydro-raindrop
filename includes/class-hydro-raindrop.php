@@ -229,13 +229,6 @@ class Hydro_Raindrop {
 		$this->loader->add_filter( 'init', $plugin_public, 'manage_hydro_id', 0 );
 
 		/**
-		 * Filter: clear_auth_cookie
-		 *
-		 * Fires just before the authentication cookies are cleared.
-		 */
-		$this->loader->add_filter( 'clear_auth_cookie', $plugin_authenticate, 'unset_cookie' );
-
-		/**
 		 * Shortcodes
 		 *
 		 * @see https://codex.wordpress.org/Shortcode_API

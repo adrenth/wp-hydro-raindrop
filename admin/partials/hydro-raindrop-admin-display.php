@@ -113,7 +113,7 @@ if ( ! current_user_can( 'manage_options' ) ) {
 		<table class="form-table">
 			<tr valign="top">
 				<th scope="row">
-					<label for="hydro_raindrop_custom_mfa_page">
+					<label for="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE ); ?>">
 						Custom MFA page
 					</label>
 				</th>
@@ -142,7 +142,7 @@ if ( ! current_user_can( 'manage_options' ) ) {
 			</tr>
 			<tr valign="top">
 				<th scope="row">
-					<label for="hydro_raindrop_custom_mfa_page">
+					<label for="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ); ?>">
 						Custom HydroID page
 					</label>
 				</th>
