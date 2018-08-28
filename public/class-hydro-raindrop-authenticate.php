@@ -13,40 +13,37 @@ final class Hydro_Raindrop_Authenticate {
 
 	const MESSAGE_TRANSIENT_ID = 'HydroRaindropMessage_%s';
 
-	const COOKIE_MFA = 'HydroRaindropMfa';
-
-	/**
-	 * Multi Factor Timeout in seconds.
-	 *
-	 * The user needs to verify the MFA message within MFA_TIME_OUT seconds.
-	 *
-	 * @var int
-	 */
-	const MFA_TIME_OUT = 90;
-
 	/**
 	 * The ID of this plugin.
 	 *
-	 * @since    1.0.0
-	 * @var      string $plugin_name The ID of this plugin.
+	 * @since   1.0.0
+	 * @var     string $plugin_name The ID of this plugin.
 	 */
 	private $plugin_name;
 
 	/**
 	 * The version of this plugin.
 	 *
-	 * @since    1.0.0
-	 * @var      string $version The current version of this plugin.
+	 * @since   1.0.0
+	 * @var     string $version The current version of this plugin.
 	 */
 	private $version;
 
 	/**
 	 * Helper.
 	 *
-	 * @since    1.3.0
-	 * @var Hydro_Raindrop_Helper
+	 * @since   1.3.0
+	 * @var     Hydro_Raindrop_Helper $helper
 	 */
 	private $helper;
+
+	/**
+	 * Cookie helper.
+	 *
+	 * @since   1.3.0
+	 * @var     Hydro_Raindrop_Cookie $cookie
+	 */
+	private $cookie;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -61,6 +58,7 @@ final class Hydro_Raindrop_Authenticate {
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
 		$this->helper      = new Hydro_Raindrop_Helper();
+		$this->cookie      = new Hydro_Raindrop_Cookie( $plugin_name, $version );
 
 	}
 
@@ -96,127 +94,9 @@ final class Hydro_Raindrop_Authenticate {
 		if ( $this->user_requires_mfa( $user ) ) {
 			$this->log( 'User authenticates and requires Hydro Raindrop MFA.' );
 			$this->delete_transient_data( $user );
-			$this->set_mfa_cookie( $user->ID );
+			$this->cookie->set( $user->ID );
 			$this->start_mfa( $user );
 		}
-
-	}
-
-	/**
-	 * Set the Hydro Raindrop MFA cookie.
-	 *
-	 * @param int $user_id ID of authenticated user.
-	 *
-	 * @return bool
-	 */
-	public function set_mfa_cookie( int $user_id ) {
-
-		$user = get_userdata( $user_id );
-
-		if ( ! $user ) {
-			return false;
-		}
-
-		$expiration = time() + self::MFA_TIME_OUT;
-		$manager    = WP_Session_Tokens::get_instance( $user_id );
-		$token      = $manager->create( $expiration );
-		$pass_frag  = substr( $user->user_pass, 8, 4 );
-		$key        = wp_hash( $user->user_login . '|' . $pass_frag . '|' . $expiration . '|' . $token );
-		$algorithm  = function_exists( 'hash' ) ? 'sha256' : 'sha1';
-		$hash       = hash_hmac( $algorithm, $user->user_login . '|' . $expiration . '|' . $token, $key );
-		$cookie     = $user->user_login . '|' . $expiration . '|' . $token . '|' . $hash;
-
-		// @codingStandardsIgnoreLine
-		$result = setcookie( self::COOKIE_MFA, $cookie, 0, COOKIEPATH, (string) COOKIE_DOMAIN, true, true );
-
-		if ( ! $result ) {
-			$this->log( 'Could not set MFA cookie.' );
-		}
-
-		if ( COOKIEPATH !== SITECOOKIEPATH ) {
-			// @codingStandardsIgnoreLine
-			$result = setcookie( self::COOKIE_MFA, $cookie, 0, SITECOOKIEPATH, (string) COOKIE_DOMAIN, true, true );
-
-			if ( ! $result ) {
-				$this->log( 'Could not set MFA cookie.' );
-			}
-		}
-
-	}
-
-	/**
-	 * Parse the Hydro Raindrop MFA cookie.
-	 *
-	 * @return array|bool
-	 */
-	public function parse_mfa_cookie() {
-
-		// @codingStandardsIgnoreLine
-		if ( empty( $_COOKIE[ self::COOKIE_MFA ] ) ) {
-			return false;
-		}
-
-		// @codingStandardsIgnoreLine
-		$cookie = $_COOKIE[ self::COOKIE_MFA ];
-
-		$cookie_elements = explode( '|', $cookie );
-
-		if ( count( $cookie_elements ) !== 4 ) {
-			return false;
-		}
-
-		list( $username, $expiration, $token, $hmac ) = $cookie_elements;
-
-		return compact( 'username', 'expiration', 'token', 'hmac' );
-
-	}
-
-	/**
-	 * Validate the Hydro Raindrop MFA cookie.
-	 *
-	 * Returns the User ID when validates or FALSE when invalidates.
-	 *
-	 * @return bool|int
-	 */
-	public function validate_mfa_cookie() {
-		/** @var array $cookie_elements */
-		$cookie_elements = $this->parse_mfa_cookie();
-
-		if ( ! $cookie_elements ) {
-			return false;
-		}
-
-		$username   = $cookie_elements['username'];
-		$hmac       = $cookie_elements['hmac'];
-		$token      = $cookie_elements['token'];
-		$expiration = $cookie_elements['expiration'];
-
-		if ( $expiration < time() ) {
-			return false;
-		}
-
-		$user = get_user_by( 'login', $username );
-
-		if ( ! $user ) {
-			return false;
-		}
-
-		$pass_frag = substr( $user->user_pass, 8, 4 );
-		$key       = wp_hash( $username . '|' . $pass_frag . '|' . $expiration . '|' . $token );
-		$algorithm = function_exists( 'hash' ) ? 'sha256' : 'sha1';
-		$hash      = hash_hmac( $algorithm, $username . '|' . $expiration . '|' . $token, $key );
-
-		if ( ! hash_equals( $hash, $hmac ) ) {
-			return false;
-		}
-
-		$manager = WP_Session_Tokens::get_instance( $user->ID );
-
-		if ( ! $manager->verify( $token ) ) {
-			return false;
-		}
-
-		return $user->ID;
 
 	}
 
@@ -237,15 +117,16 @@ final class Hydro_Raindrop_Authenticate {
 
 			$this->log( 'Start first time verification.' );
 			$this->delete_transient_data( $user );
-			$this->set_mfa_cookie( $user->ID );
+			$this->cookie->set( $user->ID );
 			$this->start_mfa( $user );
+
 			return;
 
 		}
 
 		$user = $this->get_current_mfa_user();
 
-		if ( $user && $this->validate_mfa_cookie() ) {
+		if ( $user && $this->cookie->validate() ) {
 			// Redirect to MFA page if not already.
 			if ( $this->helper->is_custom_mfa_page_enabled()
 					&& $this->helper->get_custom_mfa_page_url() !== $this->helper->get_current_url() ) {
@@ -273,7 +154,7 @@ final class Hydro_Raindrop_Authenticate {
 	 */
 	public function get_current_mfa_user() {
 
-		$user_id = $this->validate_mfa_cookie();
+		$user_id = $this->cookie->validate();
 
 		if ( ! $user_id ) {
 			return null;
@@ -307,7 +188,7 @@ final class Hydro_Raindrop_Authenticate {
 
 		if ( ! $message ) {
 			$message = $client->generateMessage();
-			set_transient( $transient_id, $message, self::MFA_TIME_OUT );
+			set_transient( $transient_id, $message, Hydro_Raindrop_Cookie::MFA_TIME_OUT );
 		}
 
 		return (int) $message;
@@ -338,7 +219,7 @@ final class Hydro_Raindrop_Authenticate {
 		) {
 			$this->log( 'Nonce verification failed. Logging out.' );
 
-			$this->unset_cookies();
+			$this->cookie->unset();
 
 			// Delete all transient data which is used during the MFA process.
 			if ( $user ) {
@@ -358,7 +239,7 @@ final class Hydro_Raindrop_Authenticate {
 		) {
 			$this->log( 'MFA success.' );
 
-			$this->unset_cookies();
+			$this->cookie->unset();
 
 			// Delete all transient data which is used during the MFA process.
 			if ( $user ) {
@@ -378,8 +259,7 @@ final class Hydro_Raindrop_Authenticate {
 		) {
 			$this->log( 'User cancels MFA.' );
 
-			// Unset the MFA cookie.
-			$this->unset_cookies();
+			$this->cookie->unset();
 
 			// Delete all transient data which is used during the MFA process.
 			if ( $user ) {
@@ -505,22 +385,6 @@ final class Hydro_Raindrop_Authenticate {
 
 		wp_safe_redirect( $redirect_to );
 		exit;
-
-	}
-
-	/**
-	 * Unset the Hydro Raindrop MFA cookie
-	 *
-	 * @return void
-	 */
-	public function unset_cookies() {
-
-		$this->log( 'Unsetting MFA cookies.' );
-
-		// @codingStandardsIgnoreLine
-		setcookie( self::COOKIE_MFA, '', strtotime( '-1 day' ), (string) COOKIEPATH, (string) COOKIE_DOMAIN );
-		// @codingStandardsIgnoreLine
-		setcookie( self::COOKIE_MFA, '', strtotime( '-1 day' ), (string) SITECOOKIEPATH, (string) COOKIE_DOMAIN );
 
 	}
 

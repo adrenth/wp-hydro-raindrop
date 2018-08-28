@@ -237,13 +237,6 @@ class Hydro_Raindrop_Public {
 				 *            user can re-use his Hydro ID but needs to verify it again.
 				 */
 
-				$authenticate = new Hydro_Raindrop_Authenticate(
-					$this->plugin_name,
-					$this->version
-				);
-
-				$authenticate->unset_cookies();
-
 				// @codingStandardsIgnoreLine
 				update_user_meta( $user->ID, 'hydro_id', $hydro_id );
 
@@ -277,12 +270,8 @@ class Hydro_Raindrop_Public {
 
 		if ( $disable_hydro_mfa && $user_has_hydro_id ) {
 
-			$client       = Hydro_Raindrop::get_raindrop_client();
-			$hydro_id     = (string) get_user_meta( $user->ID, 'hydro_id', true );
-			$authenticate = new Hydro_Raindrop_Authenticate(
-				$this->plugin_name,
-				$this->version
-			);
+			$client   = Hydro_Raindrop::get_raindrop_client();
+			$hydro_id = (string) get_user_meta( $user->ID, 'hydro_id', true );
 
 			try {
 				$client->unregisterUser( $hydro_id );
@@ -295,8 +284,6 @@ class Hydro_Raindrop_Public {
 
 				// @codingStandardsIgnoreLine
 				delete_user_meta( $user->ID, 'hydro_raindrop_confirmed' );
-
-				$authenticate->unset_cookies();
 
 			} catch ( \Adrenth\Raindrop\Exception\UnregisterUserFailed $e ) {
 
@@ -314,7 +301,9 @@ class Hydro_Raindrop_Public {
 	 * @return string
 	 */
 	public function shortcode_form_open() : string {
+
 		return '<form action="" method="post">';
+
 	}
 
 	/**
@@ -323,7 +312,9 @@ class Hydro_Raindrop_Public {
 	 * @return string
 	 */
 	public function shortcode_form_close() : string {
+
 		return wp_nonce_field( 'hydro_raindrop_mfa' ) . '</form>';
+
 	}
 
 	/**
@@ -333,14 +324,20 @@ class Hydro_Raindrop_Public {
 	 * @throws Exception When message cannot be generated.
 	 */
 	public function shortcode_digits() : string {
-		$authenticate = new Hydro_Raindrop_Authenticate( $this->plugin_name, $this->version );
-		$user         = $authenticate->get_current_mfa_user();
+
+		if ( is_user_logged_in() ) {
+			$user = wp_get_current_user();
+		} else {
+			$authenticate = new Hydro_Raindrop_Authenticate( $this->plugin_name, $this->version );
+			$user         = $authenticate->get_current_mfa_user();
+		}
 
 		if ( ! ( $user instanceof WP_User ) ) {
 			return '';
 		}
 
 		return (string) Hydro_Raindrop_Authenticate::get_message( $user );
+
 	}
 
 	/**
@@ -349,12 +346,14 @@ class Hydro_Raindrop_Public {
 	 * @return string
 	 */
 	public function shortcode_button_authorize() : string {
+
 		return sprintf(
 			'<input type="submit" name="%s" class="%s" value="%s">',
 			'hydro_raindrop',
 			'hydro-raindrop-mfa-button-authorize',
 			esc_html__( 'Authenticate', 'wp-hydro-raindrop' )
 		);
+
 	}
 
 	/**
@@ -363,12 +362,14 @@ class Hydro_Raindrop_Public {
 	 * @return string
 	 */
 	public function shortcode_button_cancel() : string {
+
 		return sprintf(
 			'<input type="submit" name="%s" class="%s" value="%s">',
 			'cancel_hydro_raindrop',
 			'hydro-raindrop-mfa-button-cancel',
 			esc_html__( 'Cancel', 'wp-hydro-raindrop' )
 		);
+
 	}
 
 	/**
