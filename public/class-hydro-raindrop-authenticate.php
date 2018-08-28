@@ -124,13 +124,31 @@ final class Hydro_Raindrop_Authenticate {
 
 		}
 
-		$user = $this->get_current_mfa_user();
+		$cookie_is_valid = $this->cookie->validate();
 
-		if ( $user && $this->cookie->validate() ) {
+		// Protect custom MFA page.
+		if ( ! $cookie_is_valid
+			&& $this->helper->is_custom_mfa_page_enabled()
+			&& $this->helper->get_current_url() === $this->helper->get_custom_mfa_page_url() ) {
+			// @codingStandardsIgnoreLine
+			wp_redirect( home_url() );
+			exit;
+		}
+
+		if ( $cookie_is_valid ) {
 			// Redirect to MFA page if not already.
 			if ( $this->helper->is_custom_mfa_page_enabled()
-					&& $this->helper->get_custom_mfa_page_url() !== $this->helper->get_current_url() ) {
+					&& ! in_array(
+						$this->helper->get_current_url(),
+						[
+							$this->helper->get_custom_mfa_page_url(),
+							$this->helper->get_custom_mfa_page_url() . '?error=1',
+						],
+						true
+					)
+			) {
 				$this->log( 'User not on Hydro Raindrop MFA page. Redirecting...' );
+
 				// @codingStandardsIgnoreLine
 				wp_redirect( $this->helper->get_custom_mfa_page_url() );
 				exit;
@@ -138,9 +156,11 @@ final class Hydro_Raindrop_Authenticate {
 
 			// Render MFA page if not on login page.
 			if ( ! $this->helper->is_custom_mfa_page_enabled()
-					&& strpos( $this->helper->get_current_url(), 'wp-login.php' ) === false
+					&& strpos( $this->helper->get_current_url(), 'wp-login.php' ) !== false
 			) {
 				$this->log( 'User not on Hydro Raindrop MFA page. Render MFA page.' );
+
+				$user = $this->get_current_mfa_user();
 				$this->start_mfa( $user );
 			}
 		}
@@ -233,23 +253,43 @@ final class Hydro_Raindrop_Authenticate {
 
 		// Verify MFA message
 		// @codingStandardsIgnoreLine
-		if ( isset( $_POST['hydro_raindrop'] )
-				&& $user
-				&& $this->verify_signature_login( $user )
-		) {
-			$this->log( 'MFA success.' );
+		if ( isset( $_POST['hydro_raindrop'] ) && $user ) {
 
-			$this->cookie->unset();
+			if ( $this->verify_signature_login( $user ) ) {
+				$this->log( 'MFA success.' );
 
-			// Delete all transient data which is used during the MFA process.
-			if ( $user ) {
+				$this->cookie->unset();
+
+				// Delete all transient data which is used during the MFA process.
+				if ( $user ) {
+					$this->delete_transient_data( $user );
+				}
+
+				wp_set_auth_cookie( $user->ID ); // TODO: Remember login parameter.
+
+				// Redirect the user to it's intended location.
+				$this->redirect( $user );
+			} else {
+				$this->log( 'MFA failed.' );
+
 				$this->delete_transient_data( $user );
+
+				$to_url = $this->helper->get_current_url();
+
+				if ( $this->helper->is_custom_mfa_page_enabled() ) {
+					$to_url = $this->helper->get_custom_mfa_page_url();
+				}
+
+				if ( strpos( $to_url, '?error=1' ) === false ) {
+					$to_url .= '?error=1';
+				}
+
+				// @codingStandardsIgnoreLine
+				wp_redirect( $to_url );
+
+				exit;
 			}
 
-			wp_set_auth_cookie( $user->ID ); // TODO: Remember login parameter.
-
-			// Redirect the user to it's intended location.
-			$this->redirect( $user );
 		}
 
 		// Allow user to cancel the MFA. Which results in a logout.

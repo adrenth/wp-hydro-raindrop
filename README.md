@@ -55,6 +55,7 @@ Follow the instructions below to create your own Hydro Raindrop MFA page:
     - `[hydro_raindrop_mfa_digits]`: renders 6 digits which should be entered into the Hydro app.
     - `[hydro_raindrop_mfa_button_authorize]`: renders the "Authorize" button; customize the look of the button using CSS class `hydro-raindrop-mfa-button-authorize`.
     - `[hydro_raindrop_mfa_button_cancel]`: renders the "Cancel" button; customize the look of the button using CSS class `hydro-raindrop-mfa-button-cancel`.
+* When MFA verification fails the User will be redirected to the MFA page with GET parameter `?error=1`.
 * Under `Setting` navigate to the `Hydro Raindro MFA` section and select the page you created.
 
 ### Custom HydroID page

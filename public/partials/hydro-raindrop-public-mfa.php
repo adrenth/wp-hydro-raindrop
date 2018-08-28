@@ -51,6 +51,9 @@ $classes = apply_filters( 'login_body_class', $classes );
 	<?php if ($error) { ?>
 	<div id="login_error"><?php echo $error; ?></div>
 	<?php } ?>
+	<?php if ( isset( $_GET['error'] ) ) { ?>
+	<div id="login_error">Verification failure, please try again...</div>
+	<?php } ?>
 	<form action="" method="post">
 		<p class="hydro-illustration">
 			<img src="<?php echo esc_attr( $image ) ?>" width="180" alt="">
