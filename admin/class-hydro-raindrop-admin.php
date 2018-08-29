@@ -198,4 +198,50 @@ class Hydro_Raindrop_Admin {
 
 	}
 
+	/**
+	 * Display the activation notice.
+	 *
+	 * @return void
+	 */
+	public function activation_notice() {
+
+		if ( get_option( 'hydro_raindrop_activation_notice' ) ) {
+			return;
+		}
+
+		$option_page_url = admin_url( 'options-general.php?page=' . $this->plugin_name . '-options' );
+
+		$message = sprintf(
+			__( 'Succesfully activated the WP Hydro Raindrop plugin, to configure the plugin go to the Hydro Raindrop MFA <a style="color: #fff; font-weight: bold;" href="%1$s">settings page</a>.', $this->plugin_name ),
+			esc_url( $option_page_url )
+		);
+
+		printf(
+			'<div class="notice is-dismissible" style="background-color: #5591f3; color: #fff; border-left: none;">
+				<p>%1$s</p>
+			</div>',
+			$message
+		);
+
+		add_option( 'hydro_raindrop_activation_notice', '1' );
+
+	}
+
+	/**
+	 * Add action links to plugins table.
+	 *
+	 * @param array $links Default links.
+	 * @return array
+	 */
+	public function add_action_links( array $links = [] ) : array {
+
+		$option_page_url = admin_url( 'options-general.php?page=' . $this->plugin_name . '-options' );
+
+		$add_links = [
+			'<a href="' . $option_page_url . '">' . __( 'Settings', 'wp-hydro-raindrop' ) . '</a>',
+		];
+
+		return array_merge( $links, $add_links );
+	}
+
 }

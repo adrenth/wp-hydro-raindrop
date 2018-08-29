@@ -164,9 +164,16 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'admin_init' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_menu' );
-		$this->loader->add_action( 'before_delete_post', $plugin_admin, 'before_delete_post' );
 
 		$this->loader->add_action( 'update_option', $plugin_admin, 'update_option' );
+
+		$this->loader->add_action( 'admin_notices', $plugin_admin, 'activation_notice' );
+
+		$this->loader->add_filter(
+			"plugin_action_links_{$this->plugin_name}/{$this->plugin_name}.php",
+			$plugin_admin,
+			'add_action_links'
+		);
 
 	}
 
