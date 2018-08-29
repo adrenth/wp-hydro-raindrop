@@ -58,6 +58,57 @@ Follow the instructions below to create your own Hydro Raindrop MFA page:
 * When MFA verification fails the User will be redirected to the MFA page with GET parameter `?error=1`.
 * Under `Setting` navigate to the `Hydro Raindro MFA` section and select the page you created.
 
+#### Custom MFA page example
+
+Create a custom page template (e.g. `/wp-content/themes/my-awesome-theme/hydro-raindrop-mfa.php`) for the Hydro Raindrop MFA. Below is an example on how to use the shortcodes.
+
+```
+<?php
+/**
+ * Template Name: Hydro Raindrop MFA
+ */
+
+get_header();
+?>
+
+<!-- HTML -->
+
+<div class="row">
+    <div class="col-sm">
+        <div class="card w-75">
+            <div class="card-body">
+                <?php echo do_shortcode( '[hydro_raindrop_mfa_form_open]' ); ?>
+
+                <div class="text-center">
+                    <img src="https://www.hydrogenplatform.com/docs/hydro/v1/images/logo.png">
+                </div>
+
+                <h2 class="card-text text-center">
+                    <?php echo do_shortcode( '[hydro_raindrop_mfa_digits]' ); ?>
+                </h2>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <?php echo do_shortcode( '[hydro_raindrop_mfa_button_cancel class="btn btn-default"]' ); ?>
+                    </div>
+                    <div class="col-md-8 text-right">
+                        <?php echo do_shortcode( '[hydro_raindrop_mfa_button_authorize class="btn btn-primary"]' ); ?>
+                    </div>
+                </div>
+                
+                <?php echo do_shortcode( '[hydro_raindrop_mfa_form_close]' ); ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- HTML -->
+
+<?php
+get_footer();
+
+```
+
 ### Custom HydroID page
 
 Follow the instructions below to create your own Hydro Raindrop MFA page:
