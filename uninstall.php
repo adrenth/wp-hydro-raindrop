@@ -31,6 +31,7 @@ delete_option( 'hydro_raindrop_client_id' );
 delete_option( 'hydro_raindrop_client_secret' );
 delete_option( 'hydro_raindrop_environment' );
 delete_option( 'hydro_raindrop_access_token_success' );
+delete_option( 'hydro_raindrop_activation_notice' );
 delete_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE );
 delete_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE );
 
