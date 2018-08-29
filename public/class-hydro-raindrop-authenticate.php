@@ -124,6 +124,17 @@ final class Hydro_Raindrop_Authenticate {
 
 		}
 
+		// Allow administrator to view the MFA page.
+		if ( is_user_logged_in() ) {
+			$user = wp_get_current_user();
+
+			if ( user_can( $user, 'administrator' )
+					&& $this->helper->is_custom_mfa_page_enabled()
+					&& $this->helper->get_current_url() === $this->helper->get_custom_mfa_page_url() ) {
+				return;
+			}
+		}
+
 		$cookie_is_valid = $this->cookie->validate();
 
 		// Protect custom MFA page.

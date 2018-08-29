@@ -343,15 +343,22 @@ class Hydro_Raindrop_Public {
 	/**
 	 * MFA authorize button for the custom MFA page.
 	 *
+	 * @param array $attributes Shortcode attributes.
+	 *
 	 * @return string
 	 */
-	public function shortcode_button_authorize() : string {
+	public function shortcode_button_authorize( array $attributes = [] ) : string {
+
+		$attributes = shortcode_atts( [
+			'class' => 'hydro-raindrop-mfa-button-authorize',
+			'label' => esc_html__( 'Authenticate', 'wp-hydro-raindrop' ),
+		], $attributes);
 
 		return sprintf(
 			'<input type="submit" name="%s" class="%s" value="%s">',
 			'hydro_raindrop',
-			'hydro-raindrop-mfa-button-authorize',
-			esc_html__( 'Authenticate', 'wp-hydro-raindrop' )
+			$attributes['class'],
+			$attributes['label']
 		);
 
 	}
@@ -359,15 +366,22 @@ class Hydro_Raindrop_Public {
 	/**
 	 * MFA cancel button for the custom MFA page.
 	 *
+	 * @param array $attributes Shortcode attributes.
+	 *
 	 * @return string
 	 */
-	public function shortcode_button_cancel() : string {
+	public function shortcode_button_cancel( array $attributes = [] ) : string {
+
+		$attributes = shortcode_atts( [
+			'class' => 'hydro-raindrop-mfa-button-cancel',
+			'label' => esc_html__( 'Cancel', 'wp-hydro-raindrop' ),
+		], $attributes);
 
 		return sprintf(
 			'<input type="submit" name="%s" class="%s" value="%s">',
 			'cancel_hydro_raindrop',
-			'hydro-raindrop-mfa-button-cancel',
-			esc_html__( 'Cancel', 'wp-hydro-raindrop' )
+			$attributes['class'],
+			$attributes['label']
 		);
 
 	}
