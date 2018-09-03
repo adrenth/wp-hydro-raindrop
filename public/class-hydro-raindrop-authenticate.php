@@ -63,32 +63,25 @@ final class Hydro_Raindrop_Authenticate {
 	}
 
 	/**
-	 * Hook into the WordPress sign-on flow.
+	 * The authenticate filter hook is used to perform additional validation/authentication any time a user logs in to
+	 * WordPress.
 	 *
-	 * @param string      $user_login    Username which was entered in the sign-on form.
-	 * @param string|null $user_password The password which was entered in the sign-on form.
+	 * @param null|WP_User|WP_Error $user NULL indicates no process has authenticated the user yet. A WP_Error object
+	 *                                    indicates another process has failed the authentication.
+	 *                                    A WP_User object indicates another process has authenticated the user.
 	 *
+	 * @return null|WP_User|WP_Error
 	 * @throws Exception
 	 */
-	public function authenticate( string $user_login = null, string $user_password = null ) {
+	public function authenticate( $user = null ) {
 
-		if ( ! $user_login || ! username_exists( $user_login ) ) {
-			return;
-		}
-
-		if ( ! $this->is_hydro_raindrop_mfa_enabled() ) {
-			return;
+		if ( ! $user || $user instanceof WP_Error || ! ( $user instanceof WP_User ) ) {
+			return $user;
 		}
 
 		if ( ! is_ssl() ) {
 			$this->log( 'SSL disabled, skipping Hydro Raindrop MFA.' );
-			return;
-		}
-
-		$user = wp_authenticate( $user_login, $user_password );
-
-		if ( ! ( $user instanceof WP_User ) ) {
-			return;
+			return $user;
 		}
 
 		if ( $this->user_requires_mfa( $user ) ) {

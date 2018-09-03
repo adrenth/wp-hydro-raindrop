@@ -220,12 +220,12 @@ class Hydro_Raindrop {
 		);
 
 		/**
-		 * Action: wp_authenticate
+		 * Filter: authenticate
 		 *
-		 * This action is located inside of `wp_signon`. In contrast to the `wp_login` action, it is executed before
-		 * the WordPress authentication process.
+		 * The authenticate filter hook is used to perform additional validation/authentication any time a user logs in
+		 * to WordPress.
 		 */
-		$this->loader->add_action( 'wp_authenticate', $plugin_authenticate, 'authenticate', 0, 2 );
+		$this->loader->add_filter( 'authenticate', $plugin_authenticate, 'authenticate', 21 );
 
 		/**
 		 * Filter: init
