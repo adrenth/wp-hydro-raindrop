@@ -153,7 +153,7 @@ final class Hydro_Raindrop_Authenticate {
 						$this->helper->get_current_url(),
 						[
 							$this->helper->get_custom_mfa_page_url(),
-							$this->helper->get_custom_mfa_page_url() . '?error=1',
+							$this->helper->get_custom_mfa_page_url() . '?hydro-raindrop-error=1',
 						],
 						true
 					)
@@ -291,8 +291,8 @@ final class Hydro_Raindrop_Authenticate {
 					$to_url = $this->helper->get_custom_mfa_page_url();
 				}
 
-				if ( strpos( $to_url, '?error=1' ) === false ) {
-					$to_url .= '?error=1';
+				if ( strpos( $to_url, '?hydro-raindrop-error=1' ) === false ) {
+					$to_url .= '?hydro-raindrop-error=1';
 				}
 
 				// @codingStandardsIgnoreLine
