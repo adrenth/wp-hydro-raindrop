@@ -26,12 +26,12 @@ require_once __DIR__ . '/vendor/autoload.php';
  */
 require_once __DIR__ . '/includes/class-hydro-raindrop-helper.php';
 
-delete_option( 'hydro_raindrop_application_id' );
-delete_option( 'hydro_raindrop_client_id' );
-delete_option( 'hydro_raindrop_client_secret' );
-delete_option( 'hydro_raindrop_environment' );
-delete_option( 'hydro_raindrop_access_token_success' );
-delete_option( 'hydro_raindrop_activation_notice' );
+delete_option( Hydro_Raindrop_Helper::OPTION_APPLICATION_ID );
+delete_option( Hydro_Raindrop_Helper::OPTION_CLIENT_ID );
+delete_option( Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET );
+delete_option( Hydro_Raindrop_Helper::OPTION_ENVIRONMENT );
+delete_option( Hydro_Raindrop_Helper::OPTION_ACCESS_TOKEN_SUCCESS );
+delete_option( Hydro_Raindrop_Helper::OPTION_ACTIVATION_NOTICE );
 delete_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE );
 delete_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE );
 

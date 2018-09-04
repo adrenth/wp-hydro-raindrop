@@ -82,10 +82,10 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function admin_init() {
 
-		register_setting( 'hydro_api', 'hydro_raindrop_application_id' );
-		register_setting( 'hydro_api', 'hydro_raindrop_client_id' );
-		register_setting( 'hydro_api', 'hydro_raindrop_client_secret' );
-		register_setting( 'hydro_api', 'hydro_raindrop_environment' );
+		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_APPLICATION_ID );
+		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_CLIENT_ID );
+		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET );
+		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_ENVIRONMENT );
 		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE );
 		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE );
 
@@ -121,17 +121,17 @@ class Hydro_Raindrop_Admin {
 	public function update_option( $option ) {
 
 		switch ( $option ) {
-			case 'hydro_raindrop_application_id':
-			case 'hydro_raindrop_client_id':
-			case 'hydro_raindrop_client_secret':
-			case 'hydro_raindrop_environment':
+			case Hydro_Raindrop_Helper::OPTION_APPLICATION_ID:
+			case Hydro_Raindrop_Helper::OPTION_CLIENT_ID:
+			case Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET:
+			case Hydro_Raindrop_Helper::OPTION_ENVIRONMENT:
 				$token_storage = new Hydro_Raindrop_TransientTokenStorage();
 				$token_storage->unsetAccessToken();
 
 				$authenticate = new Hydro_Raindrop_Authenticate( $this->plugin_name, $this->version );
 				$authenticate->unset_cookies();
 
-				delete_option( 'hydro_raindrop_access_token_success' );
+				delete_option( Hydro_Raindrop_Helper::OPTION_ACCESS_TOKEN_SUCCESS );
 
 				delete_metadata( 'user', 0, 'hydro_id', '', true );
 				delete_metadata( 'user', 0, 'hydro_mfa_enabled', '', true );
@@ -179,14 +179,14 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function options_are_valid() : bool {
 
-		$token_success = (string) get_option( 'hydro_raindrop_access_token_success', '' );
+		$token_success = (string) get_option( Hydro_Raindrop_Helper::OPTION_ACCESS_TOKEN_SUCCESS, '' );
 
 		if ( empty( $token_success ) && Hydro_Raindrop::has_valid_raindrop_client_options() ) {
 			try {
 				$client = Hydro_Raindrop::get_raindrop_client();
 				$client->getAccessToken();
 
-				update_option( 'hydro_raindrop_access_token_success', 1 );
+				update_option( Hydro_Raindrop_Helper::OPTION_ACCESS_TOKEN_SUCCESS, 1 );
 
 				return true;
 			} catch ( RefreshTokenFailed $e ) {
@@ -205,7 +205,7 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function activation_notice() {
 
-		if ( get_option( 'hydro_raindrop_activation_notice' ) ) {
+		if ( get_option( Hydro_Raindrop_Helper::OPTION_ACTIVATION_NOTICE ) ) {
 			return;
 		}
 
@@ -223,7 +223,7 @@ class Hydro_Raindrop_Admin {
 			$message
 		);
 
-		add_option( 'hydro_raindrop_activation_notice', '1' );
+		add_option( Hydro_Raindrop_Helper::OPTION_ACTIVATION_NOTICE, '1' );
 
 	}
 

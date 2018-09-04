@@ -309,14 +309,14 @@ class Hydro_Raindrop {
 		if ( ! self::$raindrop_client ) {
 			self::$raindrop_client = new Client(
 				new ApiSettings(
-					(string) get_option( 'hydro_raindrop_client_id' ),
-					(string) get_option( 'hydro_raindrop_client_secret' ),
-					get_option( 'hydro_raindrop_environment' ) === 'sandbox'
+					(string) get_option( Hydro_Raindrop_Helper::OPTION_CLIENT_ID ),
+					(string) get_option( Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET ),
+					get_option( Hydro_Raindrop_Helper::OPTION_ENVIRONMENT ) === 'sandbox'
 						? new SandboxEnvironment()
 						: new ProductionEnvironment()
 				),
 				new Hydro_Raindrop_TransientTokenStorage(),
-				(string) get_option( 'hydro_raindrop_application_id' )
+				(string) get_option( Hydro_Raindrop_Helper::OPTION_APPLICATION_ID )
 			);
 		}
 
@@ -333,10 +333,10 @@ class Hydro_Raindrop {
 	public static function has_valid_raindrop_client_options() : bool {
 
 		$options = [
-			'hydro_raindrop_client_id',
-			'hydro_raindrop_client_secret',
-			'hydro_raindrop_environment',
-			'hydro_raindrop_application_id',
+			Hydro_Raindrop_Helper::OPTION_CLIENT_ID,
+			Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET,
+			Hydro_Raindrop_Helper::OPTION_ENVIRONMENT,
+			Hydro_Raindrop_Helper::OPTION_APPLICATION_ID,
 		];
 
 		foreach ( $options as $option ) {

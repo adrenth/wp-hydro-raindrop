@@ -13,8 +13,14 @@ declare( strict_types=1 );
  */
 class Hydro_Raindrop_Helper {
 
+	const OPTION_APPLICATION_ID       = 'hydro_raindrop_application_id';
+	const OPTION_CLIENT_ID            = 'hydro_raindrop_client_id';
+	const OPTION_CLIENT_SECRET        = 'hydro_raindrop_client_secret';
+	const OPTION_ENVIRONMENT          = 'hydro_raindrop_environment';
 	const OPTION_CUSTOM_MFA_PAGE      = 'hydro_raindrop_custom_mfa_page';
 	const OPTION_CUSTOM_HYDRO_ID_PAGE = 'hydro_raindrop_custom_hydro_id_page';
+	const OPTION_ACTIVATION_NOTICE    = 'hydro_raindrop_activation_notice';
+	const OPTION_ACCESS_TOKEN_SUCCESS = 'hydro_raindrop_access_token_success';
 
 	/**
 	 * Construct the Helper.
