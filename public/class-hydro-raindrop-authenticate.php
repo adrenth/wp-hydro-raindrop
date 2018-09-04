@@ -447,17 +447,6 @@ final class Hydro_Raindrop_Authenticate {
 	}
 
 	/**
-	 * Whether the Hydro Raindrop MFA is enabled.
-	 *
-	 * @return bool
-	 */
-	private function is_hydro_raindrop_mfa_enabled() : bool {
-
-		return true;
-
-	}
-
-	/**
 	 * Whether this is the first time verification.
 	 *
 	 * @return bool
