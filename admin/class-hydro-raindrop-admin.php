@@ -128,9 +128,6 @@ class Hydro_Raindrop_Admin {
 				$token_storage = new Hydro_Raindrop_TransientTokenStorage();
 				$token_storage->unsetAccessToken();
 
-				$authenticate = new Hydro_Raindrop_Authenticate( $this->plugin_name, $this->version );
-				$authenticate->unset_cookies();
-
 				delete_option( Hydro_Raindrop_Helper::OPTION_ACCESS_TOKEN_SUCCESS );
 
 				delete_metadata( 'user', 0, 'hydro_id', '', true );
