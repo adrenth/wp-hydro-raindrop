@@ -3,7 +3,7 @@
 ## 1.3.0
 
 - Allow developers to make their own custom MFA page (with shortcodes).
-- Improve MFA flow
+- Improve MFA flow and security.
 
 ## 1.2.1
 
