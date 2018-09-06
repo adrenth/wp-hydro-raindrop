@@ -66,18 +66,6 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function enqueue_styles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Hydro_Raindrop_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Hydro_Raindrop_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_style(
 			$this->plugin_name,
 			plugin_dir_url( __FILE__ ) . 'css/hydro-raindrop-admin.css',
@@ -94,10 +82,12 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function admin_init() {
 
-		register_setting( 'hydro_api', 'hydro_raindrop_application_id' );
-		register_setting( 'hydro_api', 'hydro_raindrop_client_id' );
-		register_setting( 'hydro_api', 'hydro_raindrop_client_secret' );
-		register_setting( 'hydro_api', 'hydro_raindrop_environment' );
+		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_APPLICATION_ID );
+		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_CLIENT_ID );
+		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET );
+		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_ENVIRONMENT );
+		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE );
+		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE );
 
 	}
 
@@ -131,17 +121,14 @@ class Hydro_Raindrop_Admin {
 	public function update_option( $option ) {
 
 		switch ( $option ) {
-			case 'hydro_raindrop_application_id':
-			case 'hydro_raindrop_client_id':
-			case 'hydro_raindrop_client_secret':
-			case 'hydro_raindrop_environment':
+			case Hydro_Raindrop_Helper::OPTION_APPLICATION_ID:
+			case Hydro_Raindrop_Helper::OPTION_CLIENT_ID:
+			case Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET:
+			case Hydro_Raindrop_Helper::OPTION_ENVIRONMENT:
 				$token_storage = new Hydro_Raindrop_TransientTokenStorage();
 				$token_storage->unsetAccessToken();
 
-				$authenticate = new Hydro_Raindrop_Authenticate( $this->plugin_name, $this->version );
-				$authenticate->unset_cookie();
-
-				delete_option( 'hydro_raindrop_access_token_success' );
+				delete_option( Hydro_Raindrop_Helper::OPTION_ACCESS_TOKEN_SUCCESS );
 
 				delete_metadata( 'user', 0, 'hydro_id', '', true );
 				delete_metadata( 'user', 0, 'hydro_mfa_enabled', '', true );
@@ -159,6 +146,27 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function admin_page() {
 
+		$args = array(
+			'post_type'      => 'page',
+			'posts_per_page' => -1,
+			'order'          => 'ASC',
+			'orderby'        => 'menu_order',
+		);
+
+		$parent = new WP_Query( $args );
+
+		$posts = [];
+
+		while ( $parent->have_posts() ) {
+			$parent->the_post();
+
+			$id = get_the_ID();
+
+			if ( $id ) {
+				$posts[ $id ] = get_the_title() . ' - ' . get_the_permalink();
+			}
+		}
+
 		include __DIR__ . '/../admin/partials/hydro-raindrop-admin-display.php';
 
 	}
@@ -168,14 +176,14 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function options_are_valid() : bool {
 
-		$token_success = (string) get_option( 'hydro_raindrop_access_token_success', '' );
+		$token_success = (string) get_option( Hydro_Raindrop_Helper::OPTION_ACCESS_TOKEN_SUCCESS, '' );
 
 		if ( empty( $token_success ) && Hydro_Raindrop::has_valid_raindrop_client_options() ) {
 			try {
 				$client = Hydro_Raindrop::get_raindrop_client();
 				$client->getAccessToken();
 
-				update_option( 'hydro_raindrop_access_token_success', 1 );
+				update_option( Hydro_Raindrop_Helper::OPTION_ACCESS_TOKEN_SUCCESS, 1 );
 
 				return true;
 			} catch ( RefreshTokenFailed $e ) {
@@ -185,6 +193,52 @@ class Hydro_Raindrop_Admin {
 
 		return true;
 
+	}
+
+	/**
+	 * Display the activation notice.
+	 *
+	 * @return void
+	 */
+	public function activation_notice() {
+
+		if ( get_option( Hydro_Raindrop_Helper::OPTION_ACTIVATION_NOTICE ) ) {
+			return;
+		}
+
+		$option_page_url = admin_url( 'options-general.php?page=' . $this->plugin_name . '-options' );
+
+		$message = sprintf(
+			__( 'Succesfully activated the WP Hydro Raindrop plugin, to configure the plugin go to the Hydro Raindrop MFA <a style="color: #fff; font-weight: bold;" href="%1$s">settings page</a>.', $this->plugin_name ),
+			esc_url( $option_page_url )
+		);
+
+		printf(
+			'<div class="notice is-dismissible" style="background-color: #5591f3; color: #fff; border-left: none;">
+				<p>%1$s</p>
+			</div>',
+			$message
+		);
+
+		add_option( Hydro_Raindrop_Helper::OPTION_ACTIVATION_NOTICE, '1' );
+
+	}
+
+	/**
+	 * Add action links to plugins table.
+	 *
+	 * @param array $links Default links.
+	 * @return array
+	 */
+	public function add_action_links( array $links = [] ) : array {
+
+		$option_page_url = admin_url( 'options-general.php?page=' . $this->plugin_name . '-options' );
+
+		$add_links = [
+			'<a href="' . $option_page_url . '">' . __( 'Settings', 'wp-hydro-raindrop' ) . '</a>',
+		];
+
+		return array_merge( $links, $add_links );
 	}
 
 }

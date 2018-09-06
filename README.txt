@@ -1,6 +1,6 @@
 === WP Hydro Raindrop ===
 Contributors: adrenth
-Donate link: https://github.com/adrenth
+Donate link: https://www.paypal.me/adrenth
 Tags: hydro, raindrop, mfa, 2fa
 Requires at least: 3.0.1
 Tested up to: 4.9.8
@@ -31,6 +31,10 @@ Download plugin from WordPress.org.
 Issues can be reported here: https://github.com/adrenth/wp-hydro-raindrop/issues
 
 == Changelog ==
+= 1.3.0 =
+* Allow developers to make their own custom MFA page (with shortcodes).
+* Improve MFA flow and security.
+
 = 1.2.1 =
 * Update WP readme.txt
 

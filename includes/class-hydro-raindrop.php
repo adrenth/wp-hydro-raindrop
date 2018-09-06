@@ -95,52 +95,40 @@ class Hydro_Raindrop {
 	/**
 	 * Load the required dependencies for this plugin.
 	 *
-	 * Include the following files that make up the plugin:
-	 *
-	 * - Hydro_Raindrop_Loader. Orchestrates the hooks of the plugin.
-	 * - Hydro_Raindrop_TransientTokenStorage. Implements the TokenStorage from the Raindrop SDK package.
-	 * - Hydro_Raindrop_i18n. Defines internationalization functionality.
-	 * - Hydro_Raindrop_Admin. Defines all hooks for the admin area.
-	 * - Hydro_Raindrop_Public. Defines all hooks for the public side of the site.
-	 *
-	 * Create an instance of the loader which will be used to register the hooks
-	 * with WordPress.
-	 *
 	 * @since    1.0.0
 	 * @access   private
 	 */
 	private function load_dependencies() {
 
-		/**
-		 * The class responsible for orchestrating the actions and filters of the core plugin.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-hydro-raindrop-loader.php';
+		$includes = [
+			// The class responsible for orchestrating the actions and filters of the core plugin.
+			__DIR__ . '/class-hydro-raindrop-loader.php',
+			// The class responsible for storing the access token from the Raindrop API.
+			__DIR__ . '/class-hydro-raindrop-token-storage.php',
+			// The class responsible for defining internationalization functionality of the plugin.
+			__DIR__ . '/class-hydro-raindrop-i18n.php',
+			// The class with some convenient helper methods.
+			__DIR__ . '/class-hydro-raindrop-helper.php',
+			// The class for handling the MFA cookie.
+			__DIR__ . '/class-hydro-raindrop-cookie.php',
+			// The class responsible for defining all actions that occur in the admin area.
+			__DIR__ . '/../admin/class-hydro-raindrop-admin.php',
+			// The class responsible for defining all actions that occur in the public-facing side of the site.
+			__DIR__ . '/../public/class-hydro-raindrop-public.php',
+			// The class responsible for Hydro Raindrop authentication.
+			__DIR__ . '/../public/class-hydro-raindrop-authenticate.php',
+		];
 
-		/**
-		 * The class responsible for storing the access token from the Raindrop API
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-hydro-raindrop-token-storage.php';
+		foreach ( $includes as $include ) {
+			/**
+			 * Dynamic include expressions like there are not being analysed.
+			 *
+			 * @noinspection PhpIncludeInspection
+			 */
+			require_once $include;
+		}
 
-		/**
-		 * The class responsible for defining internationalization functionality of the plugin.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-hydro-raindrop-i18n.php';
-
-		/**
-		 * The class responsible for defining all actions that occur in the admin area.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-hydro-raindrop-admin.php';
-
-		/**
-		 * The class responsible for defining all actions that occur in the public-facing side of the site.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-hydro-raindrop-public.php';
-
-		/**
-		 * The class responsible authentication.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-hydro-raindrop-authenticate.php';
-
+		// Create an instance of the loader which will be used to register the hooks with WordPress.
 		$this->loader = new Hydro_Raindrop_Loader();
 
 	}
@@ -176,9 +164,16 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'admin_init' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_menu' );
-		$this->loader->add_action( 'before_delete_post', $plugin_admin, 'before_delete_post' );
 
 		$this->loader->add_action( 'update_option', $plugin_admin, 'update_option' );
+
+		$this->loader->add_action( 'admin_notices', $plugin_admin, 'activation_notice' );
+
+		$this->loader->add_filter(
+			"plugin_action_links_{$this->plugin_name}/{$this->plugin_name}.php",
+			$plugin_admin,
+			'add_action_links'
+		);
 
 	}
 
@@ -225,21 +220,34 @@ class Hydro_Raindrop {
 		);
 
 		/**
+		 * Filter: authenticate
+		 *
+		 * The authenticate filter hook is used to perform additional validation/authentication any time a user logs in
+		 * to WordPress.
+		 */
+		$this->loader->add_filter( 'authenticate', $plugin_authenticate, 'authenticate', 21 );
+
+		/**
 		 * Filter: init
 		 *
 		 * Most of WP is loaded at this stage, and the user is authenticated.
 		 * WP continues to load on the init hook that follows (e.g. widgets), and many plugins instantiate themselves
 		 * on it for all sorts of reasons (e.g. they need a user, a taxonomy, etc.).
 		 */
-		$this->loader->add_filter( 'init', $plugin_authenticate, 'verify' );
+		$this->loader->add_filter( 'init', $plugin_authenticate, 'verify', 0 );
+		$this->loader->add_filter( 'init', $plugin_public, 'manage_hydro_id', 0 );
 
 		/**
-		 * Filter: clear_auth_cookie
+		 * Shortcodes
 		 *
-		 * Fires just before the authentication cookies are cleared.
+		 * @see https://codex.wordpress.org/Shortcode_API
 		 */
-		$this->loader->add_filter( 'clear_auth_cookie', $plugin_authenticate, 'unset_cookie' );
-
+		add_shortcode( 'hydro_raindrop_mfa_form_open', [ $plugin_public, 'shortcode_form_open' ] );
+		add_shortcode( 'hydro_raindrop_mfa_form_close', [ $plugin_public, 'shortcode_form_close' ] );
+		add_shortcode( 'hydro_raindrop_mfa_digits', [ $plugin_public, 'shortcode_digits' ] );
+		add_shortcode( 'hydro_raindrop_mfa_button_authorize', [ $plugin_public, 'shortcode_button_authorize' ] );
+		add_shortcode( 'hydro_raindrop_mfa_button_cancel', [ $plugin_public, 'shortcode_button_cancel' ] );
+		add_shortcode( 'hydro_raindrop_manage_hydro_id', [ $plugin_public, 'shortcode_manage_hydro_id' ] );
 	}
 
 	/**
@@ -301,14 +309,14 @@ class Hydro_Raindrop {
 		if ( ! self::$raindrop_client ) {
 			self::$raindrop_client = new Client(
 				new ApiSettings(
-					get_option( 'hydro_raindrop_client_id' ),
-					get_option( 'hydro_raindrop_client_secret' ),
-					get_option( 'hydro_raindrop_environment' ) === 'sandbox'
+					(string) get_option( Hydro_Raindrop_Helper::OPTION_CLIENT_ID ),
+					(string) get_option( Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET ),
+					get_option( Hydro_Raindrop_Helper::OPTION_ENVIRONMENT ) === 'sandbox'
 						? new SandboxEnvironment()
 						: new ProductionEnvironment()
 				),
 				new Hydro_Raindrop_TransientTokenStorage(),
-				get_option( 'hydro_raindrop_application_id' )
+				(string) get_option( Hydro_Raindrop_Helper::OPTION_APPLICATION_ID )
 			);
 		}
 
@@ -325,10 +333,10 @@ class Hydro_Raindrop {
 	public static function has_valid_raindrop_client_options() : bool {
 
 		$options = [
-			'hydro_raindrop_client_id',
-			'hydro_raindrop_client_secret',
-			'hydro_raindrop_environment',
-			'hydro_raindrop_application_id',
+			Hydro_Raindrop_Helper::OPTION_CLIENT_ID,
+			Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET,
+			Hydro_Raindrop_Helper::OPTION_ENVIRONMENT,
+			Hydro_Raindrop_Helper::OPTION_APPLICATION_ID,
 		];
 
 		foreach ( $options as $option ) {

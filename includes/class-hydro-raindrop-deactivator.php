@@ -33,6 +33,8 @@ class Hydro_Raindrop_Deactivator {
 	 */
 	public static function deactivate() {
 
+		delete_option( Hydro_Raindrop_Helper::OPTION_ACTIVATION_NOTICE );
+
 	}
 
 }
