@@ -442,7 +442,7 @@ final class Hydro_Raindrop_Authenticate {
 	private function get_user_hydro_id( WP_User $user ) : string {
 
 		// @codingStandardsIgnoreLine
-		return (string) get_user_meta( $user->ID, 'hydro_id', true );
+		return (string) get_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, true );
 
 	}
 
@@ -471,10 +471,10 @@ final class Hydro_Raindrop_Authenticate {
 		$hydro_id = $this->get_user_hydro_id( $user );
 
 		// @codingStandardsIgnoreLine
-		$hydro_mfa_enabled = (bool) get_user_meta( $user->ID, 'hydro_mfa_enabled', true );
+		$hydro_mfa_enabled = (bool) get_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, true );
 
 		// @codingStandardsIgnoreLine
-		$hydro_raindrop_confirmed = (bool) get_user_meta( $user->ID, 'hydro_raindrop_confirmed', true );
+		$hydro_raindrop_confirmed = (bool) get_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, true );
 
 		return ! empty( $hydro_id )
 			&& $hydro_mfa_enabled
@@ -521,7 +521,7 @@ final class Hydro_Raindrop_Authenticate {
 
 			if ( $this->is_first_time_verify() ) {
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, 'hydro_raindrop_confirmed', 1 );
+				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, 1 );
 			}
 
 			return true;

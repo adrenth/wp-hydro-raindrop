@@ -13,6 +13,11 @@ declare( strict_types=1 );
  */
 class Hydro_Raindrop_Helper {
 
+	/**
+	 * Hydro Raindrop database options.
+	 *
+	 * @since 1.3.0
+	 */
 	const OPTION_APPLICATION_ID       = 'hydro_raindrop_application_id';
 	const OPTION_CLIENT_ID            = 'hydro_raindrop_client_id';
 	const OPTION_CLIENT_SECRET        = 'hydro_raindrop_client_secret';
@@ -21,6 +26,15 @@ class Hydro_Raindrop_Helper {
 	const OPTION_CUSTOM_HYDRO_ID_PAGE = 'hydro_raindrop_custom_hydro_id_page';
 	const OPTION_ACTIVATION_NOTICE    = 'hydro_raindrop_activation_notice';
 	const OPTION_ACCESS_TOKEN_SUCCESS = 'hydro_raindrop_access_token_success';
+
+	/**
+	 * Hydro Raindrop user meta.
+	 *
+	 * @since 1.4.0
+	 */
+	const USER_META_HYDRO_ID                 = 'hydro_id';
+	const USER_META_HYDRO_MFA_ENABLED        = 'hydro_mfa_enabled';
+	const USER_META_HYDRO_RAINDROP_CONFIRMED = 'hydro_raindrop_confirmed';
 
 	/**
 	 * Construct the Helper.

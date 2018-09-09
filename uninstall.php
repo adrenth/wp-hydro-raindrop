@@ -36,11 +36,11 @@ delete_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE );
 delete_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE );
 
 /**
- * Delete user metadata by for this plugin.
+ * Delete user metadata for this plugin.
  */
-delete_metadata( 'user', 0, 'hydro_id', '', true );
-delete_metadata( 'user', 0, 'hydro_mfa_enabled', '', true );
-delete_metadata( 'user', 0, 'hydro_raindrop_confirmed', '', true );
+delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, '', true );
+delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, '', true );
+delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, '', true );
 
 /**
  * Delete access token from the transient token storage.

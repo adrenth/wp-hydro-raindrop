@@ -130,9 +130,9 @@ class Hydro_Raindrop_Admin {
 
 				delete_option( Hydro_Raindrop_Helper::OPTION_ACCESS_TOKEN_SUCCESS );
 
-				delete_metadata( 'user', 0, 'hydro_id', '', true );
-				delete_metadata( 'user', 0, 'hydro_mfa_enabled', '', true );
-				delete_metadata( 'user', 0, 'hydro_raindrop_confirmed', '', true );
+				delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, '', true );
+				delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, '', true );
+				delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, '', true );
 
 				break;
 		}
