@@ -1,6 +1,6 @@
 === WP Hydro Raindrop ===
 Contributors: adrenth, harshrajat
-Donate link: 
+Donate link:
 Tags: hydro, raindrop, mfa, 2fa, authenticator
 Requires at least: 3.0.1
 Tested up to: 4.9
@@ -12,10 +12,10 @@ Requires PHP: 7.0
 Enables Hydro Raindrop Multi Factor Authentication on your Wordpress Website.
 
 == Description ==
- 
+
 ### Hydro Raindrop MFA: Blockchain based Multi Factor Authentication
 
-Hydro MFA Plugin adds another security layer to your website using blockchain-based authentication layer. It's designed to work out of the box and offers unparalleled security standards for your website and your users, even beating google authenticator which is prone to phishing scams. 
+Hydro MFA Plugin adds another security layer to your website using blockchain-based authentication layer. It's designed to work out of the box and offers unparalleled security standards for your website and your users, even beating google authenticator which is prone to phishing scams.
 
 https://www.youtube.com/watch?v=d88jbPdxI88
 
@@ -42,19 +42,19 @@ https://www.youtube.com/watch?v=d88jbPdxI88
 The **following steps are necessary** to enable Hydro MFA on your site:
 
 #### Required Page(s) Creation
-1. Create **Hydro MFA** Page from WP Backend Interface, Keep the content as: 
+1. Create **Hydro MFA** Page from WP Backend Interface, Keep the content as:
 [hydro_raindrop_mfa_form_open]
 [hydro_raindrop_mfa_digits]
 [hydro_raindrop_mfa_button_authorize]
 [hydro_raindrop_mfa_button_cancel]
 [hydro_raindrop_mfa_form_close]
 
-2. Create **Hydro ID** Page from WP Backend Interface, Keep the content as: 
-[hydro_raindrop_manage_hydro_id] 
+2. Create **Hydro ID** Page from WP Backend Interface, Keep the content as:
+[hydro_raindrop_manage_hydro_id]
 
 #### MFA Activation (Admin Side)
 * Create an account over at [Hydrogen Website](https://www.hydrogenplatform.com/)
-* Apply for **Production Access**. Once approved, generate your **Client ID**, **Client Secret** and **Application ID**, 
+* Apply for **Production Access**. Once approved, generate your **Client ID**, **Client Secret** and **Application ID**,
 * Navigate to Settings -> Hydro MFA and enter the above details, select **Production Mode** and the plugin is ready for use
 
 #### MFA Activation (User Side)
@@ -90,15 +90,19 @@ You'll find answers to many of your questions on [Official Website Support](http
 4. Custom Authentication Page can be created by Admin for their users as well
 
 == Changelog ==
+= 1.4.0 =
+* Minor optimizations.
+* Improved the README.txt contents.
+
 = 1.3.0 =
 * Allow developers to make their own custom MFA page (with shortcodes).
 * Improve MFA flow and security.
 
 = 1.2.1 =
-* Update WP readme.txt
+* Update WP readme.txt.
 
 = 1.2.0 =
-* Set PHP 7.0 requirement
+* Set PHP 7.0 requirement.
 
 = 1.1.1 =
 * Rename PLUGIN_NAME_VERSION constant to HYDRO_RAINDROP_VERSION.
@@ -111,7 +115,7 @@ You'll find answers to many of your questions on [Official Website Support](http
 * Remove HydroID length restriction.
 
 = 1.0.0 =
-* Initial release of WP Hydro Raindrop
+* Initial release of WP Hydro Raindrop.
 
 == Upgrade Notice ==
 = 1.3.0 =
