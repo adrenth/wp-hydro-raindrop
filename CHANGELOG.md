@@ -1,5 +1,10 @@
 # wp-hydro-raindrop
 
+## 1.4.0
+
+- Minor optimizations.
+- Improved the README.txt contents.
+
 ## 1.3.0
 
 - Allow developers to make their own custom MFA page (with shortcodes).
@@ -7,11 +12,11 @@
 
 ## 1.2.1
 
-- Update WP readme.txt
+- Update WP readme.txt.
 
 ## 1.2.0
 
-- Set PHP 7.0 requirement
+- Set PHP 7.0 requirement.
 
 ## 1.1.1
 
@@ -27,4 +32,4 @@
 
 ## 1.0.0
 
-- Initial release
+- Initial release.

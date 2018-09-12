@@ -31,9 +31,9 @@ if ( file_exists( $composer = __DIR__ . '/vendor/autoload.php' ) ) {
 }
 
 /**
- * Currently plugin version.
- * Start at version 1.0.0 and use SemVer - https://semver.org
- * Rename this for your plugin and update it as you release new versions.
+ * Current WP Hydro Raindrop plugin version.
+ *
+ * @var string
  */
 define( 'HYDRO_RAINDROP_VERSION', '1.4.0' );
 
@@ -55,6 +55,7 @@ function activate_hydro_raindrop() {
 function deactivate_hydro_raindrop() {
 
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-hydro-raindrop-deactivator.php';
+
 	Hydro_Raindrop_Deactivator::deactivate();
 
 }

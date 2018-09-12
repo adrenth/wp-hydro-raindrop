@@ -31,6 +31,11 @@ Download plugin from WordPress.org.
 Issues can be reported here: https://github.com/adrenth/wp-hydro-raindrop/issues
 
 == Changelog ==
+
+= 1.4.0 =
+* Minor optimizations.
+* Improved the README.txt contents.
+
 = 1.3.0 =
 * Allow developers to make their own custom MFA page (with shortcodes).
 * Improve MFA flow and security.
