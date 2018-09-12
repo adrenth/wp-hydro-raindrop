@@ -185,7 +185,7 @@ class Hydro_Raindrop_Public {
 		$user_has_hydro_id = $this->user_has_hydro_id( $user );
 
 		// @codingStandardsIgnoreLine
-		$hydro_id = sanitize_text_field((string) ($_POST['hydro_id'] ?? ''));
+		$hydro_id = sanitize_text_field((string) ($_POST[Hydro_Raindrop_Helper::USER_META_HYDRO_ID] ?? ''));
 
 		if ( ! empty( $hydro_id ) && ! $user_has_hydro_id ) {
 
@@ -217,13 +217,13 @@ class Hydro_Raindrop_Public {
 				$client->registerUser( sanitize_text_field( $hydro_id ) );
 
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, 'hydro_id', $hydro_id );
+				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, $hydro_id );
 
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, 'hydro_mfa_enabled', 1 );
+				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, 1 );
 
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, 'hydro_raindrop_confirmed', 0 );
+				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, 0 );
 
 				// @codingStandardsIgnoreLine
 				wp_redirect( $redirect_url );
@@ -238,13 +238,13 @@ class Hydro_Raindrop_Public {
 				 */
 
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, 'hydro_id', $hydro_id );
+				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, $hydro_id );
 
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, 'hydro_mfa_enabled', 1 );
+				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, 1 );
 
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, 'hydro_raindrop_confirmed', 0 );
+				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, 0 );
 
 				// @codingStandardsIgnoreLine
 				wp_redirect( $redirect_url );
@@ -255,13 +255,13 @@ class Hydro_Raindrop_Public {
 				$errors->add( 'hydro_register_failed', $e->getMessage() );
 
 				// @codingStandardsIgnoreLine
-				delete_user_meta( $user->ID, 'hydro_id' );
+				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID );
 
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, 'hydro_mfa_enabled', 0 );
+				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, 0 );
 
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, 'hydro_raindrop_confirmed', 0 );
+				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, 0 );
 			}
 		}
 
@@ -271,19 +271,19 @@ class Hydro_Raindrop_Public {
 		if ( $disable_hydro_mfa && $user_has_hydro_id ) {
 
 			$client   = Hydro_Raindrop::get_raindrop_client();
-			$hydro_id = (string) get_user_meta( $user->ID, 'hydro_id', true );
+			$hydro_id = (string) get_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, true );
 
 			try {
 				$client->unregisterUser( $hydro_id );
 
 				// @codingStandardsIgnoreLine
-				delete_user_meta( $user->ID, 'hydro_id', $hydro_id );
+				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, $hydro_id );
 
 				// @codingStandardsIgnoreLine
-				delete_user_meta( $user->ID, 'hydro_mfa_enabled' );
+				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED );
 
 				// @codingStandardsIgnoreLine
-				delete_user_meta( $user->ID, 'hydro_raindrop_confirmed' );
+				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED );
 
 			} catch ( \Adrenth\Raindrop\Exception\UnregisterUserFailed $e ) {
 
@@ -422,7 +422,7 @@ class Hydro_Raindrop_Public {
 	 */
 	private function user_has_hydro_id( stdClass $user ) : bool {
 		// @codingStandardsIgnoreLine
-		$hydro_id = (string) get_user_meta( $user->ID, 'hydro_id', true );
+		$hydro_id = (string) get_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, true );
 
 		return ! empty( $hydro_id );
 	}
