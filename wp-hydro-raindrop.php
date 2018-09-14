@@ -11,9 +11,9 @@
  * Plugin Name:       WP Hydro Raindrop
  * Plugin URI:        https://github.com/adrenth/wp-hydro-raindrop
  * Description:       A WordPress plugin to integrate Hydro Raindrop MFA
- * Version:           1.4.0
- * Author:            Alwin Drenth, Ronald Drenth
- * Author URI:        https://github.com/adrenth
+ * Version:           1.4.1
+ * Author:            Hydrogen API
+ * Author URI:        https://hydrogenplatform.com
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       wp-hydro-raindrop
@@ -35,7 +35,7 @@ if ( file_exists( $composer = __DIR__ . '/vendor/autoload.php' ) ) {
  *
  * @var string
  */
-define( 'HYDRO_RAINDROP_VERSION', '1.4.0' );
+define( 'HYDRO_RAINDROP_VERSION', '1.4.1' );
 
 /**
  * The code that runs during plugin activation.
