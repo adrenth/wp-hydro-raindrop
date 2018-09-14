@@ -118,5 +118,11 @@ You'll find answers to many of your questions on [Official Website Support](http
 * Initial release of WP Hydro Raindrop.
 
 == Upgrade Notice ==
+= 1.4.1 =
+Updated Author.
+
+= 1.4.0 =
+Minor Optimizations.
+
 = 1.3.0 =
 Added ability to intercept login automatically. Swanky frontend UI.
