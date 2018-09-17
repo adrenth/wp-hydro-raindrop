@@ -79,7 +79,7 @@ class Hydro_Raindrop_Helper {
 	}
 
 	/**
-	 * Get the custom HydroID page URL.
+	 * Get the custom Hydro ID page URL.
 	 *
 	 * @return string
 	 */
@@ -92,28 +92,209 @@ class Hydro_Raindrop_Helper {
 	}
 
 	/**
-	 * Checks if MFA page is configured as custom.
+	 * Checks if MFA page is present and enabled.
 	 *
 	 * @return bool
 	 */
 	public function is_custom_mfa_page_enabled() : bool {
 
-		$post_id = (int) get_option( self::OPTION_CUSTOM_MFA_PAGE );
+		return $this->is_page_enabled_with_option( self::OPTION_CUSTOM_MFA_PAGE );
+
+	}
+
+	/**
+	 * Checks if Hydro ID page is present and enabled.
+	 *
+	 * @return bool
+	 */
+	public function is_custom_hydro_id_page_enabled() : bool {
+
+		return $this->is_page_enabled_with_option( self::OPTION_CUSTOM_HYDRO_ID_PAGE );
+
+	}
+
+	/**
+	 * Whether the Custom MFA Page is present.
+	 *
+	 * @return bool
+	 */
+	public function is_custom_mfa_page_present() : bool {
+
+		return $this->is_page_present_with_option( self::OPTION_CUSTOM_MFA_PAGE );
+
+	}
+
+	/**
+	 * Whether the Custom Hydro ID Page is present.
+	 *
+	 * @return bool
+	 */
+	public function is_custom_hydro_id_page_present() : bool {
+
+		return $this->is_page_present_with_option( self::OPTION_CUSTOM_HYDRO_ID_PAGE );
+
+	}
+
+	/**
+	 * Create the custom MFA page.
+	 *
+	 * @return void
+	 */
+	public function create_custom_mfa_page() {
+
+		$post_id = wp_insert_post( [
+			'post_title'  => 'Hydro MFA Login Page',
+			'post_name'   => 'hydro-raindrop-mfa',
+			'post_status' => 'publish',
+			'post_type'   => 'page',
+		], true );
+
+
+		if ( $post_id instanceof WP_Error ) {
+			return;
+		}
+
+		update_option( self::OPTION_CUSTOM_MFA_PAGE, $post_id );
+
+	}
+
+	/**
+	 * Create the custom Hydro ID page.
+	 *
+	 * @return void
+	 */
+	public function create_custom_hydro_id_page() {
+
+		$post_id = wp_insert_post( [
+			'post_title'  => 'Hydro MFA Settings Page',
+			'post_name'   => 'hydro-raindrop-settings',
+			'post_status' => 'publish',
+			'post_type'   => 'page',
+		], true );
+
+		if ( $post_id instanceof WP_Error ) {
+			return;
+		}
+
+		update_option( self::OPTION_CUSTOM_HYDRO_ID_PAGE, $post_id );
+
+	}
+
+	/**
+	 * Delete the custom MFA page.
+	 *
+	 * @return void
+	 */
+	public function delete_custom_mfa_page() {
+
+		wp_delete_post( get_option( self::OPTION_CUSTOM_MFA_PAGE ) );
+
+	}
+
+	/**
+	 * Delete the custom Hydro ID page.
+	 *
+	 * @return void
+	 */
+	public function delete_custom_hydro_id_page() {
+
+		wp_delete_post( self::OPTION_CUSTOM_HYDRO_ID_PAGE );
+
+	}
+
+	/**
+	 * Un-publish the custom MFA page.
+	 *
+	 * @return void
+	 */
+	public function unpublish_custom_mfa_page() {
+
+		$this->change_page_status_with_option( self::OPTION_CUSTOM_MFA_PAGE, false );
+
+	}
+
+	/**
+	 * Un-publish the Hydro ID page.
+	 *
+	 * @return void
+	 */
+	public function unpublish_custom_hydro_id_page() {
+
+		$this->change_page_status_with_option( self::OPTION_CUSTOM_HYDRO_ID_PAGE, false );
+
+	}
+
+	/**
+	 * Publish the custom MFA page.
+	 *
+	 * @return void
+	 */
+	public function publish_custom_mfa_page() {
+
+		$this->change_page_status_with_option( self::OPTION_CUSTOM_MFA_PAGE, true );
+
+	}
+
+	/**
+	 * Publish the Hydro ID page.
+	 *
+	 * @return void
+	 */
+	public function publish_custom_hydro_id_page() {
+
+		$this->change_page_status_with_option( self::OPTION_CUSTOM_HYDRO_ID_PAGE, true );
+
+	}
+
+	/**
+	 * Whether a page is present.
+	 *
+	 * @param string $option E.g. The self::OPTION_CUSTOM_HYDRO_ID_PAGE constant.
+	 *
+	 * @return bool
+	 */
+	private function is_page_present_with_option( string $option ) : bool {
+
+		$post_id = (int) get_option( $option );
+
+		$post = get_post( $post_id );
+
+		return $post instanceof WP_Post;
+
+	}
+
+	/**
+	 * Whether a page is enabled (post must be present and published).
+	 *
+	 * @param string $option E.g. The self::OPTION_CUSTOM_HYDRO_ID_PAGE constant.
+	 *
+	 * @return bool
+	 */
+	private function is_page_enabled_with_option( string $option ) : bool {
+
+		$post_id = (int) get_option( $option );
 
 		return $post_id > 0 && get_post_status( $post_id ) === 'publish';
 
 	}
 
 	/**
-	 * Checks if MFA page is configured as custom.
+	 * Un-publish a page.
 	 *
-	 * @return bool
+	 * @param string $option E.g. The self::OPTION_CUSTOM_HYDRO_ID_PAGE constant.
+	 * @param bool   $published Whether the page should be published or not.
 	 */
-	public function is_custom_hydro_id_page_enabled() : bool {
+	private function change_page_status_with_option( string $option, bool $published ) {
 
-		$post_id = (int) get_option( self::OPTION_CUSTOM_HYDRO_ID_PAGE );
+		$post_id = (int) get_option( $option );
 
-		return $post_id > 0 && get_post_status( $post_id ) === 'publish';
+		if ( $post_id ) {
+			wp_update_post( [
+				'ID'          => $post_id,
+				'post_status' => $published ? 'publish' : 'draft',
+			] );
+		}
 
 	}
+
 }

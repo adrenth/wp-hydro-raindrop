@@ -38,30 +38,14 @@ if ( file_exists( $composer = __DIR__ . '/vendor/autoload.php' ) ) {
 define( 'HYDRO_RAINDROP_VERSION', '1.4.1' );
 
 /**
- * The code that runs during plugin activation.
- * This action is documented in includes/class-hydro-raindrop-activator.php
+ * The installer class which handles the activation,
+ * deactivation and un-installation of this plugin.
  */
-function activate_hydro_raindrop() {
+require plugin_dir_path( __FILE__ ) . 'includes/class-hydro-raindrop-installer.php';
 
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-hydro-raindrop-activator.php';
-	Hydro_Raindrop_Activator::activate();
-
-}
-
-/**
- * The code that runs during plugin deactivation.
- * This action is documented in includes/class-hydro-raindrop-deactivator.php
- */
-function deactivate_hydro_raindrop() {
-
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-hydro-raindrop-deactivator.php';
-
-	Hydro_Raindrop_Deactivator::deactivate();
-
-}
-
-register_activation_hook( __FILE__, 'activate_hydro_raindrop' );
-register_deactivation_hook( __FILE__, 'deactivate_hydro_raindrop' );
+register_activation_hook( __FILE__, [ 'Hydro_Raindrop_Installer', 'activate' ] );
+register_deactivation_hook( __FILE__, [ 'Hydro_Raindrop_Installer', 'deactivate' ] );
+register_uninstall_hook( __FILE__, [ 'Hydro_Raindrop_Installer', 'uninstall' ] );
 
 /**
  * The core plugin class that is used to define internationalization,
