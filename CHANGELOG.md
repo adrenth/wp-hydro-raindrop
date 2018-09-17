@@ -1,5 +1,9 @@
 # wp-hydro-raindrop
 
+## 1.4.1
+
+- Updated Author.
+
 ## 1.4.0
 
 - Minor optimizations.
@@ -7,6 +11,7 @@
 
 ## 1.3.0
 
+- Added ability to intercept login automatically. Swanky frontend UI.
 - Allow developers to make their own custom MFA page (with shortcodes).
 - Improve MFA flow and security.
 

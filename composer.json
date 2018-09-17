@@ -3,7 +3,7 @@
     "description": "A WordPress plugin to integrate Hydro Raindrop MFA",
     "type": "wordpress-plugin",
     "keywords": ["wordpress", "plugin", "hydro", "raindrop", "mfa", "2fa"],
-    "license": "MIT",
+    "license": "GPL-2.0",
     "authors": [
         {
             "name": "Alwin Drenth",
