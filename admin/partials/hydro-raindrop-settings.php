@@ -24,7 +24,7 @@ if ( ! current_user_can( 'manage_options' ) ) {
 
 <div class="wrap">
 
-	<h1>Hydro Raindrop MFA Settings</h1>
+	<h1>Hydro Raindrop Settings</h1>
 
 	<div class="notice">
 		<p>Register an account at <a href="https://www.hydrogenplatform.com" target="_blank">https://www.hydrogenplatform.com</a> to obtain an Application ID.</p>
@@ -38,8 +38,8 @@ if ( ! current_user_can( 'manage_options' ) ) {
 			</div>
 		<?php } ?>
 
-		<?php settings_fields( 'hydro_api' ); ?>
-		<?php do_settings_sections( 'hydro_api' ); ?>
+		<?php settings_fields( 'hydro_raindrop_api' ); ?>
+		<?php do_settings_sections( 'hydro_raindrop_api' ); ?>
 
 		<table class="form-table">
 			<tr valign="top">
@@ -108,74 +108,12 @@ if ( ! current_user_can( 'manage_options' ) ) {
 			</tr>
 		</table>
 
-		<h2 class="title">Customization</h2>
-
-		<table class="form-table">
-			<tr valign="top">
-				<th scope="row">
-					<label for="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE ); ?>">
-						Custom MFA page
-					</label>
-				</th>
-				<td>
-					<select id="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE ); ?>"
-							name="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE ); ?>"
-							class="selection">
-						<option value="0">Use default Hydro Raindrop MFA page</option>
-						<option value="0">---</option>
-						<?php
-						/**
-						 * Type hinting.
-						 *
-						 * @var array $posts
-						 */
-						foreach ( $posts as $post_id => $post ) :
-							?>
-							<?php $selected = (int) get_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE ) === $post_id ? ' selected' : ''; ?>
-							<option value="<?php echo esc_attr( $post_id ); ?>"<?php echo esc_attr( $selected ); ?>>
-								<?php echo esc_html( $post ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-					<p class="description">Please make sure you have implemented the <a href="#">documented</a> shortcodes on the Custom MFA page.</p>
-				</td>
-			</tr>
-			<tr valign="top">
-				<th scope="row">
-					<label for="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ); ?>">
-						Custom HydroID page
-					</label>
-				</th>
-				<td>
-					<select id="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ); ?>"
-							name="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ); ?>"
-							class="selection">
-						<option value="0">Use default HydroID page</option>
-						<option value="0">---</option>
-						<?php
-						/**
-						 * Type hinting.
-						 *
-						 * @var array $posts
-						 */
-						foreach ( $posts as $post_id => $post ) :
-							?>
-							<?php $selected = (int) get_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ) === $post_id ? ' selected' : ''; ?>
-							<option value="<?php echo esc_attr( $post_id ); ?>"<?php echo esc_attr( $selected ); ?>>
-								<?php echo esc_html( $post ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-					<p class="description">Please make sure you have implemented the <a href="#">documented</a> shortcodes on the Custom HydroID page.</p>
-				</td>
-			</tr>
-		</table>
-
 		<?php if ( $this->options_are_valid() ) { ?>
 			<div class="error settings-error notice">
 				<p><strong>CAUTION: Changing these settings will disable all Users Hydro Raindrop MFA. All users need to re-enable Hydro Raindrop MFA.</strong></p>
 			</div>
 		<?php } ?>
+
 
 		<?php submit_button(); ?>
 	</form>

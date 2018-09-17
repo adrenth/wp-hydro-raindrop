@@ -82,12 +82,13 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function admin_init() {
 
-		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_APPLICATION_ID );
-		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_CLIENT_ID );
-		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET );
-		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_ENVIRONMENT );
-		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE );
-		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE );
+		register_setting( 'hydro_raindrop_api', Hydro_Raindrop_Helper::OPTION_APPLICATION_ID );
+		register_setting( 'hydro_raindrop_api', Hydro_Raindrop_Helper::OPTION_CLIENT_ID );
+		register_setting( 'hydro_raindrop_api', Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET );
+		register_setting( 'hydro_raindrop_api', Hydro_Raindrop_Helper::OPTION_ENVIRONMENT );
+
+		register_setting( 'hydro_raindrop_customization', Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE );
+		register_setting( 'hydro_raindrop_customization', Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE );
 
 	}
 
@@ -98,14 +99,51 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function admin_menu() {
 
-		add_options_page(
-			'Hydro Raindrop MFA',
-			'Hydro Raindrop MFA',
+		add_menu_page(
+			'Hydro Raindrop: General',
+			'Hydro Raindrop',
 			'manage_options',
-			$this->plugin_name . '-options',
+			$this->plugin_name,
 			[
 				$this,
-				'admin_page',
+				'settings_page',
+			],
+			plugins_url( 'images/icon.svg', __FILE__ )
+		);
+
+		add_submenu_page(
+			$this->plugin_name,
+			'Hydro Raindrop: General',
+			'General',
+			'manage_options',
+			$this->plugin_name,
+			[
+				$this,
+				'settings_page',
+			]
+		);
+
+		add_submenu_page(
+			$this->plugin_name,
+			'Hydro Raindrop: Customization',
+			'Customization',
+			'manage_options',
+			$this->plugin_name . '-customization',
+			[
+				$this,
+				'customization_page',
+			]
+		);
+
+		add_submenu_page(
+			$this->plugin_name,
+			'Hydro Raindrop: FAQ',
+			'FAQ',
+			'manage_options',
+			$this->plugin_name . '-faq',
+			[
+				$this,
+				'faq_page',
 			]
 		);
 
@@ -140,11 +178,22 @@ class Hydro_Raindrop_Admin {
 	}
 
 	/**
-	 * Display the admin page.
+	 * Display the settings page.
 	 *
 	 * @return void
 	 */
-	public function admin_page() {
+	public static function settings_page() {
+
+		include __DIR__ . '/../admin/partials/hydro-raindrop-settings.php';
+
+	}
+
+	/**
+	 * Display the customization page.
+	 *
+	 * @return void
+	 */
+	public static function customization_page() {
 
 		$args = array(
 			'post_type'      => 'page',
@@ -160,14 +209,30 @@ class Hydro_Raindrop_Admin {
 		while ( $parent->have_posts() ) {
 			$parent->the_post();
 
-			$id = get_the_ID();
+			$post_id = get_the_ID();
 
-			if ( $id ) {
-				$posts[ $id ] = get_the_title() . ' - ' . get_the_permalink();
+			if ( $post_id ) {
+				/**
+				 * The variable $posts is used in the template file.
+				 *
+				 * @noinspection OnlyWritesOnParameterInspection
+				 */
+				$posts[ (int) $post_id ] = get_the_title() . ' - ' . get_the_permalink();
 			}
 		}
 
-		include __DIR__ . '/../admin/partials/hydro-raindrop-admin-display.php';
+		include __DIR__ . '/../admin/partials/hydro-raindrop-customization.php';
+
+	}
+
+	/**
+	 * Display the FAQ page.
+	 *
+	 * @return void
+	 */
+	public static function faq_page() {
+
+		// TODO: Render external URL.
 
 	}
 
@@ -206,7 +271,7 @@ class Hydro_Raindrop_Admin {
 			return;
 		}
 
-		$option_page_url = admin_url( 'options-general.php?page=' . $this->plugin_name . '-options' );
+		$option_page_url = admin_url( 'options-general.php?page=' . $this->plugin_name );
 
 		$message = sprintf(
 			__( 'Succesfully activated the WP Hydro Raindrop plugin, to configure the plugin go to the Hydro Raindrop MFA <a style="color: #fff; font-weight: bold;" href="%1$s">settings page</a>.', $this->plugin_name ),
@@ -232,7 +297,7 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function add_action_links( array $links = [] ) : array {
 
-		$option_page_url = admin_url( 'options-general.php?page=' . $this->plugin_name . '-options' );
+		$option_page_url = admin_url( 'options-general.php?page=' . $this->plugin_name );
 
 		$add_links = [
 			'<a href="' . $option_page_url . '">' . __( 'Settings', 'wp-hydro-raindrop' ) . '</a>',
