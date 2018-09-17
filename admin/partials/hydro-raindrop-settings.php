@@ -60,12 +60,12 @@ $options_are_valid      = Hydro_Raindrop::has_valid_raindrop_client_options() &&
 
 	<form method="post" action="options.php">
 		<?php if ( Hydro_Raindrop_Admin::OPTION_GROUP_INITIALIZATION === $active_tab ) : ?>
-		<div class="notice is-dismissible">
+		<div class="hydro-notice is-dismissible">
 			<p>
 				<?php if ( $hydro_raindrop_enabled ) : ?>
-					Hydro Raindrop MFA is currently <strong style="color: #46b450">enabled</strong> for all users. To globally <strong>disable</strong> Hydro Raindrop MFA enter your username and password.
+					<i class="dashicons dashicons-yes" style="color: #46b450"></i> Hydro Raindrop MFA is currently <strong style="color: #46b450">enabled</strong> for all users. To globally <strong>disable</strong> Hydro Raindrop MFA enter your username and password.
 				<?php else : ?>
-					Hydro Raindrop MFA is currently <strong style="color: red">disabled</strong> for all users. To globally <strong>enable</strong> Hydro Raindrop MFA enter your username and password.
+					<i class="dashicons dashicons-no" style="color: red"></i>Hydro Raindrop MFA is currently <strong style="color: red">disabled</strong> for all users. To globally <strong>enable</strong> Hydro Raindrop MFA enter your username and password.
 				<?php endif; ?>
 			</p>
 		</div>
