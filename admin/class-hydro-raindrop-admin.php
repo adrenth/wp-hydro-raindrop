@@ -26,6 +26,10 @@ use Adrenth\Raindrop\Exception\RefreshTokenFailed;
  */
 class Hydro_Raindrop_Admin {
 
+	const OPTION_GROUP_INITIALIZATION = 'hydro_raindrop';
+	const OPTION_GROUP_API            = 'hydro_raindrop_api';
+	const OPTION_GROUP_CUSTOMIZATION  = 'hydro_raindrop_customization';
+
 	/**
 	 * The ID of this plugin.
 	 *
@@ -82,13 +86,15 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function admin_init() {
 
-		register_setting( 'hydro_raindrop_api', Hydro_Raindrop_Helper::OPTION_APPLICATION_ID );
-		register_setting( 'hydro_raindrop_api', Hydro_Raindrop_Helper::OPTION_CLIENT_ID );
-		register_setting( 'hydro_raindrop_api', Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET );
-		register_setting( 'hydro_raindrop_api', Hydro_Raindrop_Helper::OPTION_ENVIRONMENT );
+		register_setting( self::OPTION_GROUP_INITIALIZATION, Hydro_Raindrop_Helper::OPTION_ENABLED );
 
-		register_setting( 'hydro_raindrop_customization', Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE );
-		register_setting( 'hydro_raindrop_customization', Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE );
+		register_setting( self::OPTION_GROUP_API, Hydro_Raindrop_Helper::OPTION_APPLICATION_ID );
+		register_setting( self::OPTION_GROUP_API, Hydro_Raindrop_Helper::OPTION_CLIENT_ID );
+		register_setting( self::OPTION_GROUP_API, Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET );
+		register_setting( self::OPTION_GROUP_API, Hydro_Raindrop_Helper::OPTION_ENVIRONMENT );
+
+		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE );
+		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE );
 
 	}
 
@@ -113,25 +119,13 @@ class Hydro_Raindrop_Admin {
 
 		add_submenu_page(
 			$this->plugin_name,
-			'Hydro Raindrop: General',
-			'General',
+			'Hydro Raindrop: Settings',
+			'Settings',
 			'manage_options',
 			$this->plugin_name,
 			[
 				$this,
 				'settings_page',
-			]
-		);
-
-		add_submenu_page(
-			$this->plugin_name,
-			'Hydro Raindrop: Customization',
-			'Customization',
-			'manage_options',
-			$this->plugin_name . '-customization',
-			[
-				$this,
-				'customization_page',
 			]
 		);
 
@@ -150,6 +144,46 @@ class Hydro_Raindrop_Admin {
 	}
 
 	/**
+	 * Before updating an option.
+	 *
+	 * @param mixed  $value     New value.
+	 * @param string $option    Option which has been updated.
+	 * @param mixed  $old_value Old value.
+	 *
+	 * @return mixed
+	 */
+	public function pre_update_option( $value, string $option, $old_value ) {
+
+		switch ( $option ) {
+			case Hydro_Raindrop_Helper::OPTION_ENABLED:
+				// User wants to enable or disabled Hydro Raindrop MFA.
+				if ( ( 0 === (int) $old_value && 1 === (int) $value )
+						|| ( 1 === (int) $old_value && 0 === (int) $value )
+				) {
+					// @codingStandardsIgnoreStart
+					$user_login = $_POST['user_login'] ?? null;
+					$password = $_POST['password'] ?? null;
+					// @codingStandardsIgnoreEnd
+
+					$user = wp_authenticate( $user_login, $password );
+
+					if ( is_wp_error( $user ) ) {
+						add_settings_error(
+							$option,
+							'invalid_credentials',
+							$user->get_error_message()
+						);
+
+						return (int) ( new Hydro_Raindrop_Helper() )->is_hydro_raindrop_enabled();
+					}
+				}
+				break;
+		}
+
+		return $value;
+	}
+
+	/**
 	 * Hydro Raindrop environment options have been changed.
 	 *
 	 * @param mixed $option Option which has been updated.
@@ -159,6 +193,7 @@ class Hydro_Raindrop_Admin {
 	public function update_option( $option ) {
 
 		switch ( $option ) {
+
 			case Hydro_Raindrop_Helper::OPTION_APPLICATION_ID:
 			case Hydro_Raindrop_Helper::OPTION_CLIENT_ID:
 			case Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET:
@@ -182,18 +217,7 @@ class Hydro_Raindrop_Admin {
 	 *
 	 * @return void
 	 */
-	public static function settings_page() {
-
-		include __DIR__ . '/../admin/partials/hydro-raindrop-settings.php';
-
-	}
-
-	/**
-	 * Display the customization page.
-	 *
-	 * @return void
-	 */
-	public static function customization_page() {
+	public function settings_page() {
 
 		$args = array(
 			'post_type'      => 'page',
@@ -221,7 +245,7 @@ class Hydro_Raindrop_Admin {
 			}
 		}
 
-		include __DIR__ . '/../admin/partials/hydro-raindrop-customization.php';
+		include __DIR__ . '/../admin/partials/hydro-raindrop-settings.php';
 
 	}
 
@@ -230,7 +254,7 @@ class Hydro_Raindrop_Admin {
 	 *
 	 * @return void
 	 */
-	public static function faq_page() {
+	public function faq_page() {
 
 		// TODO: Render external URL.
 

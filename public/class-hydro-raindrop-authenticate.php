@@ -75,6 +75,19 @@ final class Hydro_Raindrop_Authenticate {
 	 */
 	public function authenticate( $user = null ) {
 
+		// @codingStandardsIgnoreStart
+
+		// Skip authentication hook on initialization process.
+		if ( isset( $_POST['_hydro_raindrop_nonce'] )
+				&& wp_verify_nonce( $_POST['_hydro_raindrop_nonce'], 'hydro_raindrop_initialization' )
+		) {
+			return $user;
+		}
+
+		// @codingStandardsIgnoreEnd
+
+		// TODO: Do not authenticate when disabling MFA
+
 		if ( ! $user || $user instanceof WP_Error || ! ( $user instanceof WP_User ) ) {
 			return $user;
 		}

@@ -15,9 +15,8 @@ class Hydro_Raindrop_Helper {
 
 	/**
 	 * Hydro Raindrop database options.
-	 *
-	 * @since 1.3.0
 	 */
+	const OPTION_ENABLED              = 'hydro_raindrop_enabled';
 	const OPTION_APPLICATION_ID       = 'hydro_raindrop_application_id';
 	const OPTION_CLIENT_ID            = 'hydro_raindrop_client_id';
 	const OPTION_CLIENT_SECRET        = 'hydro_raindrop_client_secret';
@@ -29,8 +28,6 @@ class Hydro_Raindrop_Helper {
 
 	/**
 	 * Hydro Raindrop user meta.
-	 *
-	 * @since 1.4.0
 	 */
 	const USER_META_HYDRO_ID                 = 'hydro_id';
 	const USER_META_HYDRO_MFA_ENABLED        = 'hydro_mfa_enabled';
@@ -40,6 +37,19 @@ class Hydro_Raindrop_Helper {
 	 * Construct the Helper.
 	 */
 	public function __construct() {
+
+	}
+
+	/**
+	 * Whether Hydro Raindrop is enabled.
+	 *
+	 * Only the site admin can enabled Hydro Raindrop MFA.
+	 *
+	 * @return bool
+	 */
+	public function is_hydro_raindrop_enabled() : bool {
+
+		return (int) get_option( self::OPTION_ENABLED ) === 1;
 
 	}
 
