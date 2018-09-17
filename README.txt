@@ -90,11 +90,15 @@ You'll find answers to many of your questions on [Official Website Support](http
 4. Custom Authentication Page can be created by Admin for their users as well
 
 == Changelog ==
+= 1.4.1 =
+* Updated Author.
+
 = 1.4.0 =
 * Minor optimizations.
 * Improved the README.txt contents.
 
 = 1.3.0 =
+* Added ability to intercept login automatically. Swanky frontend UI.
 * Allow developers to make their own custom MFA page (with shortcodes).
 * Improve MFA flow and security.
 
@@ -116,7 +120,3 @@ You'll find answers to many of your questions on [Official Website Support](http
 
 = 1.0.0 =
 * Initial release of WP Hydro Raindrop.
-
-== Upgrade Notice ==
-= 1.3.0 =
-Added ability to intercept login automatically. Swanky frontend UI.
