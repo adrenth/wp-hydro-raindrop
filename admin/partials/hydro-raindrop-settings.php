@@ -21,106 +21,118 @@ if ( ! current_user_can( 'manage_options' ) ) {
 	wp_die( esc_html__( 'You do not have sufficient permissions to access this page.' ) );
 }
 
+$groups = [
+	Hydro_Raindrop_Admin::OPTION_GROUP_SYSTEM_REQUIREMENTS => 'System Requirements',
+	Hydro_Raindrop_Admin::OPTION_GROUP_API_SETTINGS        => 'API Settings',
+	Hydro_Raindrop_Admin::OPTION_GROUP_CUSTOMIZATION       => 'Customization',
+];
+
 // @codingStandardsIgnoreLine
-$active_tab             = $_GET['tab'] ?? self::OPTION_GROUP_INITIALIZATION;
+$active_tab             = $_GET['tab'] ?? Hydro_Raindrop_Admin::OPTION_GROUP_SYSTEM_REQUIREMENTS;
 $helper                 = new Hydro_Raindrop_Helper();
+$requirement_checker    = new Hydro_Raindrop_RequirementChecker();
+$requirements_are_met   = $requirement_checker->passes();
 $hydro_raindrop_enabled = $helper->is_hydro_raindrop_enabled();
-$options_are_valid      = Hydro_Raindrop::has_valid_raindrop_client_options() && $this->options_are_valid()
+$options_are_valid      = Hydro_Raindrop::has_valid_raindrop_client_options() && $this->options_are_valid();
+
+$tabs = [];
+
+foreach ( $groups as $group => $caption ) {
+
+	$valid    = null;
+	$disabled = false;
+
+	if ( Hydro_Raindrop_Admin::OPTION_GROUP_SYSTEM_REQUIREMENTS === $group ) {
+		$valid = $requirements_are_met;
+	}
+
+	if ( Hydro_Raindrop_Admin::OPTION_GROUP_API_SETTINGS === $group ) {
+		$valid    = $options_are_valid;
+		$disabled = ! $requirements_are_met;
+	}
+
+	if ( Hydro_Raindrop_Admin::OPTION_GROUP_CUSTOMIZATION === $group ) {
+		$disabled = ! $options_are_valid || ! $requirements_are_met;
+	}
+
+	$classes  = $group === $active_tab ? 'nav-tab nav-tab-active' : 'nav-tab';
+	$classes .= $disabled ? ' button-disabled' : '';
+
+	$tabs[ $group ] = [
+		'url'      => sprintf( '?page=%s&tab=%s', $this->plugin_name, $group ),
+		'classes'  => $classes,
+		'caption'  => $caption,
+		'valid'    => $valid,
+		'disabled' => $disabled,
+	];
+
+}
 ?>
-<div class="wrap">
+<div class="wrap hydro-raindrop-settings">
 	<h1>Hydro Raindrop Settings</h1>
 
 	<?php settings_errors(); ?>
 
 	<h2 class="nav-tab-wrapper">
-		<a href="?page=<?php echo $this->plugin_name; ?>&tab=hydro_raindrop"
-				class="nav-tab<?php echo Hydro_Raindrop_Admin::OPTION_GROUP_INITIALIZATION === $active_tab ? ' nav-tab-active' : ''; ?>">
-			Initialization
-		</a>
-
-		<?php if ( $helper->is_hydro_raindrop_enabled() ) : ?>
-			<a href="?page=<?php echo esc_attr( $this->plugin_name ); ?>&tab=<?php echo esc_attr( Hydro_Raindrop_Admin::OPTION_GROUP_API ); ?>"
-					class="nav-tab<?php echo Hydro_Raindrop_Admin::OPTION_GROUP_API === $active_tab ? ' nav-tab-active' : ''; ?>">
-				<?php if ( $options_are_valid ) : ?>
-				<i class="dashicons dashicons-yes" style="color: #46b450; margin-top: 2px"></i>
-				<?php else : ?>
-				<i class="dashicons dashicons-no" style="color: red; margin-top: 2px"></i>
+		<?php foreach ( $tabs as $group => $tab ) : ?>
+			<a href="<?php echo $tab['disabled'] ? '#' : esc_attr( $tab['url'] ); ?>"
+					class="<?php echo esc_attr( $tab ['classes'] ); ?>">
+				<?php if ( null !== $tab['valid'] ) : ?>
+					<?php if ( $tab['valid'] ) : ?>
+						<i class="dashicons dashicons-yes"></i>
+					<?php else : ?>
+						<i class="dashicons dashicons-no"></i>
+					<?php endif; ?>
 				<?php endif; ?>
-				API Settings
+				<?php echo esc_html( $tab['caption'] ); ?>
 			</a>
-			<a href="?page=<?php echo esc_attr( $this->plugin_name ); ?>&tab=<?php echo esc_attr( Hydro_Raindrop_Admin::OPTION_GROUP_CUSTOMIZATION ); ?>"
-					class="nav-tab<?php echo Hydro_Raindrop_Admin::OPTION_GROUP_CUSTOMIZATION === $active_tab ? ' nav-tab-active' : ''; ?>">
-				Customization
-			</a>
-		<?php else : ?>
-			<a href="#" class="nav-tab button-disabled">API Settings</a>
-			<a href="#" class="nav-tab button-disabled">Customization</a>
-		<?php endif; ?>
+		<?php endforeach; ?>
 	</h2>
 
 	<form method="post" action="options.php">
-		<?php if ( Hydro_Raindrop_Admin::OPTION_GROUP_INITIALIZATION === $active_tab ) : ?>
-		<div class="hydro-notice is-dismissible">
-			<p>
-				<?php if ( $hydro_raindrop_enabled ) : ?>
-					<i class="dashicons dashicons-yes" style="color: #46b450"></i> Hydro Raindrop MFA is currently <strong style="color: #46b450">enabled</strong> for all users. To globally <strong>disable</strong> Hydro Raindrop MFA enter your username and password.
-				<?php else : ?>
-					<i class="dashicons dashicons-no" style="color: red"></i>Hydro Raindrop MFA is currently <strong style="color: red">disabled</strong> for all users. To globally <strong>enable</strong> Hydro Raindrop MFA enter your username and password.
-				<?php endif; ?>
-			</p>
-		</div>
-			<?php settings_fields( Hydro_Raindrop_Admin::OPTION_GROUP_INITIALIZATION ); ?>
-			<?php do_settings_sections( Hydro_Raindrop_Admin::OPTION_GROUP_INITIALIZATION ); ?>
-
+		<?php if ( Hydro_Raindrop_Admin::OPTION_GROUP_SYSTEM_REQUIREMENTS === $active_tab ) : ?>
+			<?php settings_fields( Hydro_Raindrop_Admin::OPTION_GROUP_SYSTEM_REQUIREMENTS ); ?>
+			<?php do_settings_sections( Hydro_Raindrop_Admin::OPTION_GROUP_SYSTEM_REQUIREMENTS ); ?>
 			<table class="form-table">
+				<thead>
+				<tr valign="top">
+					<th></th>
+					<th>Passes</th>
+					<th>Requirement</th>
+				</tr>
+				</thead>
+				<tbody>
+				<?php foreach ( $requirement_checker->get_requirements() as $result ) : ?>
 				<tr valign="top">
 					<th scope="row">
-						<label for="user_login">
-							Username
-						</label>
-					</th>
-					<td>
-						<input type="text"
-								class="input regular-text"
-								id="user_login"
-								name="user_login"
-								autocomplete="off"
-								size="20"/>
-					</td>
-				</tr>
-				<tr>
-					<th scope="row">
 						<label for="hydro_raindrop_application_id">
-							Password
+							<?php echo esc_html( $result['label'] ); ?>
 						</label>
 					</th>
 					<td>
-						<input type="password"
-								class="input regular-text"
-								id="password"
-								name="password"
-								size="20"/>
+						<?php if ( $requirement_checker->check( $result['test'] ) ) : ?>
+							<i class="dashicons dashicons-yes"></i>
+						<?php else : ?>
+							<i class="dashicons dashicons-no"></i>
+						<?php endif; ?>
+					</td>
+					<td>
+						<?php echo esc_html( $result['requirement'] ); ?>
 					</td>
 				</tr>
+				<?php endforeach; ?>
+				</tbody>
 			</table>
-
-			<?php echo wp_nonce_field( 'hydro_raindrop_initialization', '_hydro_raindrop_nonce' ); ?>
 
 			<input name="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_ENABLED ); ?>"
 					id="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_ENABLED ); ?>"
 					type="hidden"
-					value="<?php echo (int) ( ! $hydro_raindrop_enabled ); ?>">
+					value="1">
 
-			<?php if ( $hydro_raindrop_enabled ) : ?>
-				<?php submit_button( 'Disable Hydro Raindrop MFA' ); ?>
-			<?php else : ?>
-				<?php submit_button( 'Enable Hydro Raindrop MFA' ); ?>
-			<?php endif; ?>
+		<?php elseif ( Hydro_Raindrop_Admin::OPTION_GROUP_API_SETTINGS === $active_tab && $hydro_raindrop_enabled ) : ?>
 
-		<?php elseif ( Hydro_Raindrop_Admin::OPTION_GROUP_API === $active_tab && $hydro_raindrop_enabled ) : ?>
-
-			<?php settings_fields( Hydro_Raindrop_Admin::OPTION_GROUP_API ); ?>
-			<?php do_settings_sections( Hydro_Raindrop_Admin::OPTION_GROUP_API ); ?>
+			<?php settings_fields( Hydro_Raindrop_Admin::OPTION_GROUP_API_SETTINGS ); ?>
+			<?php do_settings_sections( Hydro_Raindrop_Admin::OPTION_GROUP_API_SETTINGS ); ?>
 
 			<table class="form-table<?php echo ! $options_are_valid ? ' options-are-invalid' : ''; ?>">
 				<tr valign="top">
@@ -198,6 +210,7 @@ $options_are_valid      = Hydro_Raindrop::has_valid_raindrop_client_options() &&
 		<?php elseif ( Hydro_Raindrop_Admin::OPTION_GROUP_CUSTOMIZATION === $active_tab && $hydro_raindrop_enabled ) : ?>
 			<?php settings_fields( Hydro_Raindrop_Admin::OPTION_GROUP_CUSTOMIZATION ); ?>
 			<?php do_settings_sections( Hydro_Raindrop_Admin::OPTION_GROUP_CUSTOMIZATION ); ?>
+			<?php $posts = $this->get_post_options(); ?>
 
 			<table class="form-table">
 				<tr valign="top">

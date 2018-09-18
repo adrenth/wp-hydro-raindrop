@@ -26,9 +26,9 @@ use Adrenth\Raindrop\Exception\RefreshTokenFailed;
  */
 class Hydro_Raindrop_Admin {
 
-	const OPTION_GROUP_INITIALIZATION = 'hydro_raindrop';
-	const OPTION_GROUP_API            = 'hydro_raindrop_api';
-	const OPTION_GROUP_CUSTOMIZATION  = 'hydro_raindrop_customization';
+	const OPTION_GROUP_SYSTEM_REQUIREMENTS = 'hydro_raindrop_system_requirements';
+	const OPTION_GROUP_API_SETTINGS        = 'hydro_raindrop_api_settings';
+	const OPTION_GROUP_CUSTOMIZATION       = 'hydro_raindrop_customization';
 
 	/**
 	 * The ID of this plugin.
@@ -86,12 +86,12 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function admin_init() {
 
-		register_setting( self::OPTION_GROUP_INITIALIZATION, Hydro_Raindrop_Helper::OPTION_ENABLED );
+		register_setting( self::OPTION_GROUP_SYSTEM_REQUIREMENTS, Hydro_Raindrop_Helper::OPTION_ENABLED );
 
-		register_setting( self::OPTION_GROUP_API, Hydro_Raindrop_Helper::OPTION_APPLICATION_ID );
-		register_setting( self::OPTION_GROUP_API, Hydro_Raindrop_Helper::OPTION_CLIENT_ID );
-		register_setting( self::OPTION_GROUP_API, Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET );
-		register_setting( self::OPTION_GROUP_API, Hydro_Raindrop_Helper::OPTION_ENVIRONMENT );
+		register_setting( self::OPTION_GROUP_API_SETTINGS, Hydro_Raindrop_Helper::OPTION_APPLICATION_ID );
+		register_setting( self::OPTION_GROUP_API_SETTINGS, Hydro_Raindrop_Helper::OPTION_CLIENT_ID );
+		register_setting( self::OPTION_GROUP_API_SETTINGS, Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET );
+		register_setting( self::OPTION_GROUP_API_SETTINGS, Hydro_Raindrop_Helper::OPTION_ENVIRONMENT );
 
 		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE );
 		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE );
@@ -219,32 +219,6 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function settings_page() {
 
-		$args = array(
-			'post_type'      => 'page',
-			'posts_per_page' => -1,
-			'order'          => 'ASC',
-			'orderby'        => 'menu_order',
-		);
-
-		$parent = new WP_Query( $args );
-
-		$posts = [];
-
-		while ( $parent->have_posts() ) {
-			$parent->the_post();
-
-			$post_id = get_the_ID();
-
-			if ( $post_id ) {
-				/**
-				 * The variable $posts is used in the template file.
-				 *
-				 * @noinspection OnlyWritesOnParameterInspection
-				 */
-				$posts[ (int) $post_id ] = get_the_title() . ' - ' . get_the_permalink();
-			}
-		}
-
 		include __DIR__ . '/../admin/partials/hydro-raindrop-settings.php';
 
 	}
@@ -328,6 +302,41 @@ class Hydro_Raindrop_Admin {
 		];
 
 		return array_merge( $links, $add_links );
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_post_options() : array {
+
+		$args = array(
+			'post_type'      => 'page',
+			'posts_per_page' => -1,
+			'order'          => 'ASC',
+			'orderby'        => 'menu_order',
+		);
+
+		$parent = new WP_Query( $args );
+
+		$posts = [];
+
+		while ( $parent->have_posts() ) {
+			$parent->the_post();
+
+			$post_id = get_the_ID();
+
+			if ( $post_id ) {
+				/**
+				 * The variable $posts is used in the template file.
+				 *
+				 * @noinspection OnlyWritesOnParameterInspection
+				 */
+				$posts[ (int) $post_id ] = get_the_title() . ' - ' . get_the_permalink();
+			}
+		}
+
+		return $posts;
+
 	}
 
 }

@@ -111,6 +111,8 @@ class Hydro_Raindrop {
 			__DIR__ . '/class-hydro-raindrop-helper.php',
 			// The class for handling the MFA cookie.
 			__DIR__ . '/class-hydro-raindrop-cookie.php',
+			// The class responsible for checking requirements.
+			__DIR__ . '/class-hydro-raindrop-requirement-checker.php',
 			// The class responsible for defining all actions that occur in the admin area.
 			__DIR__ . '/../admin/class-hydro-raindrop-admin.php',
 			// The class responsible for defining all actions that occur in the public-facing side of the site.

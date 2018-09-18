@@ -40,7 +40,17 @@ p.success-message {
     font-weight: 600;
 }
 
-.options-are-invalid input[type=text] {
+.hydro-raindrop-settings .dashicons-yes {
+    color: #46b450;
+    margin-top: 2px
+}
+
+.hydro-raindrop-settings .dashicons-no {
+    color: red;
+    margin-top: 2px
+}
+
+.hydro-raindrop-settings .options-are-invalid input[type=text] {
     border-color: red !important;
     color: red !important;
 }
