@@ -1,5 +1,9 @@
 # wp-hydro-raindrop
 
+## 1.4.2
+
+- Fixed critical authentication issue.
+
 ## 1.4.1
 
 - Updated Author.

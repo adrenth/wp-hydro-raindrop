@@ -71,7 +71,7 @@ final class Hydro_Raindrop_Authenticate {
 	 *                                    A WP_User object indicates another process has authenticated the user.
 	 *
 	 * @return null|WP_User|WP_Error
-	 * @throws Exception
+	 * @throws Exception If authentication message cannot be generated.
 	 */
 	public function authenticate( $user = null ) {
 
@@ -90,6 +90,8 @@ final class Hydro_Raindrop_Authenticate {
 			$this->cookie->set( $user->ID );
 			$this->start_mfa( $user );
 		}
+
+		return $user;
 
 	}
 
