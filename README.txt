@@ -90,6 +90,9 @@ You'll find answers to many of your questions on [Official Website Support](http
 4. Custom Authentication Page can be created by Admin for their users as well
 
 == Changelog ==
+= 1.4.2 =
+* Fixed critical authentication issue.
+
 = 1.4.1 =
 * Updated Author.
 
