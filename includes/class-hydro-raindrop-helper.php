@@ -25,6 +25,7 @@ class Hydro_Raindrop_Helper {
 	const OPTION_CUSTOM_HYDRO_ID_PAGE = 'hydro_raindrop_custom_hydro_id_page';
 	const OPTION_ACTIVATION_NOTICE    = 'hydro_raindrop_activation_notice';
 	const OPTION_ACCESS_TOKEN_SUCCESS = 'hydro_raindrop_access_token_success';
+	const OPTION_MFA_METHOD           = 'hydro_raindrop_mfa_method';
 
 	/**
 	 * Hydro Raindrop user meta.
@@ -32,6 +33,13 @@ class Hydro_Raindrop_Helper {
 	const USER_META_HYDRO_ID                 = 'hydro_id';
 	const USER_META_HYDRO_MFA_ENABLED        = 'hydro_mfa_enabled';
 	const USER_META_HYDRO_RAINDROP_CONFIRMED = 'hydro_raindrop_confirmed';
+
+	/**
+	 * MFA Method
+	 */
+	const MFA_METHOD_ENFORCED = 'enforced';
+	const MFA_METHOD_PROMPTED = 'prompted';
+	const MFA_METHOD_OPTIONAL = 'optional';
 
 	/**
 	 * Construct the Helper.

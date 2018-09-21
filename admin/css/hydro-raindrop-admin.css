@@ -54,3 +54,8 @@ p.success-message {
     border-color: red !important;
     color: red !important;
 }
+
+.hydro-raindrop-settings label span {
+    display: inline-block;
+    min-width: 8em;
+}

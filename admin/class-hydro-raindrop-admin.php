@@ -95,6 +95,7 @@ class Hydro_Raindrop_Admin {
 
 		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE );
 		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE );
+		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_MFA_METHOD );
 
 	}
 

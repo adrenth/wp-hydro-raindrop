@@ -47,6 +47,7 @@ final class Hydro_Raindrop_Installer {
 		$helper->publish_custom_hydro_id_page();
 
 		update_option( Hydro_Raindrop_Helper::OPTION_ENABLED, 0 );
+		update_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD, Hydro_Raindrop_Helper::MFA_METHOD_OPTIONAL );
 
 	}
 
@@ -137,6 +138,7 @@ final class Hydro_Raindrop_Installer {
 		delete_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE );
 		delete_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE );
 		delete_option( Hydro_Raindrop_Helper::OPTION_ACTIVATION_NOTICE );
+		delete_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD );
 
 	}
 

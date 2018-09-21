@@ -14,6 +14,8 @@ declare( strict_types=1 );
  * @subpackage Hydro_Raindrop/admin/partials
  */
 
+use Hydro_Raindrop_Helper as Helper;
+
 ?>
 
 <?php
@@ -29,7 +31,7 @@ $groups = [
 
 // @codingStandardsIgnoreLine
 $active_tab             = $_GET['tab'] ?? Hydro_Raindrop_Admin::OPTION_GROUP_SYSTEM_REQUIREMENTS;
-$helper                 = new Hydro_Raindrop_Helper();
+$helper                 = new Helper();
 $requirement_checker    = new Hydro_Raindrop_RequirementChecker();
 $requirements_are_met   = $requirement_checker->passes();
 $hydro_raindrop_enabled = $helper->is_hydro_raindrop_enabled();
@@ -124,8 +126,8 @@ foreach ( $groups as $group => $caption ) {
 				</tbody>
 			</table>
 
-			<input name="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_ENABLED ); ?>"
-					id="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_ENABLED ); ?>"
+			<input name="<?php echo esc_attr( Helper::OPTION_ENABLED ); ?>"
+					id="<?php echo esc_attr( Helper::OPTION_ENABLED ); ?>"
 					type="hidden"
 					value="1">
 
@@ -146,7 +148,7 @@ foreach ( $groups as $group => $caption ) {
 								class="regular-text code"
 								id="hydro_raindrop_application_id"
 								name="hydro_raindrop_application_id"
-								value="<?php echo esc_attr( get_option( Hydro_Raindrop_Helper::OPTION_APPLICATION_ID ) ); ?>"
+								value="<?php echo esc_attr( get_option( Helper::OPTION_APPLICATION_ID ) ); ?>"
 								autocomplete="off"/>
 						<p class="description">Register an account at <a href="https://www.hydrogenplatform.com" target="_blank">https://www.hydrogenplatform.com</a> to obtain an Application ID.</p>
 					</td>
@@ -162,7 +164,7 @@ foreach ( $groups as $group => $caption ) {
 								class="regular-text code"
 								id="hydro_raindrop_client_id"
 								name="hydro_raindrop_client_id"
-								value="<?php echo esc_attr( get_option( Hydro_Raindrop_Helper::OPTION_CLIENT_ID ) ); ?>"
+								value="<?php echo esc_attr( get_option( Helper::OPTION_CLIENT_ID ) ); ?>"
 								autocomplete="off"/>
 					</td>
 				</tr>
@@ -177,7 +179,7 @@ foreach ( $groups as $group => $caption ) {
 								class="regular-text code"
 								id="hydro_raindrop_client_secret"
 								name="hydro_raindrop_client_secret"
-								value="<?php echo esc_attr( get_option( Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET ) ); ?>"
+								value="<?php echo esc_attr( get_option( Helper::OPTION_CLIENT_SECRET ) ); ?>"
 								autocomplete="off"/>
 					</td>
 				</tr>
@@ -191,10 +193,10 @@ foreach ( $groups as $group => $caption ) {
 						<select id="hydro_raindrop_environment"
 								name="hydro_raindrop_environment"
 								class="selection">
-							<option value="production"<?php if ( get_option( Hydro_Raindrop_Helper::OPTION_ENVIRONMENT ) === 'production' ) : ?> selected<?php endif; ?>>
+							<option value="production"<?php if ( get_option( Helper::OPTION_ENVIRONMENT ) === 'production' ) : ?> selected<?php endif; ?>>
 								Production
 							</option>
-							<option value="sandbox"<?php if ( get_option( Hydro_Raindrop_Helper::OPTION_ENVIRONMENT ) === 'sandbox' ) : ?> selected<?php endif; ?>>
+							<option value="sandbox"<?php if ( get_option( Helper::OPTION_ENVIRONMENT ) === 'sandbox' ) : ?> selected<?php endif; ?>>
 								Sandbox
 							</option>
 						</select>
@@ -210,18 +212,65 @@ foreach ( $groups as $group => $caption ) {
 		<?php elseif ( Hydro_Raindrop_Admin::OPTION_GROUP_CUSTOMIZATION === $active_tab && $hydro_raindrop_enabled ) : ?>
 			<?php settings_fields( Hydro_Raindrop_Admin::OPTION_GROUP_CUSTOMIZATION ); ?>
 			<?php do_settings_sections( Hydro_Raindrop_Admin::OPTION_GROUP_CUSTOMIZATION ); ?>
-			<?php $posts = $this->get_post_options(); ?>
+
+			<?php
+			$posts      = $this->get_post_options();
+			$mfa_method = get_option( Helper::OPTION_MFA_METHOD )
+			?>
 
 			<table class="form-table">
 				<tr valign="top">
 					<th scope="row">
-						<label for="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE ); ?>">
-							Hydro MFA Login Page
+						MFA method
+					</th>
+					<td>
+						<fieldset>
+							<p>
+								<label>
+									<input type="radio"
+											name="<?php echo esc_attr( Helper::OPTION_MFA_METHOD ); ?>"
+											value="<?php echo esc_attr( Helper::MFA_METHOD_OPTIONAL ); ?>"
+										<?php if ( ! $mfa_method || Helper::MFA_METHOD_OPTIONAL === $mfa_method ) : ?>
+											checked="checked"
+										<?php endif; ?>>
+									<span>Optional</span>
+									User decides to enable MFA on their account.
+								</label>
+								<br>
+								<label>
+									<input type="radio"
+											name="<?php echo esc_attr( Helper::OPTION_MFA_METHOD ); ?>"
+											value="<?php echo esc_attr( Helper::MFA_METHOD_PROMPTED ); ?>"
+										<?php if ( Helper::MFA_METHOD_PROMPTED === $mfa_method ) : ?>
+											checked="checked"
+										<?php endif; ?>>
+									<span>Prompted</span>
+									MFA setup screen will be prompted after logging in. User can skip this step and setup MFA later.
+								</label>
+								<br>
+								<label>
+									<input type="radio"
+											name="<?php echo esc_attr( Helper::OPTION_MFA_METHOD ); ?>"
+											value="<?php echo esc_attr( Helper::MFA_METHOD_ENFORCED ); ?>"
+										<?php if ( Helper::MFA_METHOD_ENFORCED === $mfa_method ) : ?>
+											checked="checked"
+										<?php endif; ?>>
+									<span>Enforced</span>
+									MFA is forced site wide. Users will have to setup MFA after logging in.
+								</label>
+							</p>
+						</fieldset>
+					</td>
+				</tr>
+				<tr valign="top">
+					<th scope="row">
+						<label for="<?php echo esc_attr( Helper::OPTION_CUSTOM_MFA_PAGE ); ?>">
+							MFA Login Page
 						</label>
 					</th>
 					<td>
-						<select id="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE ); ?>"
-								name="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE ); ?>"
+						<select id="<?php echo esc_attr( Helper::OPTION_CUSTOM_MFA_PAGE ); ?>"
+								name="<?php echo esc_attr( Helper::OPTION_CUSTOM_MFA_PAGE ); ?>"
 								class="selection">
 							<option value="0">Use default Hydro MFA Login Page</option>
 							<option value="0">---</option>
@@ -233,7 +282,7 @@ foreach ( $groups as $group => $caption ) {
 							 */
 							foreach ( $posts as $post_id => $post ) :
 								?>
-								<?php $selected = (int) get_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE ) === $post_id ? ' selected' : ''; ?>
+								<?php $selected = (int) get_option( Helper::OPTION_CUSTOM_MFA_PAGE ) === $post_id ? ' selected' : ''; ?>
 								<option value="<?php echo esc_attr( $post_id ); ?>"<?php echo esc_attr( $selected ); ?>>
 									<?php echo esc_html( $post ); ?>
 								</option>
@@ -244,13 +293,13 @@ foreach ( $groups as $group => $caption ) {
 				</tr>
 				<tr valign="top">
 					<th scope="row">
-						<label for="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ); ?>">
-							Hydro MFA Settings Page
+						<label for="<?php echo esc_attr( Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ); ?>">
+							MFA Settings Page
 						</label>
 					</th>
 					<td>
-						<select id="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ); ?>"
-								name="<?php echo esc_attr( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ); ?>"
+						<select id="<?php echo esc_attr( Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ); ?>"
+								name="<?php echo esc_attr( Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ); ?>"
 								class="selection">
 							<option value="0">Use default Hydro MFA Settings Page</option>
 							<option value="0">---</option>
@@ -262,7 +311,7 @@ foreach ( $groups as $group => $caption ) {
 							 */
 							foreach ( $posts as $post_id => $post ) :
 								?>
-								<?php $selected = (int) get_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ) === $post_id ? ' selected' : ''; ?>
+								<?php $selected = (int) get_option( Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ) === $post_id ? ' selected' : ''; ?>
 								<option value="<?php echo esc_attr( $post_id ); ?>"<?php echo esc_attr( $selected ); ?>>
 									<?php echo esc_html( $post ); ?>
 								</option>
