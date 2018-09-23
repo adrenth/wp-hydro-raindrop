@@ -11,7 +11,7 @@
  * Plugin Name:       WP Hydro Raindrop
  * Plugin URI:        https://github.com/adrenth/wp-hydro-raindrop
  * Description:       A WordPress plugin to integrate Hydro Raindrop MFA
- * Version:           1.4.1
+ * Version:           2.0.0
  * Author:            Hydrogen API
  * Author URI:        https://hydrogenplatform.com
  * License:           GPL-2.0+
@@ -25,8 +25,15 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-// Require composer autoloader if installed on it's own
-if ( file_exists( $composer = __DIR__ . '/vendor/autoload.php' ) ) {
+// Require composer autoloader if installed on it's own.
+$composer = __DIR__ . '/vendor/autoload.php';
+
+if ( file_exists( $composer ) ) {
+	/**
+	 * Expression is not analysed.
+	 *
+	 * @noinspection PhpIncludeInspection
+	 */
 	require_once $composer;
 }
 
@@ -35,7 +42,7 @@ if ( file_exists( $composer = __DIR__ . '/vendor/autoload.php' ) ) {
  *
  * @var string
  */
-define( 'HYDRO_RAINDROP_VERSION', '1.4.1' );
+define( 'HYDRO_RAINDROP_VERSION', '2.0.0' );
 
 /**
  * The installer class which handles the activation,
@@ -59,8 +66,6 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-hydro-raindrop.php';
  * Since everything within the plugin is registered via hooks,
  * then kicking off the plugin from this point in the file does
  * not affect the page life cycle.
- *
- * @since    1.0.0
  */
 function run_hydro_raindrop() {
 

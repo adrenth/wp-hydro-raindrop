@@ -11,7 +11,7 @@ declare( strict_types=1 );
  * @package    Hydro_Raindrop
  * @subpackage Hydro_Raindrop/includes
  */
-class Hydro_Raindrop_Helper {
+final class Hydro_Raindrop_Helper {
 
 	/**
 	 * Hydro Raindrop database options.
@@ -21,11 +21,16 @@ class Hydro_Raindrop_Helper {
 	const OPTION_CLIENT_ID            = 'hydro_raindrop_client_id';
 	const OPTION_CLIENT_SECRET        = 'hydro_raindrop_client_secret';
 	const OPTION_ENVIRONMENT          = 'hydro_raindrop_environment';
-	const OPTION_CUSTOM_MFA_PAGE      = 'hydro_raindrop_custom_mfa_page';
-	const OPTION_CUSTOM_HYDRO_ID_PAGE = 'hydro_raindrop_custom_hydro_id_page';
 	const OPTION_ACTIVATION_NOTICE    = 'hydro_raindrop_activation_notice';
 	const OPTION_ACCESS_TOKEN_SUCCESS = 'hydro_raindrop_access_token_success';
 	const OPTION_MFA_METHOD           = 'hydro_raindrop_mfa_method';
+
+	/**
+	 * Hydro Raindrop Pages.
+	 */
+	const OPTION_PAGE_MFA      = 'hydro_raindrop_page_mfa';
+	const OPTION_PAGE_SETUP    = 'hydro_raindrop_page_setup';
+	const OPTION_PAGE_SETTINGS = 'hydro_raindrop_page_settings';
 
 	/**
 	 * Hydro Raindrop user meta.
@@ -84,26 +89,26 @@ class Hydro_Raindrop_Helper {
 	}
 
 	/**
-	 * Get the custom MFA page URL.
+	 * Get the MFA page URL.
 	 *
 	 * @return string
 	 */
-	public function get_custom_mfa_page_url() : string {
+	public function get_mfa_page_url() : string {
 
-		$post_id = (int) get_option( self::OPTION_CUSTOM_MFA_PAGE );
+		$post_id = (int) get_option( self::OPTION_PAGE_MFA );
 
 		return $post_id > 0 ? get_permalink( $post_id ) : '';
 
 	}
 
 	/**
-	 * Get the custom Hydro ID page URL.
+	 * Get the HydroID page URL.
 	 *
 	 * @return string
 	 */
-	public function get_custom_hydro_id_page_url() : string {
+	public function get_setup_page_url() : string {
 
-		$post_id = (int) get_option( self::OPTION_CUSTOM_HYDRO_ID_PAGE );
+		$post_id = (int) get_option( self::OPTION_PAGE_SETUP );
 
 		return $post_id > 0 ? get_permalink( $post_id ) : '';
 
@@ -114,109 +119,208 @@ class Hydro_Raindrop_Helper {
 	 *
 	 * @return bool
 	 */
-	public function is_custom_mfa_page_enabled() : bool {
+	public function is_mfa_page_enabled() : bool {
 
-		return $this->is_page_enabled_with_option( self::OPTION_CUSTOM_MFA_PAGE );
+		return $this->is_page_enabled_with_option( self::OPTION_PAGE_MFA );
 
 	}
 
 	/**
-	 * Checks if Hydro ID page is present and enabled.
+	 * Checks if HydroID page is present and enabled.
 	 *
 	 * @return bool
 	 */
-	public function is_custom_hydro_id_page_enabled() : bool {
+	public function is_setup_page_enabled() : bool {
 
-		return $this->is_page_enabled_with_option( self::OPTION_CUSTOM_HYDRO_ID_PAGE );
+		return $this->is_page_enabled_with_option( self::OPTION_PAGE_SETUP );
 
 	}
 
 	/**
-	 * Whether the Custom MFA Page is present.
+	 * Checks if Settings page is present and enabled.
 	 *
 	 * @return bool
 	 */
-	public function is_custom_mfa_page_present() : bool {
+	public function is_settings_page_enabled() : bool {
 
-		return $this->is_page_present_with_option( self::OPTION_CUSTOM_MFA_PAGE );
+		return $this->is_page_enabled_with_option( self::OPTION_PAGE_SETTINGS );
 
 	}
 
 	/**
-	 * Whether the Custom Hydro ID Page is present.
+	 * Whether the MFA page is present.
 	 *
 	 * @return bool
 	 */
-	public function is_custom_hydro_id_page_present() : bool {
+	public function is_mfa_page_present() : bool {
 
-		return $this->is_page_present_with_option( self::OPTION_CUSTOM_HYDRO_ID_PAGE );
+		return $this->is_page_present_with_option( self::OPTION_PAGE_MFA );
 
 	}
 
 	/**
-	 * Create the custom MFA page.
+	 * Whether the HydroID page is present.
 	 *
-	 * @return void
+	 * @return bool
 	 */
-	public function create_custom_mfa_page() {
+	public function is_setup_page_present() : bool {
+
+		return $this->is_page_present_with_option( self::OPTION_PAGE_SETUP );
+
+	}
+
+	/**
+	 * Whether the Settings page is present.
+	 *
+	 * @return bool
+	 */
+	public function is_settings_page_present() : bool {
+
+		return $this->is_page_present_with_option( self::OPTION_PAGE_SETTINGS );
+
+	}
+
+	/**
+	 * Create the MFA page.
+	 *
+	 * @return int Returns 0 on failure, otherwise a valid post ID when creation is success.
+	 */
+	public function create_mfa_page() : int {
+
+		if ( $this->is_mfa_page_present() ) {
+			return (int) get_option( self::OPTION_PAGE_MFA );
+		}
 
 		$post_id = wp_insert_post( [
-			'post_title'  => 'Hydro MFA Login Page',
-			'post_name'   => 'hydro-raindrop-mfa',
-			'post_status' => 'publish',
-			'post_type'   => 'page',
+			'post_title'   => 'Hydro Raindrop MFA Page',
+			'post_name'    => 'hydro-raindrop',
+			'post_status'  => 'publish',
+			'post_type'    => 'page',
+			'post_parent'  => null,
+			'post_content' => "[hydro_raindrop_mfa_flash]\n"
+				. "[hydro_raindrop_mfa_form_open]\n"
+				. "[hydro_raindrop_mfa_digits]\n"
+				. "[hydro_raindrop_mfa_button_authorize]\n"
+				. "[hydro_raindrop_mfa_button_cancel]\n"
+				. "[hydro_raindrop_mfa_form_close]\n",
 		], true );
 
 
 		if ( $post_id instanceof WP_Error ) {
-			return;
+			return 0;
 		}
 
-		update_option( self::OPTION_CUSTOM_MFA_PAGE, $post_id );
+		update_option( self::OPTION_PAGE_MFA, $post_id );
+
+		return $post_id;
 
 	}
 
 	/**
-	 * Create the custom Hydro ID page.
+	 * Create the HydroID page.
 	 *
-	 * @return void
+	 * @param int $post_parent_id The parent post ID.
+	 *
+	 * @return int Returns 0 on failure, otherwise a valid post ID when creation is success.
 	 */
-	public function create_custom_hydro_id_page() {
+	public function create_setup_page( int $post_parent_id ) : int {
+
+		if ( $this->is_setup_page_present() ) {
+			return (int) get_option( self::OPTION_PAGE_SETUP );
+		}
 
 		$post_id = wp_insert_post( [
-			'post_title'  => 'Hydro MFA Settings Page',
-			'post_name'   => 'hydro-raindrop-settings',
-			'post_status' => 'publish',
-			'post_type'   => 'page',
+			'post_title'   => 'HydroID Setup Page',
+			'post_name'    => 'setup',
+			'post_status'  => 'publish',
+			'post_type'    => 'page',
+			'post_parent'  => $post_parent_id,
+			'post_content' => "[hydro_raindrop_setup_flash]\n"
+				. "[hydro_raindrop_setup_form_open]\n"
+				. "[hydro_raindrop_setup_form_close]\n"
+				. "[hydro_raindrop_setup_hydro_id]\n"
+				. "[hydro_raindrop_setup_button_submit]\n"
+				. "[hydro_raindrop_setup_button_skip]\n",
 		], true );
 
 		if ( $post_id instanceof WP_Error ) {
-			return;
+			return 0;
 		}
 
-		update_option( self::OPTION_CUSTOM_HYDRO_ID_PAGE, $post_id );
+		update_option( self::OPTION_PAGE_SETUP, $post_id );
+
+		return $post_id;
 
 	}
 
 	/**
-	 * Delete the custom MFA page.
+	 * Create the custom HydroID page.
 	 *
-	 * @return void
+	 * @param int $post_parent_id The parent post ID.
+	 *
+	 * @return int Returns 0 on failure, otherwise a valid post ID when creation is success.
 	 */
-	public function delete_custom_mfa_page() {
+	public function create_settings_page( int $post_parent_id ) : int {
 
-		wp_delete_post( get_option( self::OPTION_CUSTOM_MFA_PAGE ) );
+		if ( $this->is_settings_page_present() ) {
+			return (int) get_option( self::OPTION_PAGE_SETTINGS );
+		}
+
+		$post_id = wp_insert_post( [
+			'post_title'   => 'Hydro Raindrop Settings Page',
+			'post_name'    => 'settings',
+			'post_status'  => 'publish',
+			'post_type'    => 'page',
+			'post_parent'  => $post_parent_id,
+			'post_content' => null, // TODO: Default content
+		], true );
+
+		if ( $post_id instanceof WP_Error ) {
+			return 0;
+		}
+
+		update_option( self::OPTION_PAGE_SETTINGS, $post_id );
+
+		return $post_id;
 
 	}
 
 	/**
-	 * Delete the custom Hydro ID page.
+	 * Delete the MFA page.
 	 *
-	 * @return void
+	 * @return Hydro_Raindrop_Helper
 	 */
-	public function delete_custom_hydro_id_page() {
+	public function delete_mfa_page() : Hydro_Raindrop_Helper {
 
-		wp_delete_post( self::OPTION_CUSTOM_HYDRO_ID_PAGE );
+		wp_delete_post( get_option( self::OPTION_PAGE_MFA ) );
+
+		return $this;
+
+	}
+
+	/**
+	 * Delete the HydroID page.
+	 *
+	 * @return Hydro_Raindrop_Helper
+	 */
+	public function delete_setup_page() : Hydro_Raindrop_Helper {
+
+		wp_delete_post( self::OPTION_PAGE_SETUP );
+
+		return $this;
+
+	}
+
+	/**
+	 * Delete the Settings page.
+	 *
+	 * @return Hydro_Raindrop_Helper
+	 */
+	public function delete_settings_page() : Hydro_Raindrop_Helper {
+
+		wp_delete_post( self::OPTION_PAGE_SETTINGS );
+
+		return $this;
 
 	}
 
@@ -225,20 +329,29 @@ class Hydro_Raindrop_Helper {
 	 *
 	 * @return void
 	 */
-	public function unpublish_custom_mfa_page() {
+	public function unpublish_mfa_page() {
 
-		$this->change_page_status_with_option( self::OPTION_CUSTOM_MFA_PAGE, false );
+		$this->change_page_status_with_option( self::OPTION_PAGE_MFA, false );
 
 	}
 
 	/**
-	 * Un-publish the Hydro ID page.
+	 * Un-publish the HydroID page.
 	 *
 	 * @return void
 	 */
-	public function unpublish_custom_hydro_id_page() {
+	public function unpublish_setup_page() {
 
-		$this->change_page_status_with_option( self::OPTION_CUSTOM_HYDRO_ID_PAGE, false );
+		$this->change_page_status_with_option( self::OPTION_PAGE_SETUP, false );
+
+	}
+
+	/**
+	 * Un-publish the Settings page.
+	 */
+	public function unpublish_settings_page() {
+
+		$this->change_page_status_with_option( self::OPTION_PAGE_SETTINGS, false );
 
 	}
 
@@ -247,20 +360,31 @@ class Hydro_Raindrop_Helper {
 	 *
 	 * @return void
 	 */
-	public function publish_custom_mfa_page() {
+	public function publish_mfa_page() {
 
-		$this->change_page_status_with_option( self::OPTION_CUSTOM_MFA_PAGE, true );
+		$this->change_page_status_with_option( self::OPTION_PAGE_MFA, true );
 
 	}
 
 	/**
-	 * Publish the Hydro ID page.
+	 * Publish the HydroID page.
 	 *
 	 * @return void
 	 */
-	public function publish_custom_hydro_id_page() {
+	public function publish_setup_page() {
 
-		$this->change_page_status_with_option( self::OPTION_CUSTOM_HYDRO_ID_PAGE, true );
+		$this->change_page_status_with_option( self::OPTION_PAGE_SETUP, true );
+
+	}
+
+	/**
+	 * Publish the Settings page.
+	 *
+	 * @return void
+	 */
+	public function publish_settings_page() {
+
+		$this->change_page_status_with_option( self::OPTION_PAGE_SETTINGS, true );
 
 	}
 

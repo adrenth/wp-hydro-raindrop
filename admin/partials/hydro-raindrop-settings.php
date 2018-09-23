@@ -218,10 +218,12 @@ foreach ( $groups as $group => $caption ) {
 			$mfa_method = get_option( Helper::OPTION_MFA_METHOD )
 			?>
 
+			<h2>Multi Factor Authentication</h2>
+
 			<table class="form-table">
 				<tr valign="top">
 					<th scope="row">
-						MFA method
+						Method
 					</th>
 					<td>
 						<fieldset>
@@ -264,15 +266,15 @@ foreach ( $groups as $group => $caption ) {
 				</tr>
 				<tr valign="top">
 					<th scope="row">
-						<label for="<?php echo esc_attr( Helper::OPTION_CUSTOM_MFA_PAGE ); ?>">
-							MFA Login Page
+						<label for="<?php echo esc_attr( Helper::OPTION_PAGE_MFA ); ?>">
+							MFA Page
 						</label>
 					</th>
 					<td>
-						<select id="<?php echo esc_attr( Helper::OPTION_CUSTOM_MFA_PAGE ); ?>"
-								name="<?php echo esc_attr( Helper::OPTION_CUSTOM_MFA_PAGE ); ?>"
+						<select id="<?php echo esc_attr( Helper::OPTION_PAGE_MFA ); ?>"
+								name="<?php echo esc_attr( Helper::OPTION_PAGE_MFA ); ?>"
 								class="selection">
-							<option value="0">Use default Hydro MFA Login Page</option>
+							<option value="0">Use default MFA Page</option>
 							<option value="0">---</option>
 							<?php
 							/**
@@ -282,7 +284,7 @@ foreach ( $groups as $group => $caption ) {
 							 */
 							foreach ( $posts as $post_id => $post ) :
 								?>
-								<?php $selected = (int) get_option( Helper::OPTION_CUSTOM_MFA_PAGE ) === $post_id ? ' selected' : ''; ?>
+								<?php $selected = (int) get_option( Helper::OPTION_PAGE_MFA ) === $post_id ? ' selected' : ''; ?>
 								<option value="<?php echo esc_attr( $post_id ); ?>"<?php echo esc_attr( $selected ); ?>>
 									<?php echo esc_html( $post ); ?>
 								</option>
@@ -293,13 +295,42 @@ foreach ( $groups as $group => $caption ) {
 				</tr>
 				<tr valign="top">
 					<th scope="row">
-						<label for="<?php echo esc_attr( Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ); ?>">
+						<label for="<?php echo esc_attr( Helper::OPTION_PAGE_SETUP ); ?>">
+							MFA Setup Page
+						</label>
+					</th>
+					<td>
+						<select id="<?php echo esc_attr( Helper::OPTION_PAGE_SETUP ); ?>"
+								name="<?php echo esc_attr( Helper::OPTION_PAGE_SETUP ); ?>"
+								class="selection">
+							<option value="0">Use default Hydro MFA Setup Page</option>
+							<option value="0">---</option>
+							<?php
+							/**
+							 * Type hinting.
+							 *
+							 * @var array $posts
+							 */
+							foreach ( $posts as $post_id => $post ) :
+								?>
+								<?php $selected = (int) get_option( Helper::OPTION_PAGE_SETUP ) === $post_id ? ' selected' : ''; ?>
+								<option value="<?php echo esc_attr( $post_id ); ?>"<?php echo esc_attr( $selected ); ?>>
+									<?php echo esc_html( $post ); ?>
+								</option>
+							<?php endforeach; ?>
+						</select>
+						<p class="description">Please make sure you have implemented the shortcodes on the Hydro MFA Setup Page.</p>
+					</td>
+				</tr>
+				<tr valign="top">
+					<th scope="row">
+						<label for="<?php echo esc_attr( Helper::OPTION_PAGE_SETTINGS ); ?>">
 							MFA Settings Page
 						</label>
 					</th>
 					<td>
-						<select id="<?php echo esc_attr( Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ); ?>"
-								name="<?php echo esc_attr( Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ); ?>"
+						<select id="<?php echo esc_attr( Helper::OPTION_PAGE_SETTINGS ); ?>"
+								name="<?php echo esc_attr( Helper::OPTION_PAGE_SETTINGS ); ?>"
 								class="selection">
 							<option value="0">Use default Hydro MFA Settings Page</option>
 							<option value="0">---</option>
@@ -311,7 +342,7 @@ foreach ( $groups as $group => $caption ) {
 							 */
 							foreach ( $posts as $post_id => $post ) :
 								?>
-								<?php $selected = (int) get_option( Helper::OPTION_CUSTOM_HYDRO_ID_PAGE ) === $post_id ? ' selected' : ''; ?>
+								<?php $selected = (int) get_option( Helper::OPTION_PAGE_SETTINGS ) === $post_id ? ' selected' : ''; ?>
 								<option value="<?php echo esc_attr( $post_id ); ?>"<?php echo esc_attr( $selected ); ?>>
 									<?php echo esc_html( $post ); ?>
 								</option>

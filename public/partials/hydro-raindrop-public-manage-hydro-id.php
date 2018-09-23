@@ -53,7 +53,7 @@ $hydro_mfa_disabled = ! ( (bool) $user->hydro_mfa_enabled );
 				</button>
 			<?php endif; ?>
 
-			<?php echo wp_nonce_field( 'hydro_raindrop_hydro_id', '_hydro_id_nonce' ); ?>
+			<?php echo esc_html( wp_nonce_field( 'hydro_raindrop_hydro_id', '_hydro_id_nonce' ) ); ?>
 		</form>
 
 	<?php else : ?>

@@ -24,6 +24,22 @@
     line-height: 100%;
 }
 
+.hydro-raindrop-setup input[type=text] {
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.07);
+    height: 48px;
+    text-align: center;
+    border: 1px solid #ddd;
+    padding: 10px 15px 5px 20px;
+    margin: 10px 0;
+    background-color: #fbfbfb;
+    font-family: "Courier New", sans-serif;
+    font-size: 28px;
+    font-weight: bold;
+    color: #0971f5;
+    letter-spacing: 13px;
+    width: 100%;
+}
+
 .hydro-raindrop-mfa .hydro-illustration {
     text-align: center;
 }
@@ -35,4 +51,28 @@
 .hydro-raindrop-mfa .button-cancel {
     float: left;
     display: inline-block;
+}
+
+.hydro-raindrop-flash {
+    padding: 12px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,.13);
+    border-left: 4px solid white;
+    margin-bottom: 20px;
+}
+
+.hydro-raindrop-flash.error {
+    border-left: 3px solid #dc3232;
+}
+
+.hydro-raindrop-flash.info {
+    border-left: 3px solid #00a0d2;
+}
+
+.hydro-raindrop-flash.success {
+    border-left: 3px solid #46b450;
+}
+
+.hydro-raindrop-flash.warning {
+    border-left: 3px solid #ffb900;
 }

@@ -34,17 +34,25 @@ final class Hydro_Raindrop_Installer {
 
 		$helper = new Hydro_Raindrop_Helper();
 
-		if ( ! $helper->is_custom_mfa_page_present() ) {
-			$helper->create_custom_mfa_page();
+		if ( $helper->is_mfa_page_present() ) {
+			$parent_post_id = (int) get_option( Hydro_Raindrop_Helper::OPTION_PAGE_MFA );
+		} else {
+			$parent_post_id = $helper->create_mfa_page();
 		}
 
-		$helper->publish_custom_mfa_page();
+		$helper->publish_mfa_page();
 
-		if ( ! $helper->is_custom_hydro_id_page_present() ) {
-			$helper->create_custom_hydro_id_page();
+		if ( ! $helper->is_setup_page_present() ) {
+			$helper->create_setup_page( $parent_post_id );
 		}
 
-		$helper->publish_custom_hydro_id_page();
+		$helper->publish_setup_page();
+
+		if ( ! $helper->is_settings_page_present() ) {
+			$helper->create_settings_page( $parent_post_id );
+		}
+
+		$helper->publish_settings_page();
 
 		update_option( Hydro_Raindrop_Helper::OPTION_ENABLED, 0 );
 		update_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD, Hydro_Raindrop_Helper::MFA_METHOD_OPTIONAL );
@@ -73,8 +81,9 @@ final class Hydro_Raindrop_Installer {
 		update_option( Hydro_Raindrop_Helper::OPTION_ENABLED, 0 );
 
 		$helper = new Hydro_Raindrop_Helper();
-		$helper->unpublish_custom_mfa_page();
-		$helper->unpublish_custom_hydro_id_page();
+		$helper->unpublish_mfa_page();
+		$helper->unpublish_setup_page();
+		$helper->unpublish_settings_page();
 
 	}
 
@@ -117,8 +126,9 @@ final class Hydro_Raindrop_Installer {
 		self::load_dependencies();
 
 		$helper = new Hydro_Raindrop_Helper();
-		$helper->delete_custom_mfa_page();
-		$helper->delete_custom_hydro_id_page();
+		$helper->delete_mfa_page()
+			->delete_setup_page()
+			->delete_settings_page();
 
 	}
 
@@ -135,10 +145,10 @@ final class Hydro_Raindrop_Installer {
 		delete_option( Hydro_Raindrop_Helper::OPTION_ENVIRONMENT );
 		delete_option( Hydro_Raindrop_Helper::OPTION_ACCESS_TOKEN_SUCCESS );
 		delete_option( Hydro_Raindrop_Helper::OPTION_ACTIVATION_NOTICE );
-		delete_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE );
-		delete_option( Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE );
-		delete_option( Hydro_Raindrop_Helper::OPTION_ACTIVATION_NOTICE );
 		delete_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD );
+		delete_option( Hydro_Raindrop_Helper::OPTION_PAGE_MFA );
+		delete_option( Hydro_Raindrop_Helper::OPTION_PAGE_SETUP );
+		delete_option( Hydro_Raindrop_Helper::OPTION_PAGE_SETTINGS );
 
 	}
 

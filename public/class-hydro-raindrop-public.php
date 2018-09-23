@@ -61,7 +61,7 @@ class Hydro_Raindrop_Public {
 	 * @param      string $plugin_name The name of the plugin.
 	 * @param      string $version     The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct( string $plugin_name, string $version ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
@@ -185,7 +185,7 @@ class Hydro_Raindrop_Public {
 		$user_has_hydro_id = $this->user_has_hydro_id( $user );
 
 		// @codingStandardsIgnoreLine
-		$hydro_id = sanitize_text_field((string) ($_POST[Hydro_Raindrop_Helper::USER_META_HYDRO_ID] ?? ''));
+		$hydro_id = sanitize_text_field( (string) ( $_POST[ Hydro_Raindrop_Helper::USER_META_HYDRO_ID ] ?? '' ) );
 
 		if ( ! empty( $hydro_id ) && ! $user_has_hydro_id ) {
 
@@ -201,11 +201,11 @@ class Hydro_Raindrop_Public {
 				return;
 			}
 
-			$hydro_raindrop_custom_mfa_page = (int) get_option( 'hydro_raindrop_custom_mfa_page' );
-			$hydro_raindrop_custom_mfa_url  = get_permalink( $hydro_raindrop_custom_mfa_page );
+			$hydro_raindrop_page_mfa       = (int) get_option( Hydro_Raindrop_Helper::OPTION_PAGE_MFA );
+			$hydro_raindrop_custom_mfa_url = get_permalink( $hydro_raindrop_page_mfa );
 
-			if ( $hydro_raindrop_custom_mfa_page > 0
-					&& get_post_status( $hydro_raindrop_custom_mfa_page ) === 'publish'
+			if ( $hydro_raindrop_page_mfa > 0
+					&& get_post_status( $hydro_raindrop_page_mfa ) === 'publish'
 			) {
 				$redirect_url = $hydro_raindrop_custom_mfa_url . '?hydro-raindrop-verify=1';
 			} else {
@@ -233,8 +233,8 @@ class Hydro_Raindrop_Public {
 				/*
 				 * User is already mapped to this application.
 				 *
-				 * Edge case: A user tries to re-register with Hydro ID. If the user meta has been deleted, the
-				 *            user can re-use his Hydro ID but needs to verify it again.
+				 * Edge case: A user tries to re-register with HydroID. If the user meta has been deleted, the
+				 *            user can re-use his HydroID but needs to verify it again.
 				 */
 
 				// @codingStandardsIgnoreLine
@@ -292,124 +292,6 @@ class Hydro_Raindrop_Public {
 			}
 
 		}
-
-	}
-
-	/**
-	 * Open <form> tag for the custom MFA page.
-	 *
-	 * @return string
-	 */
-	public function shortcode_form_open() : string {
-
-		return '<form action="" method="post">';
-
-	}
-
-	/**
-	 * Closing </form> tag for the custom MFA page.
-	 *
-	 * @return string
-	 */
-	public function shortcode_form_close() : string {
-
-		return wp_nonce_field( 'hydro_raindrop_mfa' ) . '</form>';
-
-	}
-
-	/**
-	 * MFA digits for the custom MFA page.
-	 *
-	 * @return string
-	 * @throws Exception When message cannot be generated.
-	 */
-	public function shortcode_digits() : string {
-
-		if ( is_user_logged_in() ) {
-			$user = wp_get_current_user();
-		} else {
-			$authenticate = new Hydro_Raindrop_Authenticate( $this->plugin_name, $this->version );
-			$user         = $authenticate->get_current_mfa_user();
-		}
-
-		if ( ! ( $user instanceof WP_User ) ) {
-			return '';
-		}
-
-		return (string) Hydro_Raindrop_Authenticate::get_message( $user );
-
-	}
-
-	/**
-	 * MFA authorize button for the custom MFA page.
-	 *
-	 * @param array $attributes Shortcode attributes.
-	 *
-	 * @return string
-	 */
-	public function shortcode_button_authorize( array $attributes = [] ) : string {
-
-		$attributes = shortcode_atts( [
-			'class' => 'hydro-raindrop-mfa-button-authorize',
-			'label' => esc_html__( 'Authenticate', 'wp-hydro-raindrop' ),
-		], $attributes);
-
-		return sprintf(
-			'<input type="submit" name="%s" class="%s" value="%s">',
-			'hydro_raindrop',
-			$attributes['class'],
-			$attributes['label']
-		);
-
-	}
-
-	/**
-	 * MFA cancel button for the custom MFA page.
-	 *
-	 * @param array $attributes Shortcode attributes.
-	 *
-	 * @return string
-	 */
-	public function shortcode_button_cancel( array $attributes = [] ) : string {
-
-		$attributes = shortcode_atts( [
-			'class' => 'hydro-raindrop-mfa-button-cancel',
-			'label' => esc_html__( 'Cancel', 'wp-hydro-raindrop' ),
-		], $attributes);
-
-		return sprintf(
-			'<input type="submit" name="%s" class="%s" value="%s">',
-			'cancel_hydro_raindrop',
-			$attributes['class'],
-			$attributes['label']
-		);
-
-	}
-
-	/**
-	 * Manage HydroID.
-	 *
-	 * @return string
-	 */
-	public function shortcode_manage_hydro_id() : string {
-
-		if ( ! is_user_logged_in() ) {
-			return '';
-		}
-
-		$user = wp_get_current_user();
-
-		$errors = $this->manage_hydro_id_errors;
-
-		ob_start();
-
-		include __DIR__ . '/partials/hydro-raindrop-public-manage-hydro-id.php';
-
-		$output = ob_get_contents();
-
-		ob_end_clean();
-
-		return $output;
 
 	}
 
