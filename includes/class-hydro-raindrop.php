@@ -104,7 +104,7 @@ class Hydro_Raindrop {
 			// The class responsible for orchestrating the actions and filters of the core plugin.
 			__DIR__ . '/class-hydro-raindrop-loader.php',
 			// The class responsible for storing the access token from the Raindrop API.
-			__DIR__ . '/class-hydro-raindrop-token-storage.php',
+			__DIR__ . '/class-hydro-raindrop-transienttokenstorage.php',
 			// The class responsible for defining internationalization functionality of the plugin.
 			__DIR__ . '/class-hydro-raindrop-i18n.php',
 			// The class with some convenient helper methods.
@@ -112,7 +112,7 @@ class Hydro_Raindrop {
 			// The class for handling the MFA cookie.
 			__DIR__ . '/class-hydro-raindrop-cookie.php',
 			// The class responsible for checking requirements.
-			__DIR__ . '/class-hydro-raindrop-requirement-checker.php',
+			__DIR__ . '/class-hydro-raindrop-requirementchecker.php',
 			// The class responsible for defining all actions that occur in the admin area.
 			__DIR__ . '/../admin/class-hydro-raindrop-admin.php',
 			// The class responsible for defining all actions that occur in the public-facing side of the site.
