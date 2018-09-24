@@ -172,6 +172,8 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_menu' );
 		$this->loader->add_action( 'update_option', $plugin_admin, 'update_option' );
 		$this->loader->add_action( 'admin_notices', $plugin_admin, 'activation_notice' );
+		$this->loader->add_action( 'edit_user_profile', $plugin_admin, 'edit_user_profile' );
+		$this->loader->add_action( 'edit_user_profile_update', $plugin_admin, 'edit_user_profile_update' );
 
 		$this->loader->add_filter( 'pre_update_option', $plugin_admin, 'pre_update_option', 10, 3 );
 		$this->loader->add_filter(

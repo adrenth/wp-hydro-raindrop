@@ -267,6 +267,20 @@ foreach ( $groups as $group => $caption ) {
 				<tr valign="top">
 					<th scope="row">
 						<label for="<?php echo esc_attr( Helper::OPTION_PAGE_MFA ); ?>">
+							MFA Maximum Attempts
+						</label>
+					</th>
+					<td>
+						<input type="number"
+								size="3"
+								name="<?php echo esc_attr( Helper::OPTION_MFA_MAXIMUM_ATTEMPTS ); ?>"
+								value="<?php echo esc_attr( (int) get_option( Helper::OPTION_MFA_MAXIMUM_ATTEMPTS ) ); ?>">
+						<p class="description">The user account will be blocked if number of attempts have been exceeded.</p>
+					</td>
+				</tr>
+				<tr valign="top">
+					<th scope="row">
+						<label for="<?php echo esc_attr( Helper::OPTION_PAGE_MFA ); ?>">
 							MFA Page
 						</label>
 					</th>

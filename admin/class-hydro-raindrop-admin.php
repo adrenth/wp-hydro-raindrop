@@ -97,6 +97,7 @@ class Hydro_Raindrop_Admin {
 		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_PAGE_SETUP );
 		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_PAGE_SETTINGS );
 		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_MFA_METHOD );
+		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_MFA_MAXIMUM_ATTEMPTS );
 
 	}
 
@@ -142,6 +143,40 @@ class Hydro_Raindrop_Admin {
 				'faq_page',
 			]
 		);
+
+	}
+
+	/**
+	 * This action hook is typically used to output new fields or data to the bottom of WordPress's user profile pages.
+	 *
+	 * @param null|WP_User $profileuser The WP_User object of the user being edited.
+	 *
+	 * @return void
+	 */
+	public function edit_user_profile( $profileuser ) {
+
+		if ( $profileuser instanceof WP_User && current_user_can( 'edit_user' ) ) {
+			require __DIR__ . '/partials/hydro-raindrop-profileuser.php';
+		}
+
+	}
+
+	/**
+	 * This action hook is generally used to save custom fields that have been added to the WordPress profile page.
+	 *
+	 * @param null|int $user_id The user ID of the user being edited.
+	 */
+	public function edit_user_profile_update( $user_id ) {
+
+		if ( ! current_user_can( 'edit_user', $user_id ) ) {
+			return;
+		}
+
+		// @codingStandardsIgnoreStart
+		$blocked = (int) ( $_POST[ Hydro_Raindrop_Helper::USER_META_ACCOUNT_BLOCKED ] ?? 0 );
+
+		update_user_meta( $user_id, Hydro_Raindrop_Helper::USER_META_ACCOUNT_BLOCKED, $blocked );
+		// @codingStandardsIgnoreEnd
 
 	}
 
@@ -206,8 +241,8 @@ class Hydro_Raindrop_Admin {
 				delete_option( Hydro_Raindrop_Helper::OPTION_ACCESS_TOKEN_SUCCESS );
 
 				delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, '', true );
-				delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, '', true );
-				delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, '', true );
+				delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED, '', true );
+				delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED, '', true );
 
 				break;
 		}

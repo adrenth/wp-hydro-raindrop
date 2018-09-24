@@ -24,6 +24,7 @@ final class Hydro_Raindrop_Helper {
 	const OPTION_ACTIVATION_NOTICE    = 'hydro_raindrop_activation_notice';
 	const OPTION_ACCESS_TOKEN_SUCCESS = 'hydro_raindrop_access_token_success';
 	const OPTION_MFA_METHOD           = 'hydro_raindrop_mfa_method';
+	const OPTION_MFA_MAXIMUM_ATTEMPTS = 'hydro_raindrop_mfa_maximum_attempts';
 
 	/**
 	 * Hydro Raindrop Pages.
@@ -35,9 +36,11 @@ final class Hydro_Raindrop_Helper {
 	/**
 	 * Hydro Raindrop user meta.
 	 */
-	const USER_META_HYDRO_ID                 = 'hydro_id';
-	const USER_META_HYDRO_MFA_ENABLED        = 'hydro_mfa_enabled';
-	const USER_META_HYDRO_RAINDROP_CONFIRMED = 'hydro_raindrop_confirmed';
+	const USER_META_HYDRO_ID            = 'hydro_raindrop_hydro_id'; // TODO: Prior 2.0.0 -> `hydro_id`.
+	const USER_META_MFA_ENABLED         = 'hydro_raindrop_mfa_enabled'; // TODO: Prior 2.0.0 -> `hydro_mfa_enabled`.
+	const USER_META_MFA_CONFIRMED       = 'hydro_raindrop_mfa_confirmed'; // TODO: Prior 2.0.0 -> `hydro_raindrop_confirmed`.
+	const USER_META_MFA_FAILED_ATTEMPTS = 'hydro_raindrop_mfa_failed_attempts';
+	const USER_META_ACCOUNT_BLOCKED     = 'hydro_raindrop_account_blocked';
 
 	/**
 	 * MFA Method

@@ -146,6 +146,7 @@ final class Hydro_Raindrop_Installer {
 		delete_option( Hydro_Raindrop_Helper::OPTION_ACCESS_TOKEN_SUCCESS );
 		delete_option( Hydro_Raindrop_Helper::OPTION_ACTIVATION_NOTICE );
 		delete_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD );
+		delete_option( Hydro_Raindrop_Helper::OPTION_MFA_MAXIMUM_ATTEMPTS );
 		delete_option( Hydro_Raindrop_Helper::OPTION_PAGE_MFA );
 		delete_option( Hydro_Raindrop_Helper::OPTION_PAGE_SETUP );
 		delete_option( Hydro_Raindrop_Helper::OPTION_PAGE_SETTINGS );
@@ -160,8 +161,10 @@ final class Hydro_Raindrop_Installer {
 	private static function delete_user_metadata() {
 
 		delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, '', true );
-		delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, '', true );
-		delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, '', true );
+		delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED, '', true );
+		delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED, '', true );
+		delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_MFA_FAILED_ATTEMPTS, '', true );
+		delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_ACCOUNT_BLOCKED, '', true );
 
 	}
 

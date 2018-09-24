@@ -19,7 +19,7 @@ final class Hydro_Raindrop_Flash {
 	/**
 	 * Flash transient ID format.
 	 */
-	const FLASH_TRANSIENT_ID = 'HydroRaindropFlash_%s';
+	const FLASH_TRANSIENT_ID = 'hydro_raindrop_flash_%s';
 
 	/**
 	 * A unique identifier.

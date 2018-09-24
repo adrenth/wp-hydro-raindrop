@@ -79,6 +79,23 @@ final class Hydro_Raindrop_Authenticate {
 			return $user;
 		}
 
+		// @codingStandardsIgnoreLine
+		$account_blocked = (bool) get_user_meta(
+			$user->ID,
+			Hydro_Raindrop_Helper::USER_META_ACCOUNT_BLOCKED,
+			true
+		);
+
+		/*
+		 * User account was blocked because of too many failed MFA attempts.
+		 */
+		if ( $account_blocked ) {
+			return new WP_Error(
+				'hydro_raindrop_account_blocked',
+				__( 'Your account has been blocked.', 'wp-hydro-raindrop' )
+			);
+		}
+
 		/*
 		 * Set up of Hydro Raindrop MFA is required.
 		 */
@@ -177,7 +194,7 @@ final class Hydro_Raindrop_Authenticate {
 		 */
 		if ( $this->helper->is_mfa_page_enabled()
 				&& $this->user_requires_mfa( $user )
-				&& $this->helper->get_current_url() !== $this->helper->get_mfa_page_url()
+				&& strpos( $this->helper->get_current_url(), $this->helper->get_mfa_page_url() ) === false
 		) {
 			$this->log( 'User not on Hydro Raindrop MFA page. Redirecting...' );
 
@@ -306,7 +323,7 @@ final class Hydro_Raindrop_Authenticate {
 
 		// @codingStandardsIgnoreStart
 		if ( isset( $_POST['hydro_raindrop_setup'] ) && $user ) {
-			$hydro_id = sanitize_text_field( (string) ( $_POST[ Hydro_Raindrop_Helper::USER_META_HYDRO_ID ] ?? '' ) );
+			$hydro_id = sanitize_text_field( (string) ( $_POST[ 'hydro_id' ] ?? '' ) );
 			$flash    = new Hydro_Raindrop_Flash( $user->user_login );
 			$client   = Hydro_Raindrop::get_raindrop_client();
 			$length   = strlen( $hydro_id );
@@ -331,31 +348,29 @@ final class Hydro_Raindrop_Authenticate {
 
 				$this->log( 'User is already mapped to this application: ' . $e->getMessage() );
 
-				$flash->warning('Already mapped');
-
 			} catch ( RegisterUserFailed $e ) {
 
 				$flash->error( $e->getMessage() );
 
 				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID );
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, 0 );
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, 0 );
+				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED );
+				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED );
+				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_FAILED_ATTEMPTS );
 
 				return;
 
 			}
 
 			update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, $hydro_id );
-			update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, 1 );
-			update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, 0 );
+			update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED, 1 );
+			update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED, 0 );
+			update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_FAILED_ATTEMPTS, 0 );
 
 			$redirect_url = $this->helper->get_current_url() . '?hydro-raindrop-verify=1';
 
 			if ( $this->helper->is_mfa_page_enabled() ) {
 				$redirect_url = $this->helper->get_mfa_page_url() . '?hydro-raindrop-verify=1';
 			}
-
-			// TODO: This redirect fails....
 
 			wp_redirect( $redirect_url );
 			exit;
@@ -382,12 +397,38 @@ final class Hydro_Raindrop_Authenticate {
 				// Redirect the user to it's intended location.
 				$this->redirect( $user );
 			} else {
-				$this->log( 'MFA failed.' );
 
 				$flash = new Hydro_Raindrop_Flash( $user->user_login );
 				$flash->error( esc_html__( 'Authentication failed.', 'wp-hydro-raindrop' ) );
 
 				$this->delete_transient_data( $user );
+
+				$meta_key = Hydro_Raindrop_Helper::USER_META_MFA_FAILED_ATTEMPTS;
+
+				// @codingStandardsIgnoreLine
+				$failed_attempts = (int) get_user_meta( $user->ID, $meta_key, true );
+
+				// @codingStandardsIgnoreLine
+				update_user_meta( $user->ID, $meta_key, ++ $failed_attempts );
+
+				$this->log( 'MFA failed, attempts: ' . $failed_attempts );
+
+				/*
+				 * Block user account if maximum MFA attempts has been reached.
+				 */
+				$maximum_attempts = (int) get_option( Hydro_Raindrop_Helper::OPTION_MFA_MAXIMUM_ATTEMPTS );
+
+				if ( $maximum_attempts > 0 && $failed_attempts > $maximum_attempts ) {
+					// @codingStandardsIgnoreStart
+					update_user_meta( $user->ID, $meta_key, 0 );
+					update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_ACCOUNT_BLOCKED, true );
+
+					$flash->error( esc_html__( 'Your account has been blocked.', 'wp-hydro-raindrop' ) );
+
+					wp_redirect( home_url() );
+					exit;
+					// @codingStandardsIgnoreEnd
+				}
 
 				return;
 			}
@@ -436,20 +477,20 @@ final class Hydro_Raindrop_Authenticate {
 
 		$error = null;
 
-		/*
-		 * The authentication failed. Delete transient data to make sure a new message will be generated.
-		 */
-		// @codingStandardsIgnoreLine
-		if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_REQUEST['hydro_raindrop'] ) ) {
-			$this->log( 'Authentication failed.' );
-
-			$flash = new Hydro_Raindrop_Flash( $user->user_login );
-			$flash->error( esc_html__( 'Authentication failed.', 'wp-hydro-raindrop' ) );
-
-			// TODO Store the amount of failed attempts.
-
-			$this->delete_transient_data( $user );
-		}
+//		/*
+//		 * The authentication failed. Delete transient data to make sure a new message will be generated.
+//		 */
+//		// @codingStandardsIgnoreLine
+//		if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_REQUEST['hydro_raindrop'] ) ) {
+//			$this->log( 'Authentication failed.' );
+//
+//			$flash = new Hydro_Raindrop_Flash( $user->user_login );
+//			$flash->error( esc_html__( 'Authentication failed.', 'wp-hydro-raindrop' ) );
+//
+//			// TODO Store the amount of failed attempts.
+//
+//			$this->delete_transient_data( $user );
+//		}
 
 		/*
 		 * Redirect to the Custom MFA page (if applicable).
@@ -608,12 +649,12 @@ final class Hydro_Raindrop_Authenticate {
 		$hydro_id                 = $this->get_user_hydro_id( $user );
 		$hydro_mfa_enabled        = (bool) get_user_meta(
 			$user->ID,
-			Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED,
+			Hydro_Raindrop_Helper::USER_META_MFA_ENABLED,
 			true
 		);
 		$hydro_raindrop_confirmed = (bool) get_user_meta(
 			$user->ID,
-			Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED,
+			Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED,
 			true
 		);
 
@@ -693,11 +734,12 @@ final class Hydro_Raindrop_Authenticate {
 
 			if ( $this->is_first_time_verify() ) {
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, 1 );
+				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED, 1 );
 			}
 
 			return true;
 		} catch ( VerifySignatureFailed $e ) {
+			$this->log( $e->getMessage() );
 			return false;
 		}
 

@@ -177,6 +177,8 @@ class Hydro_Raindrop_Public {
 	/**
 	 * Handle the HydroID form. Must be handled before the headers are sent.
 	 *
+	 * TODO: REMOVE THIS
+	 * @deprecated
 	 * @param WP_Error $errors Error collection from edit_user().
 	 * @param stdClass $user   User object being edited.
 	 */
@@ -220,10 +222,10 @@ class Hydro_Raindrop_Public {
 				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, $hydro_id );
 
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, 1 );
+				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED, 1 );
 
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, 0 );
+				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED, 0 );
 
 				// @codingStandardsIgnoreLine
 				wp_redirect( $redirect_url );
@@ -241,10 +243,10 @@ class Hydro_Raindrop_Public {
 				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, $hydro_id );
 
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, 1 );
+				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED, 1 );
 
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, 0 );
+				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED, 0 );
 
 				// @codingStandardsIgnoreLine
 				wp_redirect( $redirect_url );
@@ -258,10 +260,10 @@ class Hydro_Raindrop_Public {
 				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID );
 
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, 0 );
+				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED, 0 );
 
 				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, 0 );
+				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED, 0 );
 			}
 		}
 
@@ -280,10 +282,10 @@ class Hydro_Raindrop_Public {
 				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, $hydro_id );
 
 				// @codingStandardsIgnoreLine
-				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED );
+				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED );
 
 				// @codingStandardsIgnoreLine
-				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED );
+				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED );
 
 			} catch ( \Adrenth\Raindrop\Exception\UnregisterUserFailed $e ) {
 
