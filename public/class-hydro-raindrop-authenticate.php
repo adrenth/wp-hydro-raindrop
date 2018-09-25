@@ -3,6 +3,7 @@
 declare( strict_types=1 );
 
 use Adrenth\Raindrop\Exception\RegisterUserFailed;
+use Adrenth\Raindrop\Exception\UnregisterUserFailed;
 use Adrenth\Raindrop\Exception\UserAlreadyMappedToApplication;
 use Adrenth\Raindrop\Exception\VerifySignatureFailed;
 
@@ -132,7 +133,7 @@ final class Hydro_Raindrop_Authenticate {
 		/*
 		 * Perform first time verification.
 		 */
-		if ( is_user_logged_in() && $this->is_first_time_verify() ) {
+		if ( is_user_logged_in() && $this->is_request_verify() ) {
 
 			$user = wp_get_current_user();
 
@@ -140,8 +141,6 @@ final class Hydro_Raindrop_Authenticate {
 			$this->delete_transient_data( $user );
 			$this->cookie->set( $user->ID );
 			$this->start_mfa( $user );
-
-			return;
 
 		}
 
@@ -203,15 +202,25 @@ final class Hydro_Raindrop_Authenticate {
 			exit;
 		}
 
-		if ( $this->helper->is_setup_page_enabled()
-				&& $this->user_requires_setup_mfa( $user )
-				&& $this->helper->get_current_url() !== $this->helper->get_setup_page_url()
-		) {
-			$this->log( 'User not on Hydro Raindrop Setup page. Redirecting...' );
+		/*
+		 * User requires Hydro Raindrop MFA setup.
+		 */
+		if ( $this->user_requires_setup_mfa( $user ) ) {
 
-			// @codingStandardsIgnoreLine
-			wp_redirect( $this->helper->get_setup_page_url() );
-			exit;
+			$this->log( 'User requires setup Hydro Raindrop MFA.' );
+
+			if ( $this->helper->is_setup_page_enabled()
+					&& $this->helper->get_current_url() !== $this->helper->get_setup_page_url()
+			) {
+				$this->log( 'User not on Hydro Raindrop Setup page. Redirecting...' );
+
+				// @codingStandardsIgnoreLine
+				wp_redirect( $this->helper->get_setup_page_url() );
+				exit;
+			}
+
+			$this->start_mfa_setup( $user );
+
 		}
 
 		/*
@@ -321,6 +330,9 @@ final class Hydro_Raindrop_Authenticate {
 
 		// @codingStandardsIgnoreEnd
 
+		/*
+		 * Handle Hydro Raindrop Setup.
+		 */
 		// @codingStandardsIgnoreStart
 		if ( isset( $_POST['hydro_raindrop_setup'] ) && $user ) {
 			$hydro_id = sanitize_text_field( (string) ( $_POST[ 'hydro_id' ] ?? '' ) );
@@ -333,9 +345,17 @@ final class Hydro_Raindrop_Authenticate {
 				return;
 			}
 
+			$redirect_url = $this->helper->get_current_url( true ) . '?hydro-raindrop-verify=1';
+
+			if ( $this->helper->is_mfa_page_enabled() ) {
+				$redirect_url = $this->helper->get_mfa_page_url() . '?hydro-raindrop-verify=1';
+			}
+
 			try {
 
 				$client->registerUser( sanitize_text_field( $hydro_id ) );
+
+				$flash->info( 'Your HydroID has been successfully set-up. Enter security code in the Hydro app.' );
 
 			} catch ( UserAlreadyMappedToApplication $e) {
 
@@ -347,6 +367,20 @@ final class Hydro_Raindrop_Authenticate {
 				 */
 
 				$this->log( 'User is already mapped to this application: ' . $e->getMessage() );
+
+				try {
+					$client->unregisterUser( $hydro_id );
+
+					$flash->warning( 'Your HydroID was already mapped to this site. Mapping is removed. Please re-enter your HydroID to proceed.' );
+
+					$redirect_url = $this->helper->get_current_url();
+
+					if ( $this->helper->is_setup_page_enabled() ) {
+						$redirect_url = $this->helper->get_setup_page_url();
+					}
+				} catch ( UnregisterUserFailed $e ) {
+					$this->log( 'Unregistering user failed: ' . $e->getMessage() );
+				}
 
 			} catch ( RegisterUserFailed $e ) {
 
@@ -366,33 +400,51 @@ final class Hydro_Raindrop_Authenticate {
 			update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED, 0 );
 			update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_FAILED_ATTEMPTS, 0 );
 
-			$redirect_url = $this->helper->get_current_url() . '?hydro-raindrop-verify=1';
-
-			if ( $this->helper->is_mfa_page_enabled() ) {
-				$redirect_url = $this->helper->get_mfa_page_url() . '?hydro-raindrop-verify=1';
-			}
-
 			wp_redirect( $redirect_url );
 			exit;
 
 			// @codingStandardsIgnoreEnd
 		}
 
-		// Verify MFA message
+		/*
+		 * Verify Hydro Raindrop MFA message
+		 */
 		// @codingStandardsIgnoreLine
 		if ( isset( $_POST['hydro_raindrop_mfa'] ) && $user ) {
-
 			if ( $this->verify_signature_login( $user ) ) {
 				$this->log( 'MFA success.' );
 
 				$this->cookie->unset();
 
 				// Delete all transient data which is used during the MFA process.
-				if ( $user ) {
-					$this->delete_transient_data( $user );
+				$this->delete_transient_data( $user );
+
+				if ( ! is_user_logged_in() ) {
+					$this->set_auth_cookie( $user );
 				}
 
-				wp_set_auth_cookie( $user->ID ); // TODO: Remember login parameter.
+				/*
+				 * Disable Hydro Raindrop MFA.
+				 */
+				if ( $this->is_action_disable() ) {
+					$client = Hydro_Raindrop::get_raindrop_client();
+
+					// @codingStandardsIgnoreStart
+					$hydro_id = get_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, true );
+
+					try {
+						$client->unregisterUser( $hydro_id );
+
+						delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID );
+						delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED );
+						delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED );
+						delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_FAILED_ATTEMPTS );
+
+					} catch ( UnregisterUserFailed $e ) {
+						$this->log( 'Could not unregister user: ' . $e->getMessage() );
+					}
+					// @codingStandardsIgnoreEnd
+				}
 
 				// Redirect the user to it's intended location.
 				$this->redirect( $user );
@@ -425,6 +477,10 @@ final class Hydro_Raindrop_Authenticate {
 
 					$flash->error( esc_html__( 'Your account has been blocked.', 'wp-hydro-raindrop' ) );
 
+					$this->cookie->unset();
+
+					wp_logout();
+
 					wp_redirect( home_url() );
 					exit;
 					// @codingStandardsIgnoreEnd
@@ -434,16 +490,32 @@ final class Hydro_Raindrop_Authenticate {
 			}
 		}
 
-		// TODO: hydro_raindrop_setup_skip
 		/*
-		$method = (string) get_option(Hydro_Raindrop_Helper::OPTION_MFA_METHOD);
+		 * Skip Hydro Raindrop Setup
+		 */
+		// @codingStandardsIgnoreLine
+		if ( isset( $_POST['hydro_raindrop_setup_skip'] )
+				&& wp_verify_nonce( $nonce, 'hydro_raindrop_setup' )
+		) {
+			$method = (string) get_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD );
 
-		if ( $method === Hydro_Raindrop_Helper::MFA_METHOD_ENFORCED ) {
-			return '';
+			$user = $this->get_current_mfa_user();
+
+			if ( $user
+					&& ( Hydro_Raindrop_Helper::MFA_METHOD_PROMPTED === $method
+						|| Hydro_Raindrop_Helper::MFA_METHOD_OPTIONAL === $method
+					)
+			) {
+				$this->cookie->unset();
+				$this->delete_transient_data( $user );
+				$this->set_auth_cookie( $user );
+				$this->redirect( $user );
+			}
 		}
-		*/
 
-		// Allow user to cancel the MFA. Which results in a logout.
+		/*
+		 * Allow user to cancel the MFA. Which results in a logout.
+		 */
 		// @codingStandardsIgnoreLine
 		if ( isset( $_POST['hydro_raindrop_mfa_cancel'] )
 				&& wp_verify_nonce( $nonce, 'hydro_raindrop_mfa' )
@@ -476,21 +548,6 @@ final class Hydro_Raindrop_Authenticate {
 		$this->log( 'Start MFA.' );
 
 		$error = null;
-
-//		/*
-//		 * The authentication failed. Delete transient data to make sure a new message will be generated.
-//		 */
-//		// @codingStandardsIgnoreLine
-//		if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_REQUEST['hydro_raindrop'] ) ) {
-//			$this->log( 'Authentication failed.' );
-//
-//			$flash = new Hydro_Raindrop_Flash( $user->user_login );
-//			$flash->error( esc_html__( 'Authentication failed.', 'wp-hydro-raindrop' ) );
-//
-//			// TODO Store the amount of failed attempts.
-//
-//			$this->delete_transient_data( $user );
-//		}
 
 		/*
 		 * Redirect to the Custom MFA page (if applicable).
@@ -542,6 +599,19 @@ final class Hydro_Raindrop_Authenticate {
 	}
 
 	/**
+	 * Set the WP Auth Cookie.
+	 *
+	 * @param WP_User $user     Authenticated user.
+	 * @param bool    $remember Whether to remember the user.
+	 * @return void
+	 */
+	private function set_auth_cookie( WP_User $user, bool $remember = false ) {
+
+		wp_set_auth_cookie( $user->ID, $remember ); // TODO: Remember login parameter.
+
+	}
+
+	/**
 	 * Redirects user after successful login and MFA.
 	 *
 	 * @param WP_User $user Current logged in user.
@@ -550,7 +620,7 @@ final class Hydro_Raindrop_Authenticate {
 	 */
 	private function redirect( WP_User $user ) {
 
-		if ( $this->is_first_time_verify() && $this->helper->is_setup_page_enabled() ) {
+		if ( $this->is_request_verify() && $this->helper->is_setup_page_enabled() ) {
 
 			// @codingStandardsIgnoreLine
 			wp_redirect( $this->helper->get_setup_page_url() );
@@ -618,14 +688,38 @@ final class Hydro_Raindrop_Authenticate {
 	}
 
 	/**
-	 * Whether this is the first time verification.
+	 * Whether this is a request for verification.
 	 *
 	 * @return bool
 	 */
-	private function is_first_time_verify() : bool {
+	private function is_request_verify() : bool {
 
 		// @codingStandardsIgnoreLine
 		return (int) ( $_GET['hydro-raindrop-verify'] ?? 0 ) === 1;
+
+	}
+
+	/**
+	 * Whether to disable Hydro Raindrop MFA.
+	 *
+	 * @return bool
+	 */
+	private function is_action_disable() : bool {
+
+		// @codingStandardsIgnoreLine
+		return ( $_GET['hydro-raindrop-action'] ?? '') === 'disable';
+
+	}
+
+	/**
+	 * Whether to enable Hydro Raindrop MFA.
+	 *
+	 * @return bool
+	 */
+	private function is_action_enable() : bool {
+
+		// @codingStandardsIgnoreLine
+		return ( $_GET['hydro-raindrop-action'] ?? '') === 'enable';
 
 	}
 
@@ -662,7 +756,7 @@ final class Hydro_Raindrop_Authenticate {
 
 		return ! empty( $hydro_id )
 			&& $hydro_mfa_enabled
-			&& ( $hydro_raindrop_confirmed || $this->is_first_time_verify() );
+			&& ( $hydro_raindrop_confirmed || $this->is_request_verify() );
 
 	}
 
@@ -679,6 +773,13 @@ final class Hydro_Raindrop_Authenticate {
 
 		if ( ! $enabled ) {
 			return false;
+		}
+
+		/*
+		 * User wants to enable Hydro Raindrop MFA from user profile.
+		 */
+		if ( $this->is_action_enable() ) {
+			return true;
 		}
 
 		$method = get_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD );
@@ -732,7 +833,7 @@ final class Hydro_Raindrop_Authenticate {
 
 			$this->delete_transient_data( $user );
 
-			if ( $this->is_first_time_verify() ) {
+			if ( $this->is_request_verify() ) {
 				// @codingStandardsIgnoreLine
 				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED, 1 );
 			}

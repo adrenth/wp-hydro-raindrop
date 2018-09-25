@@ -64,6 +64,7 @@ $image   = plugin_dir_url( 'wp-hydro-raindrop/public/images/input-hydro-id.svg' 
 				name="hydro_id"
 				title="HydroID"
 				autocomplete="off"
+				placeholder=""
 				autofocus>
 		<input type="submit"
 				name="hydro_raindrop_setup_skip"

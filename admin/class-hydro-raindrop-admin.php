@@ -181,46 +181,6 @@ class Hydro_Raindrop_Admin {
 	}
 
 	/**
-	 * Before updating an option.
-	 *
-	 * @param mixed  $value     New value.
-	 * @param string $option    Option which has been updated.
-	 * @param mixed  $old_value Old value.
-	 *
-	 * @return mixed
-	 */
-	public function pre_update_option( $value, string $option, $old_value ) {
-
-		switch ( $option ) {
-			case Hydro_Raindrop_Helper::OPTION_ENABLED:
-				// User wants to enable or disabled Hydro Raindrop MFA.
-				if ( ( 0 === (int) $old_value && 1 === (int) $value )
-						|| ( 1 === (int) $old_value && 0 === (int) $value )
-				) {
-					// @codingStandardsIgnoreStart
-					$user_login = $_POST['user_login'] ?? null;
-					$password = $_POST['password'] ?? null;
-					// @codingStandardsIgnoreEnd
-
-					$user = wp_authenticate( $user_login, $password );
-
-					if ( is_wp_error( $user ) ) {
-						add_settings_error(
-							$option,
-							'invalid_credentials',
-							$user->get_error_message()
-						);
-
-						return (int) ( new Hydro_Raindrop_Helper() )->is_hydro_raindrop_enabled();
-					}
-				}
-				break;
-		}
-
-		return $value;
-	}
-
-	/**
 	 * Hydro Raindrop environment options have been changed.
 	 *
 	 * @param mixed $option Option which has been updated.

@@ -175,7 +175,6 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'edit_user_profile', $plugin_admin, 'edit_user_profile' );
 		$this->loader->add_action( 'edit_user_profile_update', $plugin_admin, 'edit_user_profile_update' );
 
-		$this->loader->add_filter( 'pre_update_option', $plugin_admin, 'pre_update_option', 10, 3 );
 		$this->loader->add_filter(
 			"plugin_action_links_{$this->plugin_name}/{$this->plugin_name}.php",
 			$plugin_admin,
@@ -206,20 +205,19 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'login_enqueue_scripts', $plugin_public, 'enqueue_login_styles' );
 
 		/**
-		 * Action: user_profile_update_errors
-		 *
-		 * This hook runs AFTER edit_user_profile_update and personal_options_update.
-		 * This same callback, after performing your validations, and save the data if it is empty.
-		 */
-		$this->loader->add_action( 'user_profile_update_errors', $plugin_public, 'custom_user_profile_validate', 10, 3 );
-
-		/**
 		 * Action: show_user_profile
 		 *
 		 * This action hook is typically used to output new fields or data to the bottom of WordPress's user profile
 		 * pages.
 		 */
 		$this->loader->add_action( 'show_user_profile', $plugin_public, 'custom_user_profile_fields' );
+
+		/**
+		 * Action: personal_options_update
+		 *
+		 * Generally, action hook is used to save custom fields that have been added to the WordPress profile page.
+		 */
+		$this->loader->add_action( 'personal_options_update', $plugin_public, 'update_extra_profile_fields' );
 
 		$plugin_authenticate = new Hydro_Raindrop_Authenticate(
 			$this->get_plugin_name(),
@@ -242,7 +240,6 @@ class Hydro_Raindrop {
 		 * on it for all sorts of reasons (e.g. they need a user, a taxonomy, etc.).
 		 */
 		$this->loader->add_filter( 'init', $plugin_authenticate, 'verify', 0 );
-		$this->loader->add_filter( 'init', $plugin_public, 'manage_hydro_id', 0 );
 
 		$plugin_shortcode = new Hydro_Raindrop_Shortcode(
 			$this->get_plugin_name(),

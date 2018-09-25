@@ -12,9 +12,6 @@ declare( strict_types=1 );
  * @subpackage Hydro_Raindrop/public
  */
 
-use Adrenth\Raindrop\Exception\RegisterUserFailed;
-use Adrenth\Raindrop\Exception\UserAlreadyMappedToApplication;
-
 /**
  * The public-facing functionality of the plugin.
  *
@@ -44,14 +41,6 @@ class Hydro_Raindrop_Public {
 	 * @var      string $version The current version of this plugin.
 	 */
 	private $version;
-
-	/**
-	 * Errors occurred when managing HydroID.
-	 *
-	 * @var WP_Error|null
-	 * @since 1.3.0
-	 */
-	private $manage_hydro_id_errors;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -119,7 +108,9 @@ class Hydro_Raindrop_Public {
 	}
 
 	/**
-	 * @param WP_User $user
+	 * Extend the User Profile form.
+	 *
+	 * @param WP_User $user The current user.
 	 */
 	public function custom_user_profile_fields( WP_User $user ) {
 
@@ -128,187 +119,62 @@ class Hydro_Raindrop_Public {
 	}
 
 	/**
-	 * Validate and process Hydro Raindrop MFA post data.
+	 * Update the extra User Profile fields.
 	 *
-	 * @param WP_Error      $errors Error collection from edit_user().
-	 * @param bool|null     $update Wether the user profile is edited or not.
-	 * @param stdClass|null $user   User object being edited.
-	 *
-	 * @return void
+	 * @param int|null $user_id The user ID of the user being edited.
 	 */
-	public function custom_user_profile_validate( &$errors, bool $update = null, &$user = null ) {
-
-		// Already errors present. Do nothing. User will not be updated to database.
-		if ( ! $user || ! $update || count( $errors->errors ) > 0 ) {
-			return;
-		}
-
-		$this->handle_hydro_id_form( $errors, $user );
-
-	}
-
-	/**
-	 * Handles saving of the HydroID.
-	 *
-	 * @return string
-	 */
-	public function manage_hydro_id() {
-
-		if ( ! is_user_logged_in() ) {
-			return '';
-		}
-
-		$user = wp_get_current_user();
+	public function update_extra_profile_fields( $user_id = null ) {
 
 		// @codingStandardsIgnoreLine
-		$retrieved_nonce = $_POST['_hydro_id_nonce'] ?? null;
+		$enabled = (bool) ( $_POST[ Hydro_Raindrop_Helper::USER_META_MFA_ENABLED ] ?? false );
 
-		$errors = new WP_Error();
+		$hydro_raindrop_mfa_method = (string) get_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD, true );
+		$is_mfa_method_enforced    = Hydro_Raindrop_Helper::MFA_METHOD_ENFORCED === $hydro_raindrop_mfa_method;
 
-		// @codingStandardsIgnoreLine
-		if ( $retrieved_nonce && wp_verify_nonce( $retrieved_nonce, 'hydro_raindrop_hydro_id' ) ) {
-			$this->handle_hydro_id_form( $errors, $user->data );
-		}
+		/*
+		 * Disable Hydro Raindrop MFA.
+		 */
+		if ( ! $enabled
+				&& ! $is_mfa_method_enforced
+				&& current_user_can( 'edit_user', $user_id )
+		) {
 
-		$this->manage_hydro_id_errors = $errors;
+			$helper = new Hydro_Raindrop_Helper();
 
-	}
+			$redirect_url = $helper->get_current_url() . '?hydro-raindrop-verify=1&hydro-raindrop-action=disable';
 
-	/**
-	 * Handle the HydroID form. Must be handled before the headers are sent.
-	 *
-	 * TODO: REMOVE THIS
-	 * @deprecated
-	 * @param WP_Error $errors Error collection from edit_user().
-	 * @param stdClass $user   User object being edited.
-	 */
-	public function handle_hydro_id_form( &$errors, stdClass $user ) {
-
-		$user_has_hydro_id = $this->user_has_hydro_id( $user );
-
-		// @codingStandardsIgnoreLine
-		$hydro_id = sanitize_text_field( (string) ( $_POST[ Hydro_Raindrop_Helper::USER_META_HYDRO_ID ] ?? '' ) );
-
-		if ( ! empty( $hydro_id ) && ! $user_has_hydro_id ) {
-
-			$client = Hydro_Raindrop::get_raindrop_client();
-
-			$length = strlen( $hydro_id );
-
-			if ( $length < 3 || $length > 32 ) {
-				$errors->add(
-					'hydro_id_invalid',
-					esc_html__( 'Please provide a valid HydroID.', 'wp-hydro-raindrop' )
-				);
-				return;
+			if ( $helper->is_mfa_page_enabled() ) {
+				$redirect_url = $helper->get_mfa_page_url() . '?hydro-raindrop-verify=1&hydro-raindrop-action=disable';
 			}
 
-			$hydro_raindrop_page_mfa       = (int) get_option( Hydro_Raindrop_Helper::OPTION_PAGE_MFA );
-			$hydro_raindrop_custom_mfa_url = get_permalink( $hydro_raindrop_page_mfa );
+			$user = wp_get_current_user();
 
-			if ( $hydro_raindrop_page_mfa > 0
-					&& get_post_status( $hydro_raindrop_page_mfa ) === 'publish'
-			) {
-				$redirect_url = $hydro_raindrop_custom_mfa_url . '?hydro-raindrop-verify=1';
-			} else {
-				$redirect_url = self_admin_url( 'profile.php?hydro-raindrop-verify=1' );
-			}
+			$flash = new Hydro_Raindrop_Flash( $user->user_login );
+			$flash->info( 'Enter the security code into the Hydro app to disable Hydro Raindrop MFA.' );
 
-			try {
-
-				$client->registerUser( sanitize_text_field( $hydro_id ) );
-
-				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, $hydro_id );
-
-				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED, 1 );
-
-				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED, 0 );
-
-				// @codingStandardsIgnoreLine
-				wp_redirect( $redirect_url );
-				exit;
-
-			} catch ( UserAlreadyMappedToApplication $e) {
-				/*
-				 * User is already mapped to this application.
-				 *
-				 * Edge case: A user tries to re-register with HydroID. If the user meta has been deleted, the
-				 *            user can re-use his HydroID but needs to verify it again.
-				 */
-
-				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, $hydro_id );
-
-				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED, 1 );
-
-				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED, 0 );
-
-				// @codingStandardsIgnoreLine
-				wp_redirect( $redirect_url );
-				exit;
-
-			} catch ( RegisterUserFailed $e ) {
-
-				$errors->add( 'hydro_register_failed', $e->getMessage() );
-
-				// @codingStandardsIgnoreLine
-				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID );
-
-				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED, 0 );
-
-				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED, 0 );
-			}
-		}
-
-		// @codingStandardsIgnoreLine
-		$disable_hydro_mfa = isset( $_POST['disable_hydro_mfa'] );
-
-		if ( $disable_hydro_mfa && $user_has_hydro_id ) {
-
-			$client   = Hydro_Raindrop::get_raindrop_client();
-			$hydro_id = (string) get_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, true );
-
-			try {
-				$client->unregisterUser( $hydro_id );
-
-				// @codingStandardsIgnoreLine
-				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, $hydro_id );
-
-				// @codingStandardsIgnoreLine
-				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED );
-
-				// @codingStandardsIgnoreLine
-				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED );
-
-			} catch ( \Adrenth\Raindrop\Exception\UnregisterUserFailed $e ) {
-
-				$errors->add( 'hydro_unregister_failed', $e->getMessage() );
-
-			}
+			// @codingStandardsIgnoreLine
+			wp_redirect($redirect_url);
+			exit;
 
 		}
 
-	}
+		/*
+		 * Enable Hydro Raindrop MFA.
+		 */
+		if ( $enabled && current_user_can( 'edit_user', $user_id ) ) {
 
-	/**
-	 * Whether given user has a HydroID.
-	 *
-	 * @param stdClass $user WP User object.
-	 *
-	 * @return bool
-	 */
-	private function user_has_hydro_id( stdClass $user ) : bool {
-		// @codingStandardsIgnoreLine
-		$hydro_id = (string) get_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, true );
+			$user   = wp_get_current_user();
+			$helper = new Hydro_Raindrop_Helper();
 
-		return ! empty( $hydro_id );
+			$cookie = new Hydro_Raindrop_Cookie( $this->plugin_name, $this->version );
+			$cookie->set( $user->ID );
+
+			// @codingStandardsIgnoreLine
+			wp_redirect($helper->get_current_url() . '?hydro-raindrop-action=enable');
+			exit;
+
+		}
+
 	}
 
 }

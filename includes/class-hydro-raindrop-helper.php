@@ -83,11 +83,26 @@ final class Hydro_Raindrop_Helper {
 	/**
 	 * Get the current URL.
 	 *
+	 * @param bool $without_action Whether to strip the Hydro Raindrop Action parameter.
+	 *
 	 * @return string
 	 */
-	public function get_current_url() : string {
+	public function get_current_url( bool $without_action = false ) : string {
 
-		return home_url( add_query_arg( null, null ) );
+		$current_url = home_url( add_query_arg( null, null ) );
+
+		if ( $without_action ) {
+			$current_url = str_replace(
+				[
+					'?hydro-raindrop-action=enable',
+					'&hydro-raindrop-action=enable',
+				],
+				'',
+				$current_url
+			);
+		}
+
+		return $current_url;
 
 	}
 
