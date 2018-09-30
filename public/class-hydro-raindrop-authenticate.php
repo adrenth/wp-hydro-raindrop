@@ -481,7 +481,7 @@ final class Hydro_Raindrop_Authenticate {
 
 					wp_logout();
 
-					wp_redirect( home_url() );
+					wp_redirect( wp_login_url() );
 					exit;
 					// @codingStandardsIgnoreEnd
 				}
