@@ -50,6 +50,17 @@ final class Hydro_Raindrop_Helper {
 	const MFA_METHOD_OPTIONAL = 'optional';
 
 	/**
+	 * Actions
+	 */
+	const ACTION_USER_BLOCKED  = 'hydro_raindrop_user_blocked';
+	const ACTION_MFA_FAILED    = 'hydro_raindrop_mfa_failed';
+	const ACTION_MFA_SUCCESS   = 'hydro_raindrop_mfa_success';
+	const ACTION_SETUP_FAILED  = 'hydro_raindrop_setup_failed';
+	const ACTION_SETUP_SUCCESS = 'hydro_raindrop_setup_success';
+	const ACTION_PRE_SETUP_MFA = 'hydro_raindrop_pre_setup';
+	const ACTION_PRE_MFA       = 'hydro_raindrop_pre_mfa';
+
+	/**
 	 * Construct the Helper.
 	 */
 	public function __construct() {

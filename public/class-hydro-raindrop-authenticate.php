@@ -391,6 +391,8 @@ final class Hydro_Raindrop_Authenticate {
 				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED );
 				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_FAILED_ATTEMPTS );
 
+				do_action( Hydro_Raindrop_Helper::ACTION_SETUP_FAILED, $user );
+
 				return;
 
 			}
@@ -418,6 +420,8 @@ final class Hydro_Raindrop_Authenticate {
 
 				// Delete all transient data which is used during the MFA process.
 				$this->delete_transient_data( $user );
+
+				do_action( Hydro_Raindrop_Helper::ACTION_MFA_SUCCESS, $user );
 
 				if ( ! is_user_logged_in() ) {
 					$this->set_auth_cookie( $user );
@@ -448,6 +452,7 @@ final class Hydro_Raindrop_Authenticate {
 
 				// Redirect the user to it's intended location.
 				$this->redirect( $user );
+
 			} else {
 
 				$flash = new Hydro_Raindrop_Flash( $user->user_login );
@@ -465,6 +470,8 @@ final class Hydro_Raindrop_Authenticate {
 
 				$this->log( 'MFA failed, attempts: ' . $failed_attempts );
 
+				do_action( Hydro_Raindrop_Helper::ACTION_MFA_FAILED, $user, $failed_attempts );
+
 				/*
 				 * Block user account if maximum MFA attempts has been reached.
 				 */
@@ -478,6 +485,8 @@ final class Hydro_Raindrop_Authenticate {
 					$flash->error( esc_html__( 'Your account has been blocked.', 'wp-hydro-raindrop' ) );
 
 					$this->cookie->unset();
+
+					do_action( Hydro_Raindrop_Helper::ACTION_USER_BLOCKED, $user );
 
 					wp_logout();
 
@@ -547,6 +556,8 @@ final class Hydro_Raindrop_Authenticate {
 
 		$this->log( 'Start MFA.' );
 
+		do_action( Hydro_Raindrop_Helper::ACTION_PRE_MFA, $user );
+
 		$error = null;
 
 		/*
@@ -579,6 +590,8 @@ final class Hydro_Raindrop_Authenticate {
 	private function start_mfa_setup( WP_User $user ) {
 
 		$this->log( 'Start MFA Setup.' );
+
+		do_action( Hydro_Raindrop_Helper::ACTION_PRE_SETUP_MFA, $user );
 
 		if ( $this->helper->is_setup_page_enabled() ) {
 
@@ -836,6 +849,8 @@ final class Hydro_Raindrop_Authenticate {
 			if ( $this->is_request_verify() ) {
 				// @codingStandardsIgnoreLine
 				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED, 1 );
+
+				do_action( Hydro_Raindrop_Helper::ACTION_SETUP_SUCCESS, $user, $hydro_id );
 			}
 
 			return true;

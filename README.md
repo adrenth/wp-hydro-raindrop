@@ -43,7 +43,7 @@ Site Editors / Authors / etc. can enable the Hydro Raindrop MFA from their profi
 
 ## Customization
 
-### Custom MFA page
+### Custom MFA Page
 
 Follow the instructions below to create your own Hydro Raindrop MFA page:
 
@@ -57,6 +57,14 @@ Follow the instructions below to create your own Hydro Raindrop MFA page:
     - `[hydro_raindrop_mfa_button_cancel]`: renders the "Cancel" button; customize the look of the button using CSS class `hydro-raindrop-mfa-button-cancel`.
 * When MFA verification fails the User will be redirected to the MFA page with GET parameter `?hydro-raindrop-error=1`.
 * Under `Setting` navigate to the `Hydro Raindro MFA` section and select the page you created.
+
+### Custom MFA Setup Page
+
+**TODO**
+
+### Custom MFA Settings Page
+
+**TODO**
 
 #### Custom MFA page example
 
@@ -109,14 +117,39 @@ get_footer();
 
 ```
 
-### Custom HydroID page
+### Actions
 
-Follow the instructions below to create your own Hydro Raindrop MFA page:
+#### `hydro_raindrop_user_blocked( WP_User $user )`
 
-* Login as a Site Editor
-* Create a page (programmatically)
-* Use the `[hydro_raindrop_manage_hydro_id]` shortcode on this page (required!).
-* Under `Setting` navigate to the `Hydro Raindro MFA` section and select the page you created.
+When a user is blocked because of too many failed verification attempts.
+Executed after a user is blocked and before the user is being logged out.
+
+#### `hydro_raindrop_mfa_failed( WP_User $user, int $failed_attempts )`
+
+Executed after a Multi Factor Authentication attempt failed.
+
+#### `hydro_raindrop_mfa_success( WP_User $user )`
+
+Executed after a successful Multi Factor Authentication.
+
+#### `hydro_raindrop_setup_failed( WP_User $user )`
+
+Executed when Hydro Raindrop Setup failed.
+
+#### `hydro_raindrop_setup_success( WP_User $user, string $hydro_id )`
+
+Executed when user has successfully completed the Hydro Raindrop Setup.
+The HydroID is confirmed and verified at this point.
+
+#### `hydro_raindrop_pre_setup( WP_User $user )`
+
+Executed when user needs to set up their HydroID.
+The given user is authenticated. **The WordPress auth cookie may not be set.**
+
+#### `hydro_raindrop_pre_mfa( WP_User $user )`
+
+Executed when user needs to perform MFA.
+The given user is authenticated. **The WordPress auth cookie may not be set.**
 
 ## Documentation
 
