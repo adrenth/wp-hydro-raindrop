@@ -80,10 +80,7 @@ final class Hydro_Raindrop_Installer {
 		delete_option( Hydro_Raindrop_Helper::OPTION_ACTIVATION_NOTICE );
 		update_option( Hydro_Raindrop_Helper::OPTION_ENABLED, 0 );
 
-		$helper = new Hydro_Raindrop_Helper();
-		$helper->unpublish_mfa_page();
-		$helper->unpublish_setup_page();
-		$helper->unpublish_settings_page();
+		self::delete_posts();
 
 	}
 
