@@ -266,7 +266,7 @@ class Hydro_Raindrop_Admin {
 			return;
 		}
 
-		$option_page_url = admin_url( 'options-general.php?page=' . $this->plugin_name );
+		$option_page_url = admin_url( 'admin.php?page=' . $this->plugin_name );
 
 		$message = sprintf(
 			__( 'Succesfully activated the WP Hydro Raindrop plugin, to configure the plugin go to the Hydro Raindrop MFA <a style="color: #fff; font-weight: bold;" href="%1$s">settings page</a>.', $this->plugin_name ),
@@ -292,7 +292,7 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function add_action_links( array $links = [] ) : array {
 
-		$option_page_url = admin_url( 'options-general.php?page=' . $this->plugin_name );
+		$option_page_url = admin_url( 'admin.php?page=' . $this->plugin_name );
 
 		$add_links = [
 			'<a href="' . $option_page_url . '">' . __( 'Settings', 'wp-hydro-raindrop' ) . '</a>',
