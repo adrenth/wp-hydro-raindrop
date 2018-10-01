@@ -70,7 +70,7 @@ final class Hydro_Raindrop_Helper {
 	/**
 	 * Whether Hydro Raindrop is enabled.
 	 *
-	 * Only the site admin can enabled Hydro Raindrop MFA.
+	 * Only the site admin can enable/disable Hydro Raindrop MFA.
 	 *
 	 * @return bool
 	 */

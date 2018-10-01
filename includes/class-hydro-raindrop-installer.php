@@ -54,7 +54,7 @@ final class Hydro_Raindrop_Installer {
 
 		$helper->publish_settings_page();
 
-		update_option( Hydro_Raindrop_Helper::OPTION_ENABLED, 0 );
+		update_option( Hydro_Raindrop_Helper::OPTION_ENABLED, 1 );
 		update_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD, Hydro_Raindrop_Helper::MFA_METHOD_OPTIONAL );
 
 	}
