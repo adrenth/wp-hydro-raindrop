@@ -153,7 +153,7 @@ class Hydro_Raindrop_Public {
 			$flash->info( 'Enter the security code into the Hydro app to disable Hydro Raindrop MFA.' );
 
 			// @codingStandardsIgnoreLine
-			wp_redirect($redirect_url);
+			wp_redirect( $redirect_url );
 			exit;
 
 		}
@@ -170,7 +170,7 @@ class Hydro_Raindrop_Public {
 			$cookie->set( $user->ID );
 
 			// @codingStandardsIgnoreLine
-			wp_redirect($helper->get_current_url() . '?hydro-raindrop-action=enable');
+			wp_redirect( $helper->get_current_url() . '?hydro-raindrop-action=enable' );
 			exit;
 
 		}

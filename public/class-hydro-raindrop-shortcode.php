@@ -106,7 +106,6 @@ class Hydro_Raindrop_Shortcode {
 	 * MFA authorize button for the MFA page.
 	 *
 	 * @param mixed $attributes Shortcode attributes.
-	 *
 	 * @return string
 	 */
 	public function mfa_button_authorize( $attributes ) : string {
@@ -129,7 +128,6 @@ class Hydro_Raindrop_Shortcode {
 	 * MFA cancel button for the MFA page.
 	 *
 	 * @param mixed $attributes Shortcode attributes.
-	 *
 	 * @return string
 	 */
 	public function mfa_button_cancel( $attributes ) : string {
@@ -166,7 +164,7 @@ class Hydro_Raindrop_Shortcode {
 	}
 
 	/**
-	 * Open <form> tag for the MFA page.
+	 * Open <form> tag for the Setup page.
 	 *
 	 * @return string
 	 */
@@ -191,7 +189,6 @@ class Hydro_Raindrop_Shortcode {
 	 * Renders the HydroID input field.
 	 *
 	 * @param mixed $attributes Shortcode attributes.
-	 *
 	 * @return string
 	 */
 	public function setup_hydro_id( $attributes ) : string {
@@ -212,7 +209,6 @@ class Hydro_Raindrop_Shortcode {
 	 * Renders the Setup page Submit button.
 	 *
 	 * @param mixed $attributes Shortcode attributes.
-	 *
 	 * @return string
 	 */
 	public function setup_button_submit( $attributes ) : string {
@@ -235,7 +231,6 @@ class Hydro_Raindrop_Shortcode {
 	 * Renders the Setup page Skip button (if applicable).
 	 *
 	 * @param mixed $attributes Shortcode attributes.
-	 *
 	 * @return string
 	 */
 	public function setup_button_skip( $attributes ) : string {
@@ -260,9 +255,109 @@ class Hydro_Raindrop_Shortcode {
 
 	}
 
-	// .-----------
+	/**
+	 * Show flash messages.
+	 *
+	 * @return string
+	 */
+	public function settings_flash() : string {
+
+		$user = $this->get_user();
+
+		if ( $user ) {
+			return ( new Hydro_Raindrop_Flash( $user->user_login ) )->render();
+		}
+
+		return '';
+
+	}
 
 	/**
+	 * Open <form> tag for the Settings page.
+	 *
+	 * @return string
+	 */
+	public function settings_form_open() : string {
+
+		return '<form action="" method="post">';
+
+	}
+
+	/**
+	 * Closing </form> tag for the Settings page.
+	 *
+	 * @return string
+	 */
+	public function settings_form_close() : string {
+
+		return wp_nonce_field( 'hydro_raindrop_settings' ) . '</form>';
+
+	}
+
+	/**
+	 * Render checkbox for enabling/disabling MFA.
+	 *
+	 * @param mixed $attributes Shortcode attributes.
+	 * @return string
+	 */
+	public function settings_checkbox_mfa_enabled( $attributes ) : string {
+
+		$attributes = shortcode_atts( [
+			'class' => 'hydro-raindrop-setup-button-skip',
+			'label' => esc_html__( 'Skip', 'wp-hydro-raindrop' ),
+		], $attributes);
+
+		$user = $this->get_user();
+
+		if ( ! $user ) {
+			return '';
+		}
+
+		// @codingStandardsIgnoreStart
+		$hydro_raindrop_mfa_method  = (string) get_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD, true );
+		$hydro_raindrop_mfa_enabled = (bool) get_user_meta(
+			$user->ID,
+			Hydro_Raindrop_Helper::USER_META_MFA_ENABLED,
+			true
+		);
+		// @codingStandardsIgnoreEnd
+
+		return sprintf(
+			'<label class="%s"><input name="%s" type="checkbox" value="1"%s%s>%s</label>',
+			$attributes['class'],
+			Hydro_Raindrop_Helper::USER_META_MFA_ENABLED,
+			$hydro_raindrop_mfa_enabled ? ' checked' : '',
+			Hydro_Raindrop_Helper::MFA_METHOD_ENFORCED === $hydro_raindrop_mfa_method ? ' disabled' : '',
+			esc_html__( 'Enable Multi Factor Authentication', 'wp-hydro-raindrop' )
+		);
+
+	}
+
+	/**
+	 * Renders the Settings page Submit button.
+	 *
+	 * @param mixed $attributes Shortcode attributes.
+	 * @return string
+	 */
+	public function settings_button_submit( $attributes ) : string {
+
+		$attributes = shortcode_atts( [
+			'class' => 'hydro-raindrop-settings-button-submit',
+			'label' => esc_html__( 'Submit', 'wp-hydro-raindrop' ),
+		], $attributes);
+
+		return sprintf(
+			'<input type="submit" name="%s" class="%s" value="%s">',
+			'hydro_raindrop_settings',
+			$attributes['class'],
+			$attributes['label']
+		);
+
+	}
+
+	/**
+	 * Get the current User.
+	 *
 	 * @return null|WP_User
 	 */
 	private function get_user() {
@@ -274,33 +369,6 @@ class Hydro_Raindrop_Shortcode {
 		}
 
 		return $user;
-
-	}
-
-	/**
-	 * Manage HydroID.
-	 *
-	 * @return string
-	 */
-	public function mfa_manage_hydro_id() : string {
-
-		if ( ! is_user_logged_in() ) {
-			return '';
-		}
-
-		$user = wp_get_current_user();
-
-		$errors = $this->manage_hydro_id_errors; // TODO: Use transient for this
-
-		ob_start();
-
-		include __DIR__ . '/partials/hydro-raindrop-public-manage-hydro-id.php';
-
-		$output = ob_get_contents();
-
-		ob_end_clean();
-
-		return $output;
 
 	}
 

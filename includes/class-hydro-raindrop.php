@@ -253,19 +253,24 @@ class Hydro_Raindrop {
 		 */
 		add_shortcode( 'hydro_raindrop_mfa_flash', [ $plugin_shortcode, 'mfa_flash' ] );
 		add_shortcode( 'hydro_raindrop_mfa_form_open', [ $plugin_shortcode, 'mfa_form_open' ] );
-		add_shortcode( 'hydro_raindrop_mfa_form_close', [ $plugin_shortcode, 'mfa_form_close' ] );
 		add_shortcode( 'hydro_raindrop_mfa_digits', [ $plugin_shortcode, 'mfa_digits' ] );
 		add_shortcode( 'hydro_raindrop_mfa_button_authorize', [ $plugin_shortcode, 'mfa_button_authorize' ] );
 		add_shortcode( 'hydro_raindrop_mfa_button_cancel', [ $plugin_shortcode, 'mfa_button_cancel' ] );
+		add_shortcode( 'hydro_raindrop_mfa_form_close', [ $plugin_shortcode, 'mfa_form_close' ] );
 
 		add_shortcode( 'hydro_raindrop_setup_flash', [ $plugin_shortcode, 'setup_flash' ] );
 		add_shortcode( 'hydro_raindrop_setup_form_open', [ $plugin_shortcode, 'setup_form_open' ] );
-		add_shortcode( 'hydro_raindrop_setup_form_close', [ $plugin_shortcode, 'setup_form_close' ] );
 		add_shortcode( 'hydro_raindrop_setup_hydro_id', [ $plugin_shortcode, 'setup_hydro_id' ] );
 		add_shortcode( 'hydro_raindrop_setup_button_submit', [ $plugin_shortcode, 'setup_button_submit' ] );
 		add_shortcode( 'hydro_raindrop_setup_button_skip', [ $plugin_shortcode, 'setup_button_skip' ] );
+		add_shortcode( 'hydro_raindrop_setup_form_close', [ $plugin_shortcode, 'setup_form_close' ] );
 
-		add_shortcode( 'hydro_raindrop_manage_hydro_id', [ $plugin_shortcode, 'mfa_manage_hydro_id' ] );
+		add_shortcode( 'hydro_raindrop_settings_flash', [ $plugin_shortcode, 'settings_flash' ] );
+		add_shortcode( 'hydro_raindrop_settings_form_open', [ $plugin_shortcode, 'settings_form_open' ] );
+		add_shortcode( 'hydro_raindrop_settings_checkbox_mfa_enabled', [ $plugin_shortcode, 'settings_checkbox_mfa_enabled' ] );
+		add_shortcode( 'hydro_raindrop_settings_button_submit', [ $plugin_shortcode, 'settings_button_submit' ] );
+		add_shortcode( 'hydro_raindrop_settings_form_close', [ $plugin_shortcode, 'settings_form_close' ] );
+
 	}
 
 	/**

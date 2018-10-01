@@ -266,10 +266,10 @@ final class Hydro_Raindrop_Helper {
 			'post_parent'  => $post_parent_id,
 			'post_content' => "[hydro_raindrop_setup_flash]\n"
 				. "[hydro_raindrop_setup_form_open]\n"
-				. "[hydro_raindrop_setup_form_close]\n"
 				. "[hydro_raindrop_setup_hydro_id]\n"
 				. "[hydro_raindrop_setup_button_submit]\n"
-				. "[hydro_raindrop_setup_button_skip]\n",
+				. "[hydro_raindrop_setup_button_skip]\n"
+				. "[hydro_raindrop_setup_form_close]\n",
 		], true );
 
 		if ( $post_id instanceof WP_Error ) {
@@ -301,7 +301,11 @@ final class Hydro_Raindrop_Helper {
 			'post_status'  => 'publish',
 			'post_type'    => 'page',
 			'post_parent'  => $post_parent_id,
-			'post_content' => '', // TODO: Default content.
+			'post_content' => "[hydro_raindrop_settings_flash]\n"
+				. "[hydro_raindrop_settings_form_open]\n"
+				. "[hydro_raindrop_settings_checkbox_mfa_enabled]\n"
+				. "[hydro_raindrop_settings_button_submit]\n"
+				. "[hydro_raindrop_settings_form_close]\n",
 		], true );
 
 		if ( $post_id instanceof WP_Error ) {
@@ -321,7 +325,7 @@ final class Hydro_Raindrop_Helper {
 	 */
 	public function delete_mfa_page() : Hydro_Raindrop_Helper {
 
-		wp_delete_post( get_option( self::OPTION_PAGE_MFA ) );
+		$this->delete_page_with_option( self::OPTION_PAGE_MFA );
 
 		return $this;
 
@@ -334,7 +338,7 @@ final class Hydro_Raindrop_Helper {
 	 */
 	public function delete_setup_page() : Hydro_Raindrop_Helper {
 
-		wp_delete_post( self::OPTION_PAGE_SETUP );
+		$this->delete_page_with_option( self::OPTION_PAGE_SETUP );
 
 		return $this;
 
@@ -347,7 +351,7 @@ final class Hydro_Raindrop_Helper {
 	 */
 	public function delete_settings_page() : Hydro_Raindrop_Helper {
 
-		wp_delete_post( self::OPTION_PAGE_SETTINGS );
+		$this->delete_page_with_option( self::OPTION_PAGE_SETTINGS );
 
 		return $this;
 
@@ -446,6 +450,20 @@ final class Hydro_Raindrop_Helper {
 		$post_id = (int) get_option( $option );
 
 		return $post_id > 0 && get_post_status( $post_id ) === 'publish';
+
+	}
+
+	/**
+	 * Delete a page.
+	 *
+	 * @param string $option E.g. The self::OPTION_CUSTOM_HYDRO_ID_PAGE constant.
+	 * @return void
+	 */
+	private function delete_page_with_option( string $option ) {
+
+		$post_id = (int) get_option( $option );
+
+		wp_delete_post( $post_id, true );
 
 	}
 
