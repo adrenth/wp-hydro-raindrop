@@ -177,7 +177,7 @@ final class Hydro_Raindrop_Installer {
 
 		$includes = [
 			__DIR__ . '/class-hydro-raindrop-helper.php',
-			__DIR__ . '/class-hydro-raindrop-token-storage.php',
+			__DIR__ . '/class-hydro-raindrop-transienttokenstorage.php',
 		];
 
 		foreach ( $includes as $include ) {

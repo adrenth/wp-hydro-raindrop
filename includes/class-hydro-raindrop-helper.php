@@ -301,7 +301,7 @@ final class Hydro_Raindrop_Helper {
 			'post_status'  => 'publish',
 			'post_type'    => 'page',
 			'post_parent'  => $post_parent_id,
-			'post_content' => null, // TODO: Default content
+			'post_content' => '', // TODO: Default content.
 		], true );
 
 		if ( $post_id instanceof WP_Error ) {
