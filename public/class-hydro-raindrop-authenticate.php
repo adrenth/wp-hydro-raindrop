@@ -145,22 +145,38 @@ final class Hydro_Raindrop_Authenticate {
 		}
 
 		/*
-		 * Allow administrator to view the MFA page.
+		 * Allow administrator to view the custom pages.
 		 */
 		if ( is_user_logged_in() ) {
+			// @codingStandardsIgnoreStart
+			$is_post = $_SERVER['REQUEST_METHOD'] === 'POST';
+
 			$user = wp_get_current_user();
 
-			if ( user_can( $user, 'administrator' )
+			if ( ! $is_post
+					&& user_can( $user, 'administrator' )
 					&& $this->helper->is_mfa_page_enabled()
 					&& $this->helper->get_current_url() === $this->helper->get_mfa_page_url()
 			) {
+				$this->log( 'Allow administrator to view the MFA page.' );
 				return;
 			}
 
-			if ( user_can( $user, 'administrator' )
+			if ( ! $is_post
+					&& user_can( $user, 'administrator' )
 					&& $this->helper->is_setup_page_enabled()
 					&& $this->helper->get_current_url() === $this->helper->get_setup_page_url()
 			) {
+				$this->log( 'Allow administrator to view the Setup page.' );
+				return;
+			}
+
+			if ( ! $is_post
+					&& user_can( $user, 'administrator' )
+					&& $this->helper->is_settings_page_enabled()
+					&& $this->helper->get_current_url() === $this->helper->get_settings_page_url()
+			) {
+				$this->log( 'Allow administrator to view the Settings page.' );
 				return;
 			}
 		}
