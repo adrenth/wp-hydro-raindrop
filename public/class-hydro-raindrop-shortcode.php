@@ -346,11 +346,20 @@ class Hydro_Raindrop_Shortcode {
 			'label' => esc_html__( 'Submit', 'wp-hydro-raindrop' ),
 		], $attributes);
 
+		$user = $this->get_user();
+
+		if ( ! $user ) {
+			return '';
+		}
+
+		$hydro_raindrop_mfa_method = (string) get_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD, true );
+
 		return sprintf(
-			'<input type="submit" name="%s" class="%s" value="%s">',
+			'<input type="submit" name="%s" class="%s" value="%s"%s>',
 			'hydro_raindrop_settings',
 			$attributes['class'],
-			$attributes['label']
+			$attributes['label'],
+			Hydro_Raindrop_Helper::MFA_METHOD_ENFORCED === $hydro_raindrop_mfa_method ? ' disabled' : ''
 		);
 
 	}

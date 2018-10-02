@@ -127,9 +127,20 @@ class Hydro_Raindrop_Public {
 
 		// @codingStandardsIgnoreLine
 		$enabled = (bool) ( $_POST[ Hydro_Raindrop_Helper::USER_META_MFA_ENABLED ] ?? false );
+		$helper  = new Hydro_Raindrop_Helper();
 
 		$hydro_raindrop_mfa_method = (string) get_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD, true );
 		$is_mfa_method_enforced    = Hydro_Raindrop_Helper::MFA_METHOD_ENFORCED === $hydro_raindrop_mfa_method;
+
+		// Register the redirect URL to goto when flow is finished.
+		// @codingStandardsIgnoreLine
+		update_user_meta(
+			$user_id,
+			Hydro_Raindrop_Helper::USER_META_REDIRECT_URL,
+			$helper->is_settings_page_enabled()
+				? $helper->get_settings_page_url()
+				: get_edit_profile_url( $user_id )
+		);
 
 		/*
 		 * Disable Hydro Raindrop MFA.
@@ -138,9 +149,6 @@ class Hydro_Raindrop_Public {
 				&& ! $is_mfa_method_enforced
 				&& current_user_can( 'edit_user', $user_id )
 		) {
-
-			$helper = new Hydro_Raindrop_Helper();
-
 			$redirect_url = $helper->get_current_url() . '?hydro-raindrop-verify=1&hydro-raindrop-action=disable';
 
 			if ( $helper->is_mfa_page_enabled() ) {

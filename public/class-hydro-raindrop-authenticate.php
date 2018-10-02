@@ -188,6 +188,8 @@ final class Hydro_Raindrop_Authenticate {
 
 		$user = $this->get_current_mfa_user();
 
+		$this->delete_transient_data( $user );
+
 		/*
 		 * Redirect to MFA page if not already.
 		 */
@@ -501,10 +503,10 @@ final class Hydro_Raindrop_Authenticate {
 			return false;
 		}
 
-		$redirect_url = $this->helper->get_current_url( true ) . '?hydro-raindrop-verify=1';
+		$redirect_to = $this->helper->get_current_url( true ) . '?hydro-raindrop-verify=1';
 
 		if ( $this->helper->is_mfa_page_enabled() ) {
-			$redirect_url = $this->helper->get_mfa_page_url() . '?hydro-raindrop-verify=1';
+			$redirect_to = $this->helper->get_mfa_page_url() . '?hydro-raindrop-verify=1';
 		}
 
 		try {
@@ -528,10 +530,10 @@ final class Hydro_Raindrop_Authenticate {
 
 				$flash->warning( 'Your HydroID was already mapped to this site. Mapping is removed. Please re-enter your HydroID to proceed.' );
 
-				$redirect_url = $this->helper->get_current_url();
+				$redirect_to = $this->helper->get_current_url();
 
 				if ( $this->helper->is_setup_page_enabled() ) {
-					$redirect_url = $this->helper->get_setup_page_url();
+					$redirect_to = $this->helper->get_setup_page_url();
 				}
 			} catch ( UnregisterUserFailed $e ) {
 				$this->log( 'Unregistering user failed: ' . $e->getMessage() );
@@ -559,7 +561,7 @@ final class Hydro_Raindrop_Authenticate {
 		update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED, 0 );
 		update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_FAILED_ATTEMPTS, 0 );
 
-		wp_redirect( $redirect_url );
+		wp_redirect( $redirect_to );
 		exit;
 		// @codingStandardsIgnoreEnd
 
@@ -587,14 +589,20 @@ final class Hydro_Raindrop_Authenticate {
 				$this->set_auth_cookie( $user );
 			}
 
+			$hydro_raindrop_mfa_method = (string) get_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD, true );
+
 			/*
 			 * Disable Hydro Raindrop MFA.
 			 */
-			if ( $this->is_action_disable() ) {
+			if ( Hydro_Raindrop_Helper::MFA_METHOD_ENFORCED !== $hydro_raindrop_mfa_method
+					&& $this->is_action_disable()
+			) {
 				$client = Hydro_Raindrop::get_raindrop_client();
 
 				// @codingStandardsIgnoreStart
 				$hydro_id = get_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, true );
+
+				$this->log( 'Attempting to unregister HydroID ' . $hydro_id );
 
 				try {
 					$client->unregisterUser( $hydro_id );
@@ -603,10 +611,22 @@ final class Hydro_Raindrop_Authenticate {
 					delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED );
 					delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED );
 					delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_FAILED_ATTEMPTS );
+					delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_ACCOUNT_BLOCKED );
 
 				} catch ( UnregisterUserFailed $e ) {
 					$this->log( 'Could not unregister user: ' . $e->getMessage() );
 				}
+				// @codingStandardsIgnoreEnd
+			}
+
+			// @codingStandardsIgnoreLine
+			$redirect_to = get_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_REDIRECT_URL, true );
+
+			if ( $redirect_to ) {
+				// @codingStandardsIgnoreStart
+				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_REDIRECT_URL );
+				wp_redirect( $redirect_to );
+				exit;
 				// @codingStandardsIgnoreEnd
 			}
 

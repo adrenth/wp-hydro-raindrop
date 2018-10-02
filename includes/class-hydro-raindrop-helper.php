@@ -41,6 +41,7 @@ final class Hydro_Raindrop_Helper {
 	const USER_META_MFA_CONFIRMED       = 'hydro_raindrop_mfa_confirmed'; // TODO: Prior 2.0.0 -> `hydro_raindrop_confirmed`.
 	const USER_META_MFA_FAILED_ATTEMPTS = 'hydro_raindrop_mfa_failed_attempts';
 	const USER_META_ACCOUNT_BLOCKED     = 'hydro_raindrop_account_blocked';
+	const USER_META_REDIRECT_URL        = 'hydro_raindrop_redirect_url';
 
 	/**
 	 * MFA Method
@@ -138,6 +139,19 @@ final class Hydro_Raindrop_Helper {
 	public function get_setup_page_url() : string {
 
 		$post_id = (int) get_option( self::OPTION_PAGE_SETUP );
+
+		return $post_id > 0 ? get_permalink( $post_id ) : '';
+
+	}
+
+	/**
+	 * Get the Settings page URL.
+	 *
+	 * @return string
+	 */
+	public function get_settings_page_url() : string {
+
+		$post_id = (int) get_option( self::OPTION_PAGE_SETTINGS );
 
 		return $post_id > 0 ? get_permalink( $post_id ) : '';
 
