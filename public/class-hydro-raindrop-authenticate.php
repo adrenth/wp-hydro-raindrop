@@ -156,6 +156,13 @@ final class Hydro_Raindrop_Authenticate {
 			) {
 				return;
 			}
+
+			if ( user_can( $user, 'administrator' )
+					&& $this->helper->is_setup_page_enabled()
+					&& $this->helper->get_current_url() === $this->helper->get_setup_page_url()
+			) {
+				return;
+			}
 		}
 
 		$cookie_is_valid = $this->cookie->validate();
