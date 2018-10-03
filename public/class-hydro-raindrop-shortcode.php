@@ -41,6 +41,63 @@ class Hydro_Raindrop_Shortcode {
 	}
 
 	/**
+	 * Renders the default MFA template.
+	 *
+	 * @return string
+	 */
+	public function mfa() : string {
+
+		ob_start();
+
+		include __DIR__ . '/partials/shortcode/mfa.php';
+
+		$output = ob_get_contents();
+
+		ob_end_clean();
+
+		return $output;
+
+	}
+
+	/**
+	 * Renders the default Setup template.
+	 *
+	 * @return string
+	 */
+	public function setup() : string {
+
+		ob_start();
+
+		include __DIR__ . '/partials/shortcode/setup.php';
+
+		$output = ob_get_contents();
+
+		ob_end_clean();
+
+		return $output;
+
+	}
+
+	/**
+	 * Renders the default Settings template.
+	 *
+	 * @return string
+	 */
+	public function settings() : string {
+
+		ob_start();
+
+		include __DIR__ . '/partials/shortcode/settings.php';
+
+		$output = ob_get_contents();
+
+		ob_end_clean();
+
+		return $output;
+
+	}
+
+	/**
 	 * Show flash messages.
 	 *
 	 * @return string

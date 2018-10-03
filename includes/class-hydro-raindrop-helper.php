@@ -240,12 +240,7 @@ final class Hydro_Raindrop_Helper {
 			'post_status'  => 'publish',
 			'post_type'    => 'page',
 			'post_parent'  => null,
-			'post_content' => "[hydro_raindrop_mfa_flash]\n"
-				. "[hydro_raindrop_mfa_form_open]\n"
-				. "[hydro_raindrop_mfa_digits]\n"
-				. "[hydro_raindrop_mfa_button_authorize]\n"
-				. "[hydro_raindrop_mfa_button_cancel]\n"
-				. "[hydro_raindrop_mfa_form_close]\n",
+			'post_content' => '[hydro_raindrop_mfa]',
 		], true );
 
 
@@ -278,12 +273,7 @@ final class Hydro_Raindrop_Helper {
 			'post_status'  => 'publish',
 			'post_type'    => 'page',
 			'post_parent'  => $post_parent_id,
-			'post_content' => "[hydro_raindrop_setup_flash]\n"
-				. "[hydro_raindrop_setup_form_open]\n"
-				. "[hydro_raindrop_setup_hydro_id]\n"
-				. "[hydro_raindrop_setup_button_submit]\n"
-				. "[hydro_raindrop_setup_button_skip]\n"
-				. "[hydro_raindrop_setup_form_close]\n",
+			'post_content' => '[hydro_raindrop_setup]',
 		], true );
 
 		if ( $post_id instanceof WP_Error ) {
@@ -315,11 +305,7 @@ final class Hydro_Raindrop_Helper {
 			'post_status'  => 'publish',
 			'post_type'    => 'page',
 			'post_parent'  => $post_parent_id,
-			'post_content' => "[hydro_raindrop_settings_flash]\n"
-				. "[hydro_raindrop_settings_form_open]\n"
-				. "[hydro_raindrop_settings_checkbox_mfa_enabled]\n"
-				. "[hydro_raindrop_settings_button_submit]\n"
-				. "[hydro_raindrop_settings_form_close]\n",
+			'post_content' => '[hydro_raindrop_settings]',
 		], true );
 
 		if ( $post_id instanceof WP_Error ) {
