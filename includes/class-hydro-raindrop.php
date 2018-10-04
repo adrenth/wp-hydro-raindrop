@@ -123,6 +123,8 @@ class Hydro_Raindrop {
 			__DIR__ . '/../public/class-hydro-raindrop-shortcode.php',
 			// The class responsible for rendering the Flash messages.
 			__DIR__ . '/../public/class-hydro-raindrop-flash.php',
+			// The class responsible for handling the meta boxes.
+			__DIR__ . '/../public/class-hydro-raindrop-metabox.php',
 		];
 
 		foreach ( $includes as $include ) {
@@ -180,6 +182,13 @@ class Hydro_Raindrop {
 			$plugin_admin,
 			'add_action_links'
 		);
+
+		$meta_box = new Hydro_Raindrop_MetaBox();
+
+		$this->loader->add_action( 'load-post.php', $meta_box, 'init' );
+		$this->loader->add_action( 'load-post-new.php', $meta_box, 'init' );
+		$this->loader->add_action( 'add_meta_boxes', $meta_box, 'init' );
+		$this->loader->add_action( 'save_post', $meta_box, 'save' );
 
 	}
 

@@ -44,6 +44,11 @@ final class Hydro_Raindrop_Helper {
 	const USER_META_REDIRECT_URL        = 'hydro_raindrop_redirect_url';
 
 	/**
+	 * Hydro Raindrop post meta.
+	 */
+	const POST_META_MFA_REQUIRED = 'hydro_raindrop_mfa_required';
+
+	/**
 	 * MFA Method
 	 */
 	const MFA_METHOD_ENFORCED = 'enforced';
