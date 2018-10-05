@@ -20,21 +20,21 @@ $enabled                    = (bool) get_option( Hydro_Raindrop_Helper::OPTION_E
 <table class="form-table">
 	<?php if ( $enabled ) : ?>
 	<tr>
-		<th scope="row"><?php esc_html_e( 'Hydro Raindrop MFA', 'wp-hydro-raindrop' ); ?></th>
-		<td>
-			<label>
-				<input name="<?php echo esc_attr( Hydro_Raindrop_Helper::USER_META_MFA_ENABLED ); ?>"
-						type="checkbox"
-						value="1"
+			<th scope="row"><?php esc_html_e( 'Hydro Raindrop MFA', 'wp-hydro-raindrop' ); ?></th>
+			<td>
+				<label>
+					<input name="<?php echo esc_attr( Hydro_Raindrop_Helper::USER_META_MFA_ENABLED ); ?>"
+							type="checkbox"
+							value="1"
 						<?php if ( $hydro_raindrop_mfa_enabled ) : ?>
 							checked
 						<?php endif; ?>
 						<?php if ( Hydro_Raindrop_Helper::MFA_METHOD_ENFORCED === $hydro_raindrop_mfa_method ) : ?>
 							disabled
 						<?php endif; ?>>
-				Enable Multi Factor Authentication
-			</label>
-		</td>
-	</tr>
+					Enable Multi Factor Authentication
+				</label>
+			</td>
+		</tr>
 	<?php endif; ?>
 </table>

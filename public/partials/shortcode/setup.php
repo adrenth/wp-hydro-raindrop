@@ -5,12 +5,52 @@
  * @package Hydro_Raindrop
  */
 
+$image          = plugin_dir_url( 'wp-hydro-raindrop/public/images/input-hydro-id.svg' ) . 'input-message.png';
+$custom_logo_id = get_theme_mod( 'custom_logo' );
+$custom_logo    = wp_get_attachment_image_src( $custom_logo_id, 'full' );
 ?>
-<div class="hydro-raindrop hydro-raindrop-setup">
-	<?php echo do_shortcode( '[hydro_raindrop_setup_flash]' ); ?>
+<div class="hydro-raindrop-container hydro-raindrop-setup">
 	<?php echo do_shortcode( '[hydro_raindrop_setup_form_open]' ); ?>
-	<?php echo do_shortcode( '[hydro_raindrop_setup_hydro_id]' ); ?>
-	<?php echo do_shortcode( '[hydro_raindrop_setup_button_submit class="btn btn-primary"]' ); ?>
-	<?php echo do_shortcode( '[hydro_raindrop_setup_button_skip class="btn btn-default"]' ); ?>
+	<div class="hydro-raindrop-header">
+		<?php if ( is_array( $custom_logo ) && isset( $custom_logo[0] ) ): ?>
+			<div class="logo">
+				<a href="<?php echo esc_attr( home_url( '/' ) ); ?>">
+					<img src="<?php echo esc_html( $custom_logo[0] ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
+				</a>
+			</div>
+		<?php endif; ?>
+		<h1><?php esc_html_e( 'Hydro Raindrop MFA', 'wp-hydro-raindrop' ); ?></h1>
+	</div>
+	<div class="hydro-raindrop-body">
+		<div class="item full">
+			<img src="<?php echo esc_attr( $image ); ?>" class="hydro-raindrop-mfa-illustration"
+					alt="<?php esc_html_e( 'Enter your HydroID.', 'wp-hydro-raindrop' ); ?>">
+			<label><?php esc_html_e( 'Enter your HydroID.', 'wp-hydro-raindrop' ); ?></label>
+			<?php echo do_shortcode( '[hydro_raindrop_setup_hydro_id]' ); ?>
+			<?php echo do_shortcode( '[hydro_raindrop_setup_flash]' ); ?>
+			<div class="notice info">
+				<h3>Steps for getting a HydroID</h3>
+				<span>Download Free Hydro Mobile App
+					<a href="https://itunes.apple.com/app/id1406519814">iOS</a>/<a href="https://play.google.com/store/apps/details?id=com.hydrogenplatform.hydro">Android</a>
+				</span>
+				<span>Setup Mobile App and enter HydroID to continue.</span>
+			</div>
+
+		</div>
+		<div class="item actions">
+			<?php echo do_shortcode( '[hydro_raindrop_setup_button_skip class="secondary"]' ); ?>
+		</div>
+	</div>
+	<div class="hydro-raindrop-footer">
+		<div class="hydro-raindrop-submission">
+			<?php echo do_shortcode( '[hydro_raindrop_setup_button_submit class="primary"]' ); ?>
+		</div>
+		<div class="hydro-raindrop-powered-by">
+			<a href="https://www.hydrogenplatform.com/" target="_blank">
+				<label><?php esc_html_e( 'Powered by', 'wp-hydro-raindrop' ); ?></label>
+				<img src="https://www.hydrogenplatform.com/images/logo_hydro.svg" alt="Hydro">
+			</a>
+		</div>
+	</div>
 	<?php echo do_shortcode( '[hydro_raindrop_setup_form_close]' ); ?>
 </div>
