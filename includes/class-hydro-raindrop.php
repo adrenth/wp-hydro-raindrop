@@ -250,16 +250,17 @@ class Hydro_Raindrop {
 		 */
 		$this->loader->add_filter( 'init', $plugin_authenticate, 'verify', 0 );
 
-		$plugin_shortcode = new Hydro_Raindrop_Shortcode(
-			$this->get_plugin_name(),
-			$this->get_version()
-		);
-
 		/**
 		 * Shortcodes
 		 *
 		 * @see https://codex.wordpress.org/Shortcode_API
 		 */
+
+		$plugin_shortcode = new Hydro_Raindrop_Shortcode(
+			$this->get_plugin_name(),
+			$this->get_version()
+		);
+
 		add_shortcode( 'hydro_raindrop_mfa', [ $plugin_shortcode, 'mfa' ] );
 		add_shortcode( 'hydro_raindrop_mfa_flash', [ $plugin_shortcode, 'mfa_flash' ] );
 		add_shortcode( 'hydro_raindrop_mfa_form_open', [ $plugin_shortcode, 'mfa_form_open' ] );

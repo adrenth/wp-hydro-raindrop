@@ -162,7 +162,7 @@ class Hydro_Raindrop_Public {
 
 			// @codingStandardsIgnoreLine
 			wp_redirect( $redirect_url );
-			exit;
+			exit();
 
 		}
 
@@ -179,7 +179,7 @@ class Hydro_Raindrop_Public {
 
 			// @codingStandardsIgnoreLine
 			wp_redirect( $helper->get_current_url() . '?hydro-raindrop-action=enable' );
-			exit;
+			exit();
 
 		}
 
