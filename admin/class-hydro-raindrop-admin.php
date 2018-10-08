@@ -98,6 +98,7 @@ class Hydro_Raindrop_Admin {
 		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_PAGE_SETTINGS );
 		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_MFA_METHOD );
 		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_MFA_MAXIMUM_ATTEMPTS );
+		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_POST_VERIFICATION_TIMEOUT );
 
 	}
 

@@ -14,44 +14,55 @@ use Adrenth\Raindrop\Exception\VerifySignatureFailed;
  */
 final class Hydro_Raindrop_Authenticate {
 
-	const TRANSIENT_ID_MESSAGE           = 'hydro_raindrop_mfa_message_%d';
-	const TRANSIENT_ID_POST_VERIFICATION = 'hydro_raindrop_post_re-verification_%d';
-	const TRANSIENT_ID_POST_VERIFIED     = 'hydro_raindrop_post_verified_%d_%d';
-	const POST_VERIFICATION_TIMEOUT      = 1800; // 30 minutes. TODO: Make this configurable.
+	const TRANSIENT_ID_MESSAGE = 'hydro_raindrop_mfa_message_%d';
+
+	/**
+	 * Stores the post which is being verified.
+	 *
+	 * @var string
+	 */
+	const TRANSIENT_ID_POST_VERIFICATION = 'hydro_raindrop_post_verification_%d';
+
+	/**
+	 * Stores the post which is verified.
+	 *
+	 * @var string
+	 */
+	const TRANSIENT_ID_POST_VERIFIED = 'hydro_raindrop_post_verified_%d_%d';
 
 	/**
 	 * The ID of this plugin.
 	 *
-	 * @var     string $plugin_name The ID of this plugin.
+	 * @var string $plugin_name The ID of this plugin.
 	 */
 	private $plugin_name;
 
 	/**
 	 * The version of this plugin.
 	 *
-	 * @var     string $version The current version of this plugin.
+	 * @var string $version The current version of this plugin.
 	 */
 	private $version;
 
 	/**
 	 * Helper.
 	 *
-	 * @var     Hydro_Raindrop_Helper $helper
+	 * @var Hydro_Raindrop_Helper $helper
 	 */
 	private $helper;
 
 	/**
 	 * Cookie helper.
 	 *
-	 * @var     Hydro_Raindrop_Cookie $cookie
+	 * @var Hydro_Raindrop_Cookie $cookie
 	 */
 	private $cookie;
 
 	/**
 	 * Initialize the class and set its properties.
 	 *
-	 * @param      string $plugin_name The name of the plugin.
-	 * @param      string $version     The version of this plugin.
+	 * @param string $plugin_name The name of the plugin.
+	 * @param string $version     The version of this plugin.
 	 */
 	public function __construct( string $plugin_name, string $version ) {
 
@@ -235,7 +246,11 @@ final class Hydro_Raindrop_Authenticate {
 				);
 
 				// Register for which Post we need to perform a MFA.
-				set_transient( sprintf( self::TRANSIENT_ID_POST_VERIFICATION, $user->ID ), $post_id, Hydro_Raindrop_Cookie::MFA_TIME_OUT );
+				set_transient(
+					sprintf( self::TRANSIENT_ID_POST_VERIFICATION, $user->ID ),
+					$post_id,
+					Hydro_Raindrop_Cookie::MFA_TIME_OUT
+				);
 
 				$this->log( sprintf( 'User %s is accessing a post which requires MFA.', $user->user_login ) );
 
@@ -672,14 +687,16 @@ final class Hydro_Raindrop_Authenticate {
 		if ( $post_id > 0 ) {
 			$this->log( sprintf( 'MFA for Post %d for user %s has been verified.', $post_id, $user->ID ) );
 
+			$timeout = (int) get_option( Hydro_Raindrop_Helper::OPTION_POST_VERIFICATION_TIMEOUT, 3600 );
+
 			delete_transient( sprintf( self::TRANSIENT_ID_POST_VERIFICATION, $user->ID ) );
 
-			$message = 'Verification expires at ' . date( 'Y-m-d H:i:s', time() + self::POST_VERIFICATION_TIMEOUT );
+			$message = 'Verification expires at ' . date( 'Y-m-d H:i:s', time() + $timeout );
 
 			set_transient(
 				sprintf( self::TRANSIENT_ID_POST_VERIFIED, $user->ID, $post_id ),
 				$message,
-				self::POST_VERIFICATION_TIMEOUT
+				$timeout
 			);
 
 			$this->log( $message );

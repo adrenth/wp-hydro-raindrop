@@ -223,20 +223,23 @@ foreach ( $groups as $group => $caption ) {
 			<table class="form-table">
 				<tr valign="top">
 					<th scope="row">
-						Method
+						<label for="<?php echo esc_attr( Helper::OPTION_MFA_METHOD ); ?>">
+							Method
+						</label>
 					</th>
 					<td>
 						<fieldset>
 							<p>
 								<label>
 									<input type="radio"
+											id="<?php echo esc_attr( Helper::OPTION_MFA_METHOD ); ?>"
 											name="<?php echo esc_attr( Helper::OPTION_MFA_METHOD ); ?>"
 											value="<?php echo esc_attr( Helper::MFA_METHOD_OPTIONAL ); ?>"
 										<?php if ( ! $mfa_method || Helper::MFA_METHOD_OPTIONAL === $mfa_method ) : ?>
 											checked="checked"
 										<?php endif; ?>>
 									<span>Optional</span>
-									User decides to enable MFA on their account.
+									User decides to enable MFA on their account. (default)
 								</label>
 								<br>
 								<label>
@@ -266,16 +269,17 @@ foreach ( $groups as $group => $caption ) {
 				</tr>
 				<tr valign="top">
 					<th scope="row">
-						<label for="<?php echo esc_attr( Helper::OPTION_PAGE_MFA ); ?>">
+						<label for="<?php echo esc_attr( Helper::OPTION_MFA_MAXIMUM_ATTEMPTS ); ?>">
 							MFA Maximum Attempts
 						</label>
 					</th>
 					<td>
 						<input type="number"
 								size="3"
+								id="<?php echo esc_attr( Helper::OPTION_MFA_MAXIMUM_ATTEMPTS ); ?>"
 								name="<?php echo esc_attr( Helper::OPTION_MFA_MAXIMUM_ATTEMPTS ); ?>"
-								value="<?php echo esc_attr( (int) get_option( Helper::OPTION_MFA_MAXIMUM_ATTEMPTS ) ); ?>">
-						<p class="description">The user account will be blocked if number of attempts have been exceeded.</p>
+								value="<?php echo esc_attr( (int) get_option( Helper::OPTION_MFA_MAXIMUM_ATTEMPTS ) ); ?>"> (default: 0 = unlimited)
+						<p class="description">The user account will be blocked if the number of attempts exceeds this value.</p>
 					</td>
 				</tr>
 				<tr valign="top">
@@ -304,7 +308,17 @@ foreach ( $groups as $group => $caption ) {
 								</option>
 							<?php endforeach; ?>
 						</select>
-						<p class="description">Please make sure you have implemented the shortcodes on the Hydro MFA Login Page.</p>
+						<p class="description">
+							The shortcode <code>[hydro_raindrop_mfa]</code> or all of its descendants must be present in the page content or template.
+							<br><br>
+							Descendants (for usage in template file):<br>
+							- <code>[hydro_raindrop_mfa_flash]</code>: Renders flash messages.<br>
+							- <code>[hydro_raindrop_mfa_form_open]</code>: Renders opening &lt;form&gt; tag.<br>
+							- <code>[hydro_raindrop_mfa_digits]</code>: Renders the MFA digits.<br>
+							- <code>[hydro_raindrop_mfa_button_authorize class="my-css-class" label="Authorize"]</code>: Renders the Authorize (submit) button.<br>
+							- <code>[hydro_raindrop_mfa_button_cancel class="my-css-class" label="Cancel"]</code>: Renders the Cancel button.<br>
+							- <code>[hydro_raindrop_mfa_form_close]</code>: Renders the closing &lt;/form&gt; tag along with the nonce field.<br>
+						</p>
 					</td>
 				</tr>
 				<tr valign="top">
@@ -333,7 +347,17 @@ foreach ( $groups as $group => $caption ) {
 								</option>
 							<?php endforeach; ?>
 						</select>
-						<p class="description">Please make sure you have implemented the shortcodes on the Hydro MFA Setup Page.</p>
+						<p class="description">
+							The shortcode <code>[hydro_raindrop_setup]</code> or all of its descendants must be present in the page content or template.
+							<br><br>
+							Descendants (for usage in template file):<br>
+							- <code>[hydro_raindrop_setup_flash]</code>: Renders flash messages.<br>
+							- <code>[hydro_raindrop_setup_form_open]</code>: Renders opening &lt;form&gt; tag.<br>
+							- <code>[hydro_raindrop_setup_hydro_id]</code>: Renders the HydroID input form field.<br>
+							- <code>[hydro_raindrop_setup_button_submit class="my-css-class" label="Submit"]</code>: Renders the Submit button.<br>
+							- <code>[hydro_raindrop_setup_button_skip class="my-css-class" label="Skip"]</code>: Renders the Skip button (if applicable).<br>
+							- <code>[hydro_raindrop_setup_form_close]</code>: Renders the closing &lt;/form&gt; tag along with the nonce field.<br>
+						</p>
 					</td>
 				</tr>
 				<tr valign="top">
@@ -362,7 +386,34 @@ foreach ( $groups as $group => $caption ) {
 								</option>
 							<?php endforeach; ?>
 						</select>
-						<p class="description">Please make sure you have implemented the shortcodes on the Hydro MFA Settings Page.</p>
+						<p class="description">
+							The shortcode <code>[hydro_raindrop_setting]</code> or all of its descendants must be present in the page content or template.
+							<br><br>
+							Descendants (for usage in template file):<br>
+							- <code>[hydro_raindrop_settings_flash]</code>: Renders flash messages.<br>
+							- <code>[hydro_raindrop_settings_form_open]</code>: Renders opening &lt;form&gt; tag.<br>
+							- <code>[hydro_raindrop_settings_checkbox_mfa_enabled]</code>: Renders the checkbox form field.<br>
+							- <code>[hydro_raindrop_settings_button_submit class="my-css-class" label="Submit"]</code>: Renders the Submit button.<br>
+							- <code>[hydro_raindrop_settings_form_close]</code>: Renders the closing &lt;/form&gt; tag along with the nonce field.<br>
+						</p>
+					</td>
+				</tr>
+				<tr valign="top">
+					<th scope="row">
+						<label for="<?php echo esc_attr( Helper::OPTION_POST_VERIFICATION_TIMEOUT ); ?>">
+							MFA Lifetime for Posts
+						</label>
+					</th>
+					<td>
+						<input type="number"
+								size="4"
+								id="<?php echo esc_attr( Helper::OPTION_POST_VERIFICATION_TIMEOUT ); ?>"
+								name="<?php echo esc_attr( Helper::OPTION_POST_VERIFICATION_TIMEOUT ); ?>"
+								value="<?php echo esc_attr( (int) get_option( Helper::OPTION_POST_VERIFICATION_TIMEOUT ) ); ?>"> seconds (default: 3600 = 1 hour)
+						<p class="description">
+							To add an extra layer of security, Editors can require Users to perform MFA before viewing a Post.<br>
+							The MFA Lifetime for Posts indicates how long the Post will be accessible. If the lifetime expires, Users need to perform MFA again to view the Post.<br>
+						</p>
 					</td>
 				</tr>
 			</table>

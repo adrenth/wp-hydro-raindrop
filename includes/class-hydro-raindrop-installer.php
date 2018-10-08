@@ -55,7 +55,9 @@ final class Hydro_Raindrop_Installer {
 		$helper->publish_settings_page();
 
 		update_option( Hydro_Raindrop_Helper::OPTION_ENABLED, 1 );
+		update_option( Hydro_Raindrop_Helper::OPTION_MFA_MAXIMUM_ATTEMPTS, 0 );
 		update_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD, Hydro_Raindrop_Helper::MFA_METHOD_OPTIONAL );
+		update_option( Hydro_Raindrop_Helper::OPTION_POST_VERIFICATION_TIMEOUT, 3600 );
 
 	}
 
@@ -148,6 +150,7 @@ final class Hydro_Raindrop_Installer {
 		delete_option( Hydro_Raindrop_Helper::OPTION_PAGE_SETUP );
 		delete_option( Hydro_Raindrop_Helper::OPTION_PAGE_SETTINGS );
 		delete_option( Hydro_Raindrop_Helper::OPTION_ENABLED );
+		delete_option( Hydro_Raindrop_Helper::OPTION_POST_VERIFICATION_TIMEOUT );
 
 	}
 

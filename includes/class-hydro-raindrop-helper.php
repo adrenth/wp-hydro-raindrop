@@ -16,15 +16,16 @@ final class Hydro_Raindrop_Helper {
 	/**
 	 * Hydro Raindrop database options.
 	 */
-	const OPTION_ENABLED              = 'hydro_raindrop_enabled';
-	const OPTION_APPLICATION_ID       = 'hydro_raindrop_application_id';
-	const OPTION_CLIENT_ID            = 'hydro_raindrop_client_id';
-	const OPTION_CLIENT_SECRET        = 'hydro_raindrop_client_secret';
-	const OPTION_ENVIRONMENT          = 'hydro_raindrop_environment';
-	const OPTION_ACTIVATION_NOTICE    = 'hydro_raindrop_activation_notice';
-	const OPTION_ACCESS_TOKEN_SUCCESS = 'hydro_raindrop_access_token_success';
-	const OPTION_MFA_METHOD           = 'hydro_raindrop_mfa_method';
-	const OPTION_MFA_MAXIMUM_ATTEMPTS = 'hydro_raindrop_mfa_maximum_attempts';
+	const OPTION_ENABLED                   = 'hydro_raindrop_enabled';
+	const OPTION_APPLICATION_ID            = 'hydro_raindrop_application_id';
+	const OPTION_CLIENT_ID                 = 'hydro_raindrop_client_id';
+	const OPTION_CLIENT_SECRET             = 'hydro_raindrop_client_secret';
+	const OPTION_ENVIRONMENT               = 'hydro_raindrop_environment';
+	const OPTION_ACTIVATION_NOTICE         = 'hydro_raindrop_activation_notice';
+	const OPTION_ACCESS_TOKEN_SUCCESS      = 'hydro_raindrop_access_token_success';
+	const OPTION_MFA_METHOD                = 'hydro_raindrop_mfa_method';
+	const OPTION_MFA_MAXIMUM_ATTEMPTS      = 'hydro_raindrop_mfa_maximum_attempts';
+	const OPTION_POST_VERIFICATION_TIMEOUT = 'hydro_raindrop_post_verification_timeout';
 
 	/**
 	 * Hydro Raindrop Pages.
