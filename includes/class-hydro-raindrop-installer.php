@@ -81,7 +81,7 @@ final class Hydro_Raindrop_Installer {
 
 		update_option( Hydro_Raindrop_Helper::OPTION_ENABLED, 1 );
 		update_option( Hydro_Raindrop_Helper::OPTION_MFA_MAXIMUM_ATTEMPTS, 0 );
-		update_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD, Hydro_Raindrop_Helper::MFA_METHOD_OPTIONAL );
+		update_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD, Hydro_Raindrop_Helper::MFA_METHOD_PROMPTED );
 		update_option( Hydro_Raindrop_Helper::OPTION_POST_VERIFICATION_TIMEOUT, 3600 );
 
 	}

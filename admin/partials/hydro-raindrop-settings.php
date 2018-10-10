@@ -239,7 +239,7 @@ foreach ( $groups as $group => $caption ) {
 											checked="checked"
 										<?php endif; ?>>
 									<span>Optional</span>
-									User decides to enable MFA on their account. (default)
+									User decides to enable MFA on their account.
 								</label>
 								<br>
 								<label>
@@ -250,7 +250,7 @@ foreach ( $groups as $group => $caption ) {
 											checked="checked"
 										<?php endif; ?>>
 									<span>Prompted</span>
-									MFA setup screen will be prompted after logging in. User can skip this step and setup MFA later.
+									MFA setup screen will be prompted after logging in. User can skip this step and setup MFA later. (default)
 								</label>
 								<br>
 								<label>
