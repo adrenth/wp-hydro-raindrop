@@ -43,39 +43,32 @@ Site Editors / Authors / etc. can enable the Hydro Raindrop MFA from their profi
 
 ## Customization
 
-During the installation of the plugin the following pages will be made:
- 
-* Hydro Raindrop MFA Page (`/hydro-raindrop/`)
-* Hydro Raindrop MFA Settings Page (`/hydro-raindrop/settings`)
-* Hydro Raindrop MFA Setup Page (`/hydro-raindrop/setup`)
+### Custom MFA Page
 
-Each page contains it's corresponding shortcode which will be responsible for the Hydro Raindrop MFA implementation to work.
-These pages are meant for customization and integration in your own custom theme. 
+Follow the instructions below to create your own Hydro Raindrop MFA page:
 
-By default the Hydro Raindrop integrated pages are enabled. 
+* Login as a Site Editor
+* Create a page (programmatically)
+* Use the following shortcodes on this page (required!):
+    - `[hydro_raindrop_mfa_form_open]`: renders the form opening element.
+    - `[hydro_raindrop_mfa_form_close]`: renders closing element with the wp_nonce field.
+    - `[hydro_raindrop_mfa_digits]`: renders 6 digits which should be entered into the Hydro app.
+    - `[hydro_raindrop_mfa_button_authorize]`: renders the "Authorize" button; customize the look of the button using CSS class `hydro-raindrop-mfa-button-authorize`.
+    - `[hydro_raindrop_mfa_button_cancel]`: renders the "Cancel" button; customize the look of the button using CSS class `hydro-raindrop-mfa-button-cancel`.
+* When MFA verification fails the User will be redirected to the MFA page with GET parameter `?hydro-raindrop-error=1`.
+* Under `Setting` navigate to the `Hydro Raindro MFA` section and select the page you created.
 
-### Custom Hydro Raindrop MFA Page
+### Custom MFA Setup Page
 
-* Login as an administrator
-* Goto 'Hydro Raindrop' > 'Settings' > Tab 'Customization'.
-* At 'MFA Page' select the 'Hydro Raindrop MFA Page' or select 'Use default MFA Page' to stick with the defaults.
-* Make sure the shortcode `[hydro_raindrop_mfa]` is present on this page.
+**TODO**
 
-**Available Shortcodes**
+### Custom MFA Settings Page
 
-Use these shortcodes in your custom templates/pages:
+**TODO**
 
-- `[hydro_raindrop_mfa_flash]`: Renders flash messages.
-- `[hydro_raindrop_mfa_form_open]`: Renders opening `<form>` tag.
-- `[hydro_raindrop_mfa_digits]`: Renders the MFA digits.
-- `[hydro_raindrop_mfa_button_authorize class="my-css-class" label="Authorize"]`: Renders the Authorize (submit) button.
-- `[hydro_raindrop_mfa_button_cancel class="my-css-class" label="Cancel"]`: Renders the Cancel button.
-- `[hydro_raindrop_mfa_form_close]<`: Renders the closing `</form>` tag along with the nonce field.
+#### Custom MFA page example
 
-**Example template**
-
-Create a custom page template (e.g. `/wp-content/themes/my-awesome-theme/hydro-raindrop-mfa.php`) for the Hydro Raindrop MFA. 
-Below is an example on how to use the shortcodes.
+Create a custom page template (e.g. `/wp-content/themes/my-awesome-theme/hydro-raindrop-mfa.php`) for the Hydro Raindrop MFA. Below is an example on how to use the shortcodes.
 
 ```
 <?php
@@ -123,41 +116,6 @@ get_header();
 get_footer();
 
 ```
-
-### Custom MFA Setup Page
-
-* Login as an administrator
-* Goto 'Hydro Raindrop' > 'Settings' > Tab 'Customization'.
-* At 'MFA Setup Page' select the 'Hydro Raindrop Setup Page' or select 'Use default MFA Setup Page' to stick with the defaults.
-* Make sure the shortcode `[hydro_raindrop_setup]` is present on this page.
-
-**Available Shortcodes**
-
-Use these shortcodes in your custom templates/pages:
-
-- `[hydro_raindrop_setup_flash]`: Renders flash messages.
-- `[hydro_raindrop_setup_form_open]`: Renders opening `<form>` tag.
-- `[hydro_raindrop_setup_hydro_id]`: Renders the HydroID input form field.
-- `[hydro_raindrop_setup_button_submit class="my-css-class" label="Submit"]`: Renders the Submit button.
-- `[hydro_raindrop_setup_button_skip class="my-css-class" label="Skip"]`: Renders the Skip button (if applicable).
-- `[hydro_raindrop_setup_form_close]`: Renders the closing `</form>` tag along with the nonce field.
-
-### Custom MFA Settings Page
-
-* Login as an administrator
-* Goto 'Hydro Raindrop' > 'Settings' > Tab 'Customization'.
-* At 'MFA Settings Page' select the 'Hydro Raindrop Settings Page' or select 'Use default MFA Settings Page' to stick with the defaults.
-* Make sure the shortcode `[hydro_raindrop_setup]` is present on this page.
-
-**Available Shortcodes**
-
-Use these shortcodes in your custom templates/pages:
-
-- `[hydro_raindrop_settings_flash]`: Renders flash messages.
-- `[hydro_raindrop_settings_form_open]`: Renders opening `<form>` tag.
-- `[hydro_raindrop_settings_checkbox_mfa_enabled]`: Renders the checkbox form field.
-- `[hydro_raindrop_settings_button_submit class="my-css-class" label="Submit"]`: Renders the Submit button.
-- `[hydro_raindrop_settings_form_close]`: Renders the closing `</form>` tag along with the nonce field.
 
 ### Actions
 

@@ -168,7 +168,7 @@ class Hydro_Raindrop_Shortcode {
 	public function mfa_button_authorize( $attributes ) : string {
 
 		$attributes = shortcode_atts( [
-			'class' => 'hydro-raindrop-mfa-button-authorize',
+			'class' => 'hydro-mfa-button-authorize',
 			'label' => esc_html__( 'Authenticate', 'wp-hydro-raindrop' ),
 		], $attributes);
 
@@ -190,7 +190,7 @@ class Hydro_Raindrop_Shortcode {
 	public function mfa_button_cancel( $attributes ) : string {
 
 		$attributes = shortcode_atts( [
-			'class' => 'hydro-raindrop-mfa-button-cancel',
+			'class' => 'hydro-mfa-button-cancel',
 			'label' => esc_html__( 'Cancel', 'wp-hydro-raindrop' ),
 		], $attributes);
 
@@ -251,12 +251,13 @@ class Hydro_Raindrop_Shortcode {
 	public function setup_hydro_id( $attributes ) : string {
 
 		$attributes = shortcode_atts( [
-			'class' => 'hydro-raindrop-setup-hydro-id',
+			'class' => 'hydro-setup-hydro-id',
 		], $attributes);
 
 		return sprintf(
-			'<input type="text" name="%s" class="%s" title="HydroID" autocomplete="off" autofocus>',
+			'<input type="text" name="%s" placeholder="%s" class="%s" title="HydroID" autocomplete="off" autofocus>',
 			'hydro_id',
+			'Type in your HydroID',
 			$attributes['class']
 		);
 
@@ -271,7 +272,7 @@ class Hydro_Raindrop_Shortcode {
 	public function setup_button_submit( $attributes ) : string {
 
 		$attributes = shortcode_atts( [
-			'class' => 'hydro-raindrop-setup-button-submit',
+			'class' => 'hydro-setup-button-submit',
 			'label' => esc_html__( 'Submit', 'wp-hydro-raindrop' ),
 		], $attributes);
 
@@ -299,7 +300,7 @@ class Hydro_Raindrop_Shortcode {
 		}
 
 		$attributes = shortcode_atts( [
-			'class' => 'hydro-raindrop-setup-button-skip',
+			'class' => 'hydro-setup-button-skip',
 			'label' => esc_html__( 'Skip', 'wp-hydro-raindrop' ),
 		], $attributes);
 
@@ -360,7 +361,7 @@ class Hydro_Raindrop_Shortcode {
 	public function settings_checkbox_mfa_enabled( $attributes ) : string {
 
 		$attributes = shortcode_atts( [
-			'class' => 'hydro-raindrop-setup-button-skip',
+			'class' => 'hydro-setup-button-skip',
 			'label' => esc_html__( 'Skip', 'wp-hydro-raindrop' ),
 		], $attributes);
 
@@ -399,7 +400,7 @@ class Hydro_Raindrop_Shortcode {
 	public function settings_button_submit( $attributes ) : string {
 
 		$attributes = shortcode_atts( [
-			'class' => 'hydro-raindrop-settings-button-submit',
+			'class' => 'hydro-settings-button-submit',
 			'label' => esc_html__( 'Submit', 'wp-hydro-raindrop' ),
 		], $attributes);
 

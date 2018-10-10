@@ -6,7 +6,7 @@
  */
 
 ?>
-<div class="hydro-raindrop hydro-raindrop-settings">
+<div id="hydro-container" class="hydro-settings">
 	<?php echo do_shortcode( '[hydro_raindrop_settings_flash]' ); ?>
 	<?php echo do_shortcode( '[hydro_raindrop_settings_form_open]' ); ?>
 	<?php echo do_shortcode( '[hydro_raindrop_settings_checkbox_mfa_enabled]' ); ?>
