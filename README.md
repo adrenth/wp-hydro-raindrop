@@ -56,7 +56,7 @@ By default the Hydro Raindrop integrated pages are enabled.
 
 ### Custom Hydro Raindrop MFA Page
 
-* Login as a administrator
+* Login as an administrator
 * Goto 'Hydro Raindrop' > 'Settings' > Tab 'Customization'.
 * At 'MFA Page' select the 'Hydro Raindrop MFA Page' or select 'Use default MFA Page' to stick with the defaults.
 * Make sure the shortcode `[hydro_raindrop_mfa]` is present on this page.
@@ -126,7 +126,7 @@ get_footer();
 
 ### Custom MFA Setup Page
 
-* Login as a administrator
+* Login as an administrator
 * Goto 'Hydro Raindrop' > 'Settings' > Tab 'Customization'.
 * At 'MFA Setup Page' select the 'Hydro Raindrop Setup Page' or select 'Use default MFA Setup Page' to stick with the defaults.
 * Make sure the shortcode `[hydro_raindrop_setup]` is present on this page.
@@ -144,7 +144,7 @@ Use these shortcodes in your custom templates/pages:
 
 ### Custom MFA Settings Page
 
-* Login as a administrator
+* Login as an administrator
 * Goto 'Hydro Raindrop' > 'Settings' > Tab 'Customization'.
 * At 'MFA Settings Page' select the 'Hydro Raindrop Settings Page' or select 'Use default MFA Settings Page' to stick with the defaults.
 * Make sure the shortcode `[hydro_raindrop_setup]` is present on this page.
