@@ -1,243 +1,8 @@
-#hydro-container {
-    display: block;
-    max-width: 480px;
-    background: #fff;
-    margin: 0 auto;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,.1);
-    transition: .3s;
-    background-clip: border-box;
-    border: 1px solid rgba(0,0,0,.125);
-    border-radius: .25rem;
-    overflow: hidden
+.hydro-raindrop-mfa h1 {
+    margin: 0 0 15px 0;
 }
 
-#hydro-container * {
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif
-}
-
-#hydro-container form {
-    display: block
-}
-
-#hydro-container .hydro-header {
-    display: flex;
-    flex-wrap: wrap
-}
-
-#hydro-container .hydro-header .logo {
-    flex-basis: 100%;
-    padding: 15px 10px
-}
-
-#hydro-container .hydro-header .logo img {
-    display: block;
-    max-height: 40px;
-    margin: 0 auto;
-    border-radius: 4px
-}
-
-#hydro-container .hydro-header h1 {
-    width: 100%;
-    background: #eee;
-    color: #000;
-    padding: 8px 15px;
-    font-size: 16px;
-    letter-spacing: .1em;
-    font-weight: 400;
-    text-transform: uppercase;
-    text-align: center;
-    margin: 0
-}
-
-#hydro-container .hydro-body {
-    display: block;
-    flex-wrap: wrap;
-    background: #fafafa
-}
-
-#hydro-container .hydro-body .item {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    margin: 0 auto;
-    padding: 20px 10px;
-}
-
-#hydro-container .hydro-body .item.side {
-    flex-shrink: 1;
-    flex-direction: row
-}
-
-#hydro-container .hydro-body .item .hydro-illustration {
-    width: 140px;
-    margin-bottom: 10px
-}
-
-#hydro-container .hydro-body .notice {
-    background: #fff;
-    color: #666;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-    margin: 20px 20px 0 20px!important;
-    box-sizing: content-box;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    font-size: 13px;
-    font-weight: 500;
-    width: 90%
-}
-
-#hydro-container .hydro-body h3:before {
-    content: "â“˜";
-    line-height: 44px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    padding: 0 10px;
-    color: #fff;
-    background: #007bff
-}
-
-#hydro-container .hydro-body .notice h3 {
-    background: #fff;
-    margin: 0;
-    padding-left: 50px;
-    font-weight: 400;
-    font-size: 17px;
-    color: #aaa;
-    border-bottom: 1px solid #ddd;
-    position: relative;
-    line-height: 44px
-}
-
-#hydro-container .hydro-body .notice span:before {
-    content: "- ";
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    color: #aaa
-}
-
-#hydro-container .hydro-body .notice span {
-    position: relative;
-    padding: 0 5px;
-    line-height: 18px;
-    font-weight: 400;
-    color: #000;
-    box-sizing: content-box
-}
-
-#hydro-container .hydro-body .notice span:first-child {
-    padding-top: 20px
-}
-
-#hydro-container .hydro-body .notice a {
-    font-weight: inherit;
-    color: #006ffc;
-    border-bottom: 1px solid #006cfc;
-    box-shadow: none
-}
-
-#hydro-container .hydro-body .item.actions {
-    display: flex;
-    flex-direction: row-reverse;
-    padding: 0;
-    justify-content: space-between;
-    background: #fafafa
-}
-
-#hydro-container .hydro-body .item.actions input {
-    background: transparent;
-    border: 0;
-    font-size: 13px;
-    width: auto;
-    height: auto;
-    text-decoration: underline;
-    font-weight: 400;
-    color: #000;
-}
-
-#hydro-container .hydro-body .item.actions input:hover,#hydro-container .hydro-body .item.actions input:focus {
-    color: #0671f3
-}
-
-#hydro-container .hydro-body .item:last-child {
-    border-bottom: 0
-}
-
-#hydro-container .hydro-body .item label {
-    font-size: 13px;
-    font-weight: 500
-}
-
-#hydro-container .hydro-body .item input[type="text"] {
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: .2em;
-    font-size: 20px;
-    font-weight: 500;
-    width: 90%;
-    color: #0671f3
-}
-
-#hydro-container .hydro-body .item .hydro-digits {
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: .2em;
-    font-size: 26px;
-    font-weight: 500;
-    color: #fff;
-    position: relative;
-    padding: 0 10px;
-    border: 1px solid #ffffff;
-    background: #07f;
-    border-radius: 4px;
-}
-
-
-#hydro-container .hydro-body .item input {
-    display: block;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    cursor: hand
-}
-
-#hydro-container .hydro-body .item * {
-    margin: 5px
-}
-
-#hydro-container .hydro-body .hydro-flash {
-    padding: 12px;
-    background: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,.13);
-    border-left: 4px solid #fff;
-    margin-bottom: 20px
-}
-
-#hydro-container .hydro-body .hydro-flash.error {
-    border-left: 3px solid #dc3232
-}
-
-#hydro-container .hydro-body .hydro-flash.info {
-    border-left: 3px solid #00a0d2
-}
-
-#hydro-container .hydro-body .hydro-flash.success {
-    border-left: 3px solid #46b450
-}
-
-#hydro-container .hydro-body .hydro-flash.warning {
-    border-left: 3px solid #ffb900
-}
-
-#hydro-container .hydro-body .hydro-mfa .message-digits {
+.hydro-raindrop-mfa .message-digits {
     text-align: center;
     margin: 10px 0;
     padding: 15px 15px 10px 15px;
@@ -247,95 +12,27 @@
     border: 1px solid #ddd;
     box-shadow: inset 0 1px 2px rgba(0,0,0,.07);
     outline: 0;
-    transition: 50ms border-color ease-in-out
+    transition: 50ms border-color ease-in-out;
 }
 
-#hydro-container .hydro-body .hydro-mfa .message-digits .digit {
-    font-family: "Courier New",sans-serif;
+.hydro-raindrop-mfa .message-digits .digit {
+    font-family: "Courier New", sans-serif;
     font-size: 32px;
     font-weight: bold;
     color: #0971f5;
     margin: 0 5px;
-    line-height: 100%
+    line-height: 100%;
 }
 
-#hydro-container .hydro-footer {
-    display: flex;
-    flex-wrap: wrap;
-    border-top: 1px #ddd solid;
-    padding-top: 15px;
-    margin: 0 auto
+.hydro-raindrop-mfa .hydro-illustration {
+    text-align: center;
 }
 
-#hydro-container .hydro-footer .hydro-submission {
-    display: flex;
-    align-items: center;
-    align-self: flex-center;
-    justify-content: space-between;
-    margin: 0 auto
+.hydro-raindrop-mfa .hydro-illustration img {
+    margin: 10px 0;
 }
 
-#hydro-container .hydro-footer .hydro-submission input.primary {
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: #fff;
-    font-weight: 600;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 400;
-    border: 0;
-    border-radius: 4px;
-    cursor: pointer;
-    cursor: hand;
-    box-shadow: rgba(23,43,99,.24) 0 7px 28px;
-    letter-spacing: .1em;
-    font-size: 13px;
-    padding: 12px 23px;
-    text-shadow: 1px 1px rgba(0,0,0,.09);
-    border-radius: 4px;
-    vz }
-
-#hydro-container .hydro-footer .hydro-submission input.primary:hover, #hydro-container .hydro-footer .hydro-submission input.primary:focus {
-    color:#fff;
-    text-decoration: none;
-    box-shadow: rgba(23,43,99,.3) 0 8px 35px;
-    background-color: #0069d9;
-    border-color: #0062cc
-}
-
-#hydro-container .hydro-footer .hydro-abt-us {
-    padding-top: 10px;
-    display: flex;
-    flex-basis: 100%;
-    font-size: 10px;
-    align-items: center;
-    justify-content: flex-end
-}
-
-#hydro-container .hydro-footer .hydro-abt-us a {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    text-decoration: none;
-    box-shadow: none;
-    flex-wrap: wrap;
-    flex-direction: row
-}
-
-#hydro-container .hydro-footer .hydro-abt-us a:hover,#hydro-container .hydro-footer .hydro-abt-us a:focus {
-    box-shadow: rgba(23,43,99,.3) 0 8px 35px
-}
-
-#hydro-container .hydro-footer .hydro-abt-us a label {
-    padding: 5px;
-    font-size: 12px;
-    color: #333;
-    font-weight: 400;
-    margin: 0
-}
-
-#hydro-container .hydro-footer .hydro-abt-us a img {
-    max-width: 50px;
-    box-shadow: none
+.hydro-raindrop-mfa .button-cancel {
+    float: left;
+    display: inline-block;
 }
