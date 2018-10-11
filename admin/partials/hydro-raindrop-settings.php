@@ -239,7 +239,7 @@ foreach ( $groups as $group => $caption ) {
 											checked="checked"
 										<?php endif; ?>>
 									<span>Optional</span>
-									User decides to enable MFA on their account. (default)
+									User decides to enable MFA on their account.
 								</label>
 								<br>
 								<label>
@@ -250,7 +250,7 @@ foreach ( $groups as $group => $caption ) {
 											checked="checked"
 										<?php endif; ?>>
 									<span>Prompted</span>
-									MFA setup screen will be prompted after logging in. User can skip this step and setup MFA later.
+									MFA setup screen will be prompted after logging in. User can skip this step and setup MFA later. (default)
 								</label>
 								<br>
 								<label>
@@ -309,15 +309,7 @@ foreach ( $groups as $group => $caption ) {
 							<?php endforeach; ?>
 						</select>
 						<p class="description">
-							The shortcode <code>[hydro_raindrop_mfa]</code> or all of its descendants must be present in the page content or template.
-							<br><br>
-							Descendants (for usage in template file):<br>
-							- <code>[hydro_raindrop_mfa_flash]</code>: Renders flash messages.<br>
-							- <code>[hydro_raindrop_mfa_form_open]</code>: Renders opening &lt;form&gt; tag.<br>
-							- <code>[hydro_raindrop_mfa_digits]</code>: Renders the MFA digits.<br>
-							- <code>[hydro_raindrop_mfa_button_authorize class="my-css-class" label="Authorize"]</code>: Renders the Authorize (submit) button.<br>
-							- <code>[hydro_raindrop_mfa_button_cancel class="my-css-class" label="Cancel"]</code>: Renders the Cancel button.<br>
-							- <code>[hydro_raindrop_mfa_form_close]</code>: Renders the closing &lt;/form&gt; tag along with the nonce field.<br>
+							The shortcode <code>[hydro_raindrop_mfa]</code> must be present in the page content or template.
 						</p>
 					</td>
 				</tr>
@@ -348,15 +340,7 @@ foreach ( $groups as $group => $caption ) {
 							<?php endforeach; ?>
 						</select>
 						<p class="description">
-							The shortcode <code>[hydro_raindrop_setup]</code> or all of its descendants must be present in the page content or template.
-							<br><br>
-							Descendants (for usage in template file):<br>
-							- <code>[hydro_raindrop_setup_flash]</code>: Renders flash messages.<br>
-							- <code>[hydro_raindrop_setup_form_open]</code>: Renders opening &lt;form&gt; tag.<br>
-							- <code>[hydro_raindrop_setup_hydro_id]</code>: Renders the HydroID input form field.<br>
-							- <code>[hydro_raindrop_setup_button_submit class="my-css-class" label="Submit"]</code>: Renders the Submit button.<br>
-							- <code>[hydro_raindrop_setup_button_skip class="my-css-class" label="Skip"]</code>: Renders the Skip button (if applicable).<br>
-							- <code>[hydro_raindrop_setup_form_close]</code>: Renders the closing &lt;/form&gt; tag along with the nonce field.<br>
+							The shortcode <code>[hydro_raindrop_setup]</code> must be present in the page content or template.
 						</p>
 					</td>
 				</tr>
@@ -387,14 +371,7 @@ foreach ( $groups as $group => $caption ) {
 							<?php endforeach; ?>
 						</select>
 						<p class="description">
-							The shortcode <code>[hydro_raindrop_setting]</code> or all of its descendants must be present in the page content or template.
-							<br><br>
-							Descendants (for usage in template file):<br>
-							- <code>[hydro_raindrop_settings_flash]</code>: Renders flash messages.<br>
-							- <code>[hydro_raindrop_settings_form_open]</code>: Renders opening &lt;form&gt; tag.<br>
-							- <code>[hydro_raindrop_settings_checkbox_mfa_enabled]</code>: Renders the checkbox form field.<br>
-							- <code>[hydro_raindrop_settings_button_submit class="my-css-class" label="Submit"]</code>: Renders the Submit button.<br>
-							- <code>[hydro_raindrop_settings_form_close]</code>: Renders the closing &lt;/form&gt; tag along with the nonce field.<br>
+							The shortcode <code>[hydro_raindrop_setting]</code> must be present in the page content or template.
 						</p>
 					</td>
 				</tr>

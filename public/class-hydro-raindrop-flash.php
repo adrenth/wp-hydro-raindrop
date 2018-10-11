@@ -62,7 +62,7 @@ final class Hydro_Raindrop_Flash {
 		$html = '';
 
 		foreach ( $flash_messages as $type => $messages ) {
-			$html .= "<div class=\"hydro-flash {$type}\">";
+			$html .= "<div class=\"hydro-raindrop-flash {$type}\">";
 
 			foreach ( (array) $messages as $message ) {
 				$html .= '<p>' . esc_html( $message ) . '</p>';

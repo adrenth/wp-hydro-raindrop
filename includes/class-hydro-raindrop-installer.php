@@ -30,6 +30,31 @@ final class Hydro_Raindrop_Installer {
 			return;
 		}
 
+		// Perform database migrations.
+		if ( version_compare( HYDRO_RAINDROP_VERSION, '2.0.0', '>=' ) ) {
+			global $wpdb;
+
+			// @codingStandardsIgnoreStart
+			$wpdb->update(
+				$wpdb->prefix . 'usermeta',
+				[ 'meta_key' => Hydro_Raindrop_Helper::USER_META_HYDRO_ID ],
+				[ 'meta_key' => 'hydro_id' ]
+			);
+
+			$wpdb->update(
+				$wpdb->prefix . 'usermeta',
+				[ 'meta_key' => Hydro_Raindrop_Helper::USER_META_MFA_ENABLED ],
+				[ 'meta_key' => 'hydro_mfa_enabled' ]
+			);
+
+			$wpdb->update(
+				$wpdb->prefix . 'usermeta',
+				[ 'meta_key' => Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED ],
+				[ 'meta_key' => 'hydro_raindrop_confirmed' ]
+			);
+			// @codingStandardsIgnoreEnd
+		}
+
 		self::load_dependencies();
 
 		$helper = new Hydro_Raindrop_Helper();
@@ -56,7 +81,7 @@ final class Hydro_Raindrop_Installer {
 
 		update_option( Hydro_Raindrop_Helper::OPTION_ENABLED, 1 );
 		update_option( Hydro_Raindrop_Helper::OPTION_MFA_MAXIMUM_ATTEMPTS, 0 );
-		update_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD, Hydro_Raindrop_Helper::MFA_METHOD_OPTIONAL );
+		update_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD, Hydro_Raindrop_Helper::MFA_METHOD_PROMPTED );
 		update_option( Hydro_Raindrop_Helper::OPTION_POST_VERIFICATION_TIMEOUT, 3600 );
 
 	}
