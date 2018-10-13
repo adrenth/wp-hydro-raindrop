@@ -84,19 +84,11 @@ class Hydro_Raindrop_Cookie {
 		$cookie     = $user->user_login . '|' . $expiration . '|' . $token . '|' . $hash;
 
 		// @codingStandardsIgnoreLine
-		$result = setcookie( self::NAME, $cookie, 0, COOKIEPATH, (string) COOKIE_DOMAIN, true, true );
-
-		if ( ! $result ) {
-			$this->log( 'Could not set MFA cookie.' );
-		}
+		setcookie( self::NAME, $cookie, 0, COOKIEPATH, (string) COOKIE_DOMAIN, true, true );
 
 		if ( COOKIEPATH !== SITECOOKIEPATH ) {
 			// @codingStandardsIgnoreLine
-			$result = setcookie( self::NAME, $cookie, 0, SITECOOKIEPATH, (string) COOKIE_DOMAIN, true, true );
-
-			if ( ! $result ) {
-				$this->log( 'Could not set MFA cookie.' );
-			}
+			setcookie( self::NAME, $cookie, 0, SITECOOKIEPATH, (string) COOKIE_DOMAIN, true, true );
 		}
 
 	}
