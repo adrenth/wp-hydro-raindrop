@@ -257,7 +257,7 @@ class Hydro_Raindrop_Shortcode {
 		return sprintf(
 			'<input type="text" name="%s" placeholder="%s" class="%s" title="HydroID" autocomplete="off" autofocus>',
 			'hydro_id',
-			'Type in your HydroID',
+			'Enter HydroID',
 			$attributes['class']
 		);
 
@@ -361,8 +361,8 @@ class Hydro_Raindrop_Shortcode {
 	public function settings_checkbox_mfa_enabled( $attributes ) : string {
 
 		$attributes = shortcode_atts( [
-			'class' => 'hydro-setup-button-skip',
-			'label' => esc_html__( 'Skip', 'wp-hydro-raindrop' ),
+			'class' => 'hydro-settings-mfa switch',
+			'label' => esc_html__( 'User MFA Settings', 'wp-hydro-raindrop' ),
 		], $attributes);
 
 		$user = $this->get_user();
@@ -381,12 +381,12 @@ class Hydro_Raindrop_Shortcode {
 		// @codingStandardsIgnoreEnd
 
 		return sprintf(
-			'<label class="%s"><input name="%s" type="checkbox" value="1"%s%s>%s</label>',
+			'<label>%s</label><label class="%s"><input name="%s" type="checkbox" value="1"%s%s><span class="slider"></span></label>',
+			esc_html__( 'Enable Multi Factor Authentication:', 'wp-hydro-raindrop' ),
 			$attributes['class'],
 			Hydro_Raindrop_Helper::USER_META_MFA_ENABLED,
 			$hydro_raindrop_mfa_enabled ? ' checked' : '',
-			Hydro_Raindrop_Helper::MFA_METHOD_ENFORCED === $hydro_raindrop_mfa_method ? ' disabled' : '',
-			esc_html__( 'Enable Multi Factor Authentication', 'wp-hydro-raindrop' )
+			Hydro_Raindrop_Helper::MFA_METHOD_ENFORCED === $hydro_raindrop_mfa_method ? ' disabled' : ''
 		);
 
 	}

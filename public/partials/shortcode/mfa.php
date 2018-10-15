@@ -22,7 +22,7 @@ $custom_logo    = wp_get_attachment_image_src( $custom_logo_id, 'full' );
 		<h1><?php esc_html_e( 'Hydro MFA', 'wp-hydro-raindrop' ); ?></h1>
 	</div>
 	<div class="hydro-body">
-		<div class="item full">
+		<div class="item full nobottom">
 			<img src="<?php echo esc_url( $image ); ?>" class="hydro-illustration"
 					alt="<?php esc_html_e( 'Enter Code in the Hydro App', 'wp-hydro-raindrop' ); ?>">
 			<label><?php esc_html_e( 'Enter Security Code into the Hydro App', 'wp-hydro-raindrop' ); ?></label>
@@ -40,7 +40,7 @@ $custom_logo    = wp_get_attachment_image_src( $custom_logo_id, 'full' );
 			<?php echo do_shortcode( '[hydro_raindrop_mfa_button_authorize class="primary"]' ); ?>
 		</div>
 		<div class="hydro-abt-us">
-			<a href="https://www.hydrogenplatform.com/" target="_blank">
+			<a href="https://www.hydrogenplatform.com/" target="_blank" title="This website is powered by Hydro - Blockchain based multi factor authentication, visit us to know more">
 				<label><?php esc_html_e( 'Powered by', 'wp-hydro-raindrop' ); ?></label>
 				<img src="https://www.hydrogenplatform.com/images/logo_hydro.svg" alt="Hydro">
 			</a>
