@@ -53,16 +53,22 @@ final class Hydro_Raindrop_Flash {
 	/**
 	 * Render the Flash messages.
 	 *
+	 * @param string $html_id HTML ID for the wrapper element.
+	 *
 	 * @return string
 	 */
-	public function render() : string {
+	public function render( string $html_id = 'hydro-flash' ) : string {
 
 		$flash_messages = $this->get_messages();
 
 		$html = '';
 
 		foreach ( $flash_messages as $type => $messages ) {
-			$html .= "<div class=\"hydro-flash {$type}\">";
+			$html .= sprintf(
+				'<div id="%s" class="hydro-flash %s">',
+				esc_attr( $html_id ),
+				esc_attr( $type )
+			);
 
 			foreach ( (array) $messages as $message ) {
 				$html .= '<p>' . esc_html( $message ) . '</p>';

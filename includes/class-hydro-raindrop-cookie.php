@@ -126,6 +126,7 @@ class Hydro_Raindrop_Cookie {
 	 * Returns the User ID when validates or FALSE when invalidates.
 	 *
 	 * @return bool|int
+	 * @throws Hydro_Raindrop_CookieExpired When cookie is expired.
 	 */
 	public function validate() {
 		/**
@@ -145,7 +146,11 @@ class Hydro_Raindrop_Cookie {
 		$expiration = $cookie_elements['expiration'];
 
 		if ( $expiration < time() ) {
-			return false;
+
+			$this->unset();
+
+			throw new Hydro_Raindrop_CookieExpired( 'MFA Cookie expired!' );
+
 		}
 
 		$user = get_user_by( 'login', $username );

@@ -125,6 +125,8 @@ class Hydro_Raindrop {
 			__DIR__ . '/../public/class-hydro-raindrop-flash.php',
 			// The class responsible for handling the meta boxes.
 			__DIR__ . '/../public/class-hydro-raindrop-metabox.php',
+			// Cookie Expired Exception.
+			__DIR__ . '/exceptions/class-hydro-raindrop-cookieexpired.php'
 		];
 
 		foreach ( $includes as $include ) {
@@ -283,6 +285,8 @@ class Hydro_Raindrop {
 		add_shortcode( 'hydro_raindrop_settings_checkbox_mfa_enabled', [ $plugin_shortcode, 'settings_checkbox_mfa_enabled' ] );
 		add_shortcode( 'hydro_raindrop_settings_button_submit', [ $plugin_shortcode, 'settings_button_submit' ] );
 		add_shortcode( 'hydro_raindrop_settings_form_close', [ $plugin_shortcode, 'settings_form_close' ] );
+
+		add_shortcode( 'hydro_raindrop_general_flash', [ $plugin_shortcode, 'general_flash' ] );
 
 	}
 

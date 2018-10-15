@@ -423,6 +423,18 @@ class Hydro_Raindrop_Shortcode {
 	}
 
 	/**
+	 * Show general flash messages.
+	 *
+	 * @return string
+	 */
+	public function general_flash() : string {
+
+		return ( new Hydro_Raindrop_Flash( $this->plugin_name ) )
+			->render( 'hydro-flash-general' );
+
+	}
+
+	/**
 	 * Get the current User.
 	 *
 	 * @return null|WP_User
