@@ -211,7 +211,7 @@ final class Hydro_Raindrop_Authenticate {
 		 */
 		if ( ! $cookie_is_valid
 				&& $this->helper->is_mfa_page_enabled()
-				&& $this->helper->get_current_url() === $this->helper->get_mfa_page_url() ) {
+				&& strpos( $this->helper->get_current_url(), $this->helper->get_mfa_page_url() ) !== false ) {
 			// @codingStandardsIgnoreLine
 			wp_redirect( home_url() );
 			exit();
@@ -222,7 +222,7 @@ final class Hydro_Raindrop_Authenticate {
 		 */
 		if ( ! $cookie_is_valid
 				&& $this->helper->is_setup_page_enabled()
-				&& $this->helper->get_current_url() === $this->helper->get_setup_page_url() ) {
+				&& strpos( $this->helper->get_current_url(), $this->helper->get_setup_page_url() ) !== false ) {
 			// @codingStandardsIgnoreLine
 			wp_redirect( home_url() );
 			exit();
