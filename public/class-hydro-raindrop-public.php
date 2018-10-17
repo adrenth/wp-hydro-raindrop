@@ -160,6 +160,9 @@ class Hydro_Raindrop_Public {
 			$flash = new Hydro_Raindrop_Flash( $user->user_login );
 			$flash->info( 'Enter the security code into the Hydro app to disable Hydro Raindrop MFA.' );
 
+			$cookie = new Hydro_Raindrop_Cookie( $this->plugin_name, $this->version );
+			$cookie->set( $user->ID );
+
 			// @codingStandardsIgnoreLine
 			wp_redirect( $redirect_url );
 			exit();

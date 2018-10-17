@@ -382,7 +382,7 @@ class Hydro_Raindrop_Shortcode {
 
 		return sprintf(
 			'<label>%s</label><label class="%s"><input name="%s" type="checkbox" value="1"%s%s><span class="slider"></span></label>',
-			esc_html__( 'Enable Multi Factor Authentication:', 'wp-hydro-raindrop' ),
+			esc_html__( 'Enable Multi Factor Authentication', 'wp-hydro-raindrop' ),
 			$attributes['class'],
 			Hydro_Raindrop_Helper::USER_META_MFA_ENABLED,
 			$hydro_raindrop_mfa_enabled ? ' checked' : '',

@@ -315,14 +315,13 @@ final class Hydro_Raindrop_Authenticate {
 		if ( ! $this->helper->is_mfa_page_enabled()
 				&& strpos( $this->helper->get_current_url(), 'wp-login.php' ) !== false
 		) {
-			$this->log( 'User not on Hydro Raindrop MFA page. Render MFA page.' );
-
 			$user = $this->get_current_mfa_user();
 
 			if ( $this->user_requires_setup_mfa( $user ) ) {
 				$this->start_mfa_setup( $user );
 			}
 
+			$this->log( 'User not on Hydro Raindrop MFA page. Render MFA page.' );
 			$this->start_mfa( $user );
 		}
 
