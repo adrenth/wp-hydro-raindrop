@@ -215,6 +215,8 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 		$this->loader->add_action( 'login_enqueue_scripts', $plugin_public, 'enqueue_login_styles' );
 
+		$this->loader->add_action( 'wp_head', $plugin_public, 'init_head' );
+		
 		/**
 		 * Action: show_user_profile
 		 *
@@ -286,7 +288,7 @@ class Hydro_Raindrop {
 		add_shortcode( 'hydro_raindrop_settings_button_submit', [ $plugin_shortcode, 'settings_button_submit' ] );
 		add_shortcode( 'hydro_raindrop_settings_form_close', [ $plugin_shortcode, 'settings_form_close' ] );
 
-		add_shortcode( 'hydro_raindrop_general_flash', [ $plugin_shortcode, 'general_flash' ] );
+		add_shortcode( 'hydro_raindrop_mfa_timed_out_notice', [ $plugin_shortcode, 'mfa_timed_out_notice' ] );
 
 	}
 

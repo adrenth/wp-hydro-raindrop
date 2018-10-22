@@ -68,6 +68,12 @@ final class Hydro_Raindrop_Helper {
 	const ACTION_PRE_MFA       = 'hydro_raindrop_pre_mfa';
 
 	/**
+	 * Cookie Flags
+	 */
+	const COOKIE_MFA_TIMED_OUT	= 'hydro_raindrop_cookie_mfa_timed_out';
+	
+	
+	/**
 	 * Construct the Helper.
 	 */
 	public function __construct() {

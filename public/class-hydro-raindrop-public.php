@@ -95,7 +95,8 @@ class Hydro_Raindrop_Public {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
-
+		wp_enqueue_script( 'jquery' );
+		
 		wp_enqueue_script(
 			$this->plugin_name,
 			plugin_dir_url( __FILE__ ) . 'js/hydro-raindrop-public.js',
@@ -106,8 +107,27 @@ class Hydro_Raindrop_Public {
 		);
 
 	}
-
+	
 	/**
+	 * Handle Timed out cookie for MFA
+	 *
+	 * @since    2.0.0
+	 */
+	public function init_head() {
+		if (isset($_COOKIE[COOKIE_MFA_TIMED_OUT]) && $_COOKIE[COOKIE_MFA_TIMED_OUT] == true) {
+			//delete the cookie
+			setcookie(COOKIE_MFA_TIMED_OUT, 'false', time()-3600, COOKIEPATH, '');
+			unset($_COOKIE[COOKIE_MFA_TIMED_OUT]);
+			
+			//do the shortcode
+			$sh = do_shortcode('[hydro_raindrop_mfa_timed_out_notice]');
+			echo "<script type='text/javascript'>var hydro_mfa_timed_out = '" . $sh . "';var hydro_mfa_timed_out_notice=true;</script>";
+			
+		}
+	}
+	
+
+	/**z
 	 * Extend the User Profile form.
 	 *
 	 * @param WP_User $user The current user.

@@ -423,15 +423,16 @@ class Hydro_Raindrop_Shortcode {
 	}
 
 	/**
-	 * Show general flash messages.
+	 * Show mfa timed out notice messages.
 	 *
 	 * @return string
 	 */
-	public function general_flash() : string {
-
-		return ( new Hydro_Raindrop_Flash( $this->plugin_name ) )
-			->render( 'hydro-flash-general' );
-
+	public function mfa_timed_out_notice() : string {
+		$logo = plugin_dir_url(dirname(__FILE__)) . "public/images/logo.svg";
+		
+		$html = '<div id="hydro-mfa-timed-out-notice"><div class="logo"><img src="' . $logo . '" alt="Hydro MFA Timed Out"></img></div><div class="text"><span>Multi Factor Authentication Timed Out, Please retry!</span></div><div class="close"><a href="#" title="Close Notice">x</a></div></div>';
+		
+		return $html;
 	}
 
 	/**
