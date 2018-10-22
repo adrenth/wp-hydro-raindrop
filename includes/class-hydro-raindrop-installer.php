@@ -192,7 +192,7 @@ final class Hydro_Raindrop_Installer {
 		delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_MFA_FAILED_ATTEMPTS, '', true );
 		delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_ACCOUNT_BLOCKED, '', true );
 		delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_REDIRECT_URL, '', true );
-		
+
 	}
 
 	/**
