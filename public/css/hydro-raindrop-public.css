@@ -188,6 +188,7 @@
     text-decoration: underline;
     font-weight: 400;
     color: #000;
+    text-transform: initial;
 }
 
 #hydro-container .hydro-body .item.actions input:hover,#hydro-container .hydro-body .item.actions input:focus {
@@ -492,7 +493,7 @@ body.hydro-mfa-timed-out-displayed {
 #hydro-mfa-timed-out-notice .close a {
     width: 20px;
     height: 20px;
-    line-height: 20px;
+    line-height: 18px;
     background: #ffffff;
     border-radius: 20px;
     display: block;
@@ -500,8 +501,15 @@ body.hydro-mfa-timed-out-displayed {
     color: #000000;
     cursor: pointer;
     cursor: hand;
+    font-family: 'Arial';
 }
 
 #hydro-mfa-timed-out-notice .close a:hover, #hydro-mfa-timed-out-notice .close a:focus {
     box-shadow: rgba(23, 43, 99, 0.68) 0 7px 28px;
+}
+
+#hydro-raindrop-creds-displayer {
+    display: block;
+    margin: 0 auto;
+    padding: 20px 0px;
 }

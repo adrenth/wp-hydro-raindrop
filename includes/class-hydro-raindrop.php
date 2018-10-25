@@ -99,7 +99,6 @@ class Hydro_Raindrop {
 	 * @access   private
 	 */
 	private function load_dependencies() {
-
 		$includes = [
 			// The class responsible for orchestrating the actions and filters of the core plugin.
 			__DIR__ . '/class-hydro-raindrop-loader.php',

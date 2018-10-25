@@ -114,11 +114,7 @@ class Hydro_Raindrop_Public {
 	 * @since    2.0.0
 	 */
 	public function init_head() {
-		if (isset($_COOKIE[COOKIE_MFA_TIMED_OUT]) && $_COOKIE[COOKIE_MFA_TIMED_OUT] == true) {
-			//delete the cookie
-			setcookie(COOKIE_MFA_TIMED_OUT, 'false', time()-3600, COOKIEPATH, '');
-			unset($_COOKIE[COOKIE_MFA_TIMED_OUT]);
-			
+		if (isset($_COOKIE[COOKIE_MFA_TIMED_OUT])) {
 			//do the shortcode
 			$sh = do_shortcode('[hydro_raindrop_mfa_timed_out_notice]');
 			echo "<script type='text/javascript'>var hydro_mfa_timed_out = '" . $sh . "';var hydro_mfa_timed_out_notice=true;</script>";

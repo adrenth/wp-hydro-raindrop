@@ -44,6 +44,20 @@ if ( file_exists( $composer ) ) {
  */
 define( 'HYDRO_RAINDROP_VERSION', '2.0.0' );
 
+
+/**
+ * Cookie Flags
+ */
+define( 'COOKIE_MFA_TIMED_OUT', 'COOKIE_MFA_TIMED_OUT');
+
+
+/**
+ * The core plugin class that is used to define templatization,
+ * admin-specific hooks, and public-facing site hooks.
+ */
+require plugin_dir_path( __FILE__ ) . 'includes/class-hydro-raindrop-templater.php';
+
+
 /**
  * The installer class which handles the activation,
  * deactivation and un-installation of this plugin.
@@ -73,5 +87,23 @@ function run_hydro_raindrop() {
 	$plugin->run();
 
 }
-
 run_hydro_raindrop();
+
+/** 
+ * For debugging only
+ */
+/*
+if (!function_exists('write_log')) {
+
+    function write_log($log) {
+        if (true === WP_DEBUG) {
+            if (is_array($log) || is_object($log)) {
+                error_log(print_r($log, true));
+            } else {
+                error_log($log);
+            }
+        }
+    }
+
+}
+*/
