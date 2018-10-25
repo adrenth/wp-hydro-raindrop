@@ -428,11 +428,17 @@ class Hydro_Raindrop_Shortcode {
 	 * @return string
 	 */
 	public function mfa_timed_out_notice() : string {
-		$logo = plugin_dir_url(dirname(__FILE__)) . "public/images/logo.svg";
-		
-		$html = '<div id="hydro-mfa-timed-out-notice"><div class="logo"><img src="' . $logo . '" alt="Hydro MFA Timed Out"></img></div><div class="text"><span>Multi Factor Authentication Timed Out, Please retry!</span></div><div class="close"><a href="#" title="Close Notice">x</a></div></div>';
-		
-		return $html;
+
+		ob_start();
+
+		include __DIR__ . '/partials/shortcode/mfa-timed-out-notice.php';
+
+		$output = ob_get_contents();
+
+		ob_end_clean();
+
+		return $output;
+
 	}
 
 	/**

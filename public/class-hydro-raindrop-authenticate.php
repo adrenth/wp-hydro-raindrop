@@ -144,15 +144,20 @@ final class Hydro_Raindrop_Authenticate {
 		} catch ( Hydro_Raindrop_CookieExpired $e ) {
 			$flash = new Hydro_Raindrop_Flash( $this->plugin_name );
 			$flash->warning( __( 'The Multi Factor Authentication process has been timed out.', 'wp-hydro-raindrop' ) );
-			
-			// check and set cookie timed out
-			if (!isset($_COOKIE[COOKIE_MFA_TIMED_OUT]) && $_COOKIE[COOKIE_MFA_TIMED_OUT] == false) {
-				setcookie(COOKIE_MFA_TIMED_OUT, 'true', time() + 36000, COOKIEPATH, '');
+
+			// @codingStandardsIgnoreStart
+
+			// Check and set cookie timed out
+			if ( ! isset( $_COOKIE[ Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT ] )
+				&& $_COOKIE[ Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT ] === 'false'
+			) {
+				setcookie( Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT, 'true', time() + 36000, COOKIEPATH, '' );
 			}
-			
-			// @codingStandardsIgnoreLine
+
 			wp_redirect( home_url() );
 			exit();
+
+			// @codingStandardsIgnoreEnd
 		}
 
 		$this->verify_post_request();

@@ -215,7 +215,7 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'login_enqueue_scripts', $plugin_public, 'enqueue_login_styles' );
 
 		$this->loader->add_action( 'wp_head', $plugin_public, 'init_head' );
-		
+
 		/**
 		 * Action: show_user_profile
 		 *
