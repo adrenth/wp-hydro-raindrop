@@ -151,7 +151,7 @@ final class Hydro_Raindrop_Authenticate {
 			if ( ! isset( $_COOKIE[ Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT ] )
 				&& $_COOKIE[ Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT ] === 'false'
 			) {
-				setcookie( Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT, 'true', time() + 36000, COOKIEPATH, '' );
+				setcookie( Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT, 'true', time() + 3600, COOKIEPATH, '' );
 			}
 
 			wp_redirect( home_url() );

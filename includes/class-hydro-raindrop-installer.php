@@ -78,15 +78,27 @@ final class Hydro_Raindrop_Installer {
 		}
 
 		$helper->publish_settings_page();
-		
-		// update post meta to point to custom template
-		update_post_meta( get_option (Hydro_Raindrop_Helper::OPTION_PAGE_MFA ), '_wp_page_template', 'template-hydro-mfa-display.php' );
-		
-		// update post meta to point to custom template
-		update_post_meta( get_option(Hydro_Raindrop_Helper::OPTION_PAGE_SETUP ), '_wp_page_template', 'template-hydro-mfa-display.php' );
 
-		// update post meta to point to custom template
-		update_post_meta( get_option(Hydro_Raindrop_Helper::OPTION_PAGE_SETTINGS ), '_wp_page_template', 'template-hydro-mfa-display.php' );
+		// Update post meta to point to custom template.
+		update_post_meta(
+			get_option( Hydro_Raindrop_Helper::OPTION_PAGE_MFA ),
+			'_wp_page_template',
+			'template-hydro-mfa-display.php'
+		);
+
+		// Update post meta to point to custom template.
+		update_post_meta(
+			get_option( Hydro_Raindrop_Helper::OPTION_PAGE_SETUP ),
+			'_wp_page_template',
+			'template-hydro-mfa-display.php'
+		);
+
+		// Update post meta to point to custom template.
+		update_post_meta(
+			get_option( Hydro_Raindrop_Helper::OPTION_PAGE_SETTINGS ),
+			'_wp_page_template',
+			'template-hydro-mfa-display.php'
+		);
 
 		update_option( Hydro_Raindrop_Helper::OPTION_ENABLED, 1 );
 		update_option( Hydro_Raindrop_Helper::OPTION_MFA_MAXIMUM_ATTEMPTS, 0 );

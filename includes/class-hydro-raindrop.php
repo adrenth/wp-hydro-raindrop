@@ -125,7 +125,7 @@ class Hydro_Raindrop {
 			// The class responsible for handling the meta boxes.
 			__DIR__ . '/../public/class-hydro-raindrop-metabox.php',
 			// Cookie Expired Exception.
-			__DIR__ . '/exceptions/class-hydro-raindrop-cookieexpired.php'
+			__DIR__ . '/exceptions/class-hydro-raindrop-cookieexpired.php',
 		];
 
 		foreach ( $includes as $include ) {
@@ -214,6 +214,13 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 		$this->loader->add_action( 'login_enqueue_scripts', $plugin_public, 'enqueue_login_styles' );
 
+		/**
+		 * Action: wp_head
+		 *
+		 * The wp_head action hook is triggered within the <head></head> section of the user's template by
+		 * the wp_head() function. Although this is theme-dependent, it is one of the most essential theme hooks,
+		 * so it is widely supported.
+		 */
 		$this->loader->add_action( 'wp_head', $plugin_public, 'init_head' );
 
 		/**
@@ -253,12 +260,41 @@ class Hydro_Raindrop {
 		 */
 		$this->loader->add_filter( 'init', $plugin_authenticate, 'verify', 0 );
 
+		if ( version_compare( (string) get_bloginfo( 'version' ), '4.7', '<' ) ) {
+
+			/**
+			 * Filter: page_attributes_dropdown_pages_args
+			 *
+			 * Filters the arguments used to generate a Pages drop-down element.
+			 */
+			$this->loader->add_filter( 'page_attributes_dropdown_pages_args', $plugin_public, 'register_templates' );
+
+		} else {
+
+			$this->loader->add_filter( 'theme_page_templates', $plugin_public, 'add_new_template' );
+
+		}
+
+		/**
+		 * Filter: wp_insert_post_data
+		 *
+		 * A filter hook called by the wp_insert_post function prior to inserting into or updating the database.
+		 */
+		$this->loader->add_filter( 'wp_insert_post_data', $plugin_public, 'register_templates' );
+
+		/**
+		 * Filter: template_include
+		 *
+		 * This filter hook is executed immediately before WordPress includes the predetermined template file.
+		 * This can be used to override WordPress's default template behavior.
+		 */
+		$this->loader->add_filter( 'template_include', $plugin_public, 'view_template' );
+
 		/**
 		 * Shortcodes
 		 *
 		 * @see https://codex.wordpress.org/Shortcode_API
 		 */
-
 		$plugin_shortcode = new Hydro_Raindrop_Shortcode(
 			$this->get_plugin_name(),
 			$this->get_version()
