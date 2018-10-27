@@ -73,10 +73,12 @@
     flex-shrink: 1;
     flex-direction: row;
     justify-content: space-between;
+    flex-wrap: nowrap;
 }
 
 #hydro-container .hydro-body .item.side label {
     font-weight: 400;
+    flex-shrink: 1;
 }
 
 #hydro-container .hydro-body .item .hydro-illustration {
@@ -256,6 +258,7 @@
     display: inline-block;
     width: 54px;
     height: 28px;
+    flex-shrink: 0 !important;
 }
 
 #hydro-container .hydro-body .item .switch * {
@@ -511,5 +514,5 @@ body.hydro-mfa-timed-out-displayed {
 #hydro-raindrop-creds-displayer {
     display: block;
     margin: 0 auto;
-    padding: 20px 0px;
+    padding: 20px 15px;
 }
