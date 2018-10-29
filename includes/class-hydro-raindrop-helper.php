@@ -70,9 +70,8 @@ final class Hydro_Raindrop_Helper {
 	/**
 	 * Cookie Flags
 	 */
-	const COOKIE_MFA_TIMED_OUT	= 'hydro_raindrop_cookie_mfa_timed_out';
-	
-	
+	const COOKIE_MFA_TIMED_OUT = 'hydro_raindrop_cookie_mfa_timed_out';
+
 	/**
 	 * Construct the Helper.
 	 */

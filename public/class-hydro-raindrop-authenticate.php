@@ -142,6 +142,8 @@ final class Hydro_Raindrop_Authenticate {
 		try {
 			$cookie_is_valid = $this->cookie->validate();
 		} catch ( Hydro_Raindrop_CookieExpired $e ) {
+			$this->log( 'Cookie has expired.' );
+
 			$flash = new Hydro_Raindrop_Flash( $this->plugin_name );
 			$flash->warning( __( 'The Multi Factor Authentication process has been timed out.', 'wp-hydro-raindrop' ) );
 
@@ -149,7 +151,7 @@ final class Hydro_Raindrop_Authenticate {
 
 			// Check and set cookie timed out
 			if ( ! isset( $_COOKIE[ Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT ] )
-				&& $_COOKIE[ Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT ] === 'false'
+				|| $_COOKIE[ Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT ] === 'false'
 			) {
 				setcookie( Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT, 'true', time() + 3600, COOKIEPATH, '' );
 			}
@@ -162,9 +164,6 @@ final class Hydro_Raindrop_Authenticate {
 		$this->verify_post_request();
 
 		$cookie_elements = $this->cookie->parse();
-
-		// @codingStandardsIgnoreStart
-		$is_post = $_SERVER['REQUEST_METHOD'] === 'POST';
 
 		if ( ! $cookie_is_valid && $cookie_elements ) {
 			$this->log( 'Unset MFA cookie. MFA cookie did not pass validation.' );
@@ -201,26 +200,24 @@ final class Hydro_Raindrop_Authenticate {
 			exit();
 		}
 
+		// @codingStandardsIgnoreLine
+		$post_id = url_to_postid( $this->helper->get_current_url() );
+
 		/*
 		 * Perform re-verification on post.
 		 */
-		if ( ! $cookie_is_valid
-				&& is_user_logged_in()
-		) {
-			$user              = false;
-			$mfa_required      = false;
-			$mfa_timestamp     = 0; // If timestamp > 0; the MFA has been successfully completed for post.
-			$post_id           = url_to_postid( $this->helper->get_current_url() );
-			$post_verification = false;
+		if ( is_user_logged_in() ) {
+			$user          = false;
+			$mfa_required  = false;
+			$mfa_timestamp = 0; // If timestamp > 0; the MFA has been successfully completed for post.
 
 			if ( $post_id > 0 ) {
-				$user              = wp_get_current_user();
-				$mfa_required      = (bool) get_post_meta( $post_id, Hydro_Raindrop_Helper::POST_META_MFA_REQUIRED, true );
-				$mfa_timestamp     = (string) get_transient( sprintf( self::TRANSIENT_ID_POST_VERIFIED, $user->ID, $post_id ) );
-				$post_verification = (int) get_transient( sprintf( self::TRANSIENT_ID_POST_VERIFICATION, $user->ID ) );
+				$user          = wp_get_current_user();
+				$mfa_required  = (bool) get_post_meta( $post_id, Hydro_Raindrop_Helper::POST_META_MFA_REQUIRED, true );
+				$mfa_timestamp = (string) get_transient( sprintf( self::TRANSIENT_ID_POST_VERIFIED, $user->ID, $post_id ) );
 			}
 
-			if ( $post_verification === 0 && $mfa_required && $user && '' === $mfa_timestamp ) {
+			if ( $mfa_required && $user && '' === $mfa_timestamp ) {
 				// @codingStandardsIgnoreLine
 				update_user_meta(
 					$user->ID,
@@ -247,6 +244,8 @@ final class Hydro_Raindrop_Authenticate {
 
 		$user = $this->get_current_mfa_user();
 
+		$mfa_post_id = (int) get_transient( sprintf( self::TRANSIENT_ID_POST_VERIFICATION, $user->ID ) );
+
 		/*
 		 * Redirect to MFA page if not already.
 		 */
@@ -254,6 +253,21 @@ final class Hydro_Raindrop_Authenticate {
 				&& $this->user_requires_mfa( $user )
 				&& strpos( $this->helper->get_current_url(), $this->helper->get_mfa_page_url() ) === false
 		) {
+			if ( $mfa_post_id > 0 ) {
+				$this->log( 'Post re-authentication MFA in effect, but different page accessed. Cancel MFA.' );
+				delete_transient( sprintf( self::TRANSIENT_ID_POST_VERIFICATION, $user->ID ) );
+				delete_transient( sprintf( self::TRANSIENT_ID_POST_VERIFIED, $user->ID, $mfa_post_id ) );
+				$this->cookie->unset();
+
+				if ( $mfa_post_id === $post_id ) {
+					// @codingStandardsIgnoreLine
+					wp_redirect( home_url() );
+					exit();
+				}
+
+				return;
+			}
+
 			$this->log( 'User not on Hydro Raindrop MFA page. Redirecting...' );
 
 			// @codingStandardsIgnoreLine

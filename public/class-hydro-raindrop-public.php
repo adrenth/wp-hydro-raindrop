@@ -135,7 +135,7 @@ class Hydro_Raindrop_Public {
 		if ( $_COOKIE[ Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT ] === 'true' ) {
 
 			// Delete the cookie.
-			setcookie( Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT, 'false', time() - 3600, COOKIEPATH, '' );
+			//setcookie( Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT, 'false', time() - 3600, COOKIEPATH, '' );
 			unset( $_COOKIE[ Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT ] );
 
 			$output = do_shortcode( '[hydro_raindrop_mfa_timed_out_notice]' );
