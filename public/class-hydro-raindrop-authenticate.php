@@ -156,7 +156,6 @@ final class Hydro_Raindrop_Authenticate {
 
 			wp_redirect( home_url() );
 			exit();
-
 			// @codingStandardsIgnoreEnd
 		}
 
@@ -176,44 +175,8 @@ final class Hydro_Raindrop_Authenticate {
 		 * Perform first time verification.
 		 */
 		if ( $this->is_request_verify() && is_user_logged_in() ) {
-
 			$this->log( 'Start first time verification.' );
 			$this->start_mfa( wp_get_current_user() );
-
-		}
-
-		/*
-		 * Allow administrator to view the custom pages.
-		 */
-		if ( ! $cookie_is_valid
-				&& ! $is_post
-				&& is_user_logged_in()
-		) {
-			$user = wp_get_current_user();
-
-			if ( user_can( $user, 'administrator' )
-					&& $this->helper->is_mfa_page_enabled()
-					&& $this->helper->get_current_url() === $this->helper->get_mfa_page_url()
-			) {
-				$this->log( 'Allow administrator to view the MFA page.' );
-				return;
-			}
-
-			if ( user_can( $user, 'administrator' )
-					&& $this->helper->is_setup_page_enabled()
-					&& $this->helper->get_current_url() === $this->helper->get_setup_page_url()
-			) {
-				$this->log( 'Allow administrator to view the Setup page.' );
-				return;
-			}
-
-			if ( user_can( $user, 'administrator' )
-					&& $this->helper->is_settings_page_enabled()
-					&& $this->helper->get_current_url() === $this->helper->get_settings_page_url()
-			) {
-				$this->log( 'Allow administrator to view the Settings page.' );
-				return;
-			}
 		}
 
 		/*
@@ -302,7 +265,6 @@ final class Hydro_Raindrop_Authenticate {
 		 * User requires Hydro Raindrop MFA setup.
 		 */
 		if ( $this->user_requires_setup_mfa( $user ) ) {
-
 			$this->log( 'User requires setup Hydro Raindrop MFA.' );
 
 			if ( $this->helper->is_setup_page_enabled()
@@ -316,7 +278,6 @@ final class Hydro_Raindrop_Authenticate {
 			}
 
 			$this->start_mfa_setup( $user );
-
 		}
 
 		/*
