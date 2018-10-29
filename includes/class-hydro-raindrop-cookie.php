@@ -17,7 +17,7 @@ class Hydro_Raindrop_Cookie {
 	 *
 	 * @var string
 	 */
-	const NAME = 'HydroRaindropMfa';
+	const NAME = 'hydro_raindrop_cookie_mfa';
 
 	/**
 	 * Multi Factor Timeout in seconds.
