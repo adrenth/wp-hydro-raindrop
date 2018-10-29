@@ -7,19 +7,19 @@ $j = jQuery.noConflict();
 
 		// Check if the cookie flag is enabled.
 		if ( typeof HYDRO_MFA_TIMED_OUT_NOTICE !== "undefined" && HYDRO_MFA_TIMED_OUT_NOTICE ) {
-			$j( "body" ).prepend( HYDRO_MFA_TIMED_OUT );
+
+			var doc = new DOMParser().parseFromString( HYDRO_MFA_TIMED_OUT, "text/html" );
+
+			$j( "body" ).prepend( decodeURI( doc.documentElement.textContent ) );
 			$j( "body" ).addClass( "hydro-mfa-timed-out-displayed" );
 
-			$j( '#hydro-mfa-timed-out-notice .close a' ).click( function ( event ) {
+			$j( "#hydro-mfa-timed-out-notice .close a" ).click( function ( event ) {
 				event.preventDefault();
 				$j( "body" ).removeClass( "hydro-mfa-timed-out-displayed" );
 				$j( "#hydro-mfa-timed-out-notice" ).remove();
 			} );
 
-			var delete_cookie = function( name ) {
-				document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-			};
-			delete_cookie( "COOKIE_MFA_TIMED_OUT" );
+			document.cookie = "hydro_raindrop_cookie_mfa_timed_out=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
 		}
 
 	} );
