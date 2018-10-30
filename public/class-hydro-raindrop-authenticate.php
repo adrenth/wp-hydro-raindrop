@@ -163,6 +163,19 @@ final class Hydro_Raindrop_Authenticate {
 
 		$this->verify_post_request();
 
+		/*
+		 * Skip further verification when we're at the MFA Settings page.
+		 */
+		if ( $this->helper->is_settings_page_enabled()
+				&& strpos( $this->helper->get_current_url(), $this->helper->get_mfa_page_url() ) !== false
+		) {
+			$this->log( 'Accessing Custom MFA Settings page.' );
+			return;
+		}
+
+		/*
+		 * Validating MFA cookie.
+		 */
 		$cookie_elements = $this->cookie->parse();
 
 		if ( ! $cookie_is_valid && $cookie_elements ) {
