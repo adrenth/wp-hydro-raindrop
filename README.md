@@ -1,12 +1,20 @@
 # WP Hydro Raindrop
 
+[![GitHub issues](https://img.shields.io/github/issues/adrenth/wp-hydro-raindrop.svg)](https://github.com/adrenth/wp-hydro-raindrop/issues)
+[![GitHub forks](https://img.shields.io/github/forks/adrenth/wp-hydro-raindrop.svg)](https://github.com/adrenth/wp-hydro-raindrop/network)
+[![GitHub stars](https://img.shields.io/github/stars/adrenth/wp-hydro-raindrop.svg)](https://github.com/adrenth/wp-hydro-raindrop/stargazers)
+[![GitHub license](https://img.shields.io/github/license/adrenth/wp-hydro-raindrop.svg)](https://github.com/adrenth/wp-hydro-raindrop)
+![Version](https://img.shields.io/badge/version-2.0.0-brightgreen.svg)
+
 Welcome to the Hydro Raindrop WordPress plugin repository on GitHub.
 
 ![Hydro Logo](https://i.imgur.com/slcCepB.png)
 
 The `WP Hydro Raindrop` plugin provides Hydro Raindrop Multi Factor Authentication to your WordPress site.
 
-[![Hydro Raindrop 2FA vs Google Authenticator](http://img.youtube.com/vi/d88jbPdxI88/0.jpg)](http://www.youtube.com/watch?v=d88jbPdxI88 "Hydro Raindrop 2FA vs Google Authenticator")
+<div align="center">
+  <a href="https://www.youtube.com/watch?v=d88jbPdxI88"><img src="https://img.youtube.com/vi/d88jbPdxI88/0.jpg" alt="Hydro Raindrop 2FA vs Google Authenticator"></a>
+</div>
 
 ## Features
 
@@ -245,9 +253,9 @@ If you want to address an issue/bug, please create an issue first.
 ## Further reading
 For more info on Hydro or MFA and how it’s changing the world, check out the following:
 
-* [Hydro's official site](https://www.hydrogenplatform.com/)
-* [Hydro’s Medium Blog](https://medium.com/hydrogen-api)
-* [Hydro MFA Client Side Raindrop API](https://www.hydrogenplatform.com/docs/hydro/v1/)
-* Become a part of the fastest growing Community! [Join Hydro Community](https://github.com/HydroCommunity)
-* Are you a developer interested in expanding the Hydro ecosystem and earning bounties? [Visit Hydro HCDP Github Page](https://github.com/hydrogen-dev/hcdp/issues)
-* Follow Hydro on [Telegram](https://t.me/projecthydro), [Facebook](https://www.facebook.com/hydrogenplatform), [Twitter](https://twitter.com/hydrogenapi) or [Instagram](https://www.instagram.com/hydrogenplatform/)
+* [Hydro's Official Site](https://www.hydrogenplatform.com/).
+* [Hydro's Medium Blog](https://medium.com/hydrogen-api).
+* [Hydro MFA Client Side Raindrop API](https://www.hydrogenplatform.com/docs/hydro/v1/).
+* Become a part of the fastest growing Community! [Join Hydro Community](https://github.com/HydroCommunity).
+* Are you a developer interested in expanding the Hydro ecosystem and earning bounties? [Visit Hydro HCDP Github Page](https://github.com/hydrogen-dev/hcdp/issues).
+* Follow Hydro on [Telegram](https://t.me/projecthydro), [Facebook](https://www.facebook.com/hydrogenplatform), [Twitter](https://twitter.com/hydrogenapi) or [Instagram](https://www.instagram.com/hydrogenplatform/).
