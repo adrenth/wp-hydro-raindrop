@@ -1,5 +1,16 @@
 # wp-hydro-raindrop
 
+## 2.0.0
+
+- Added Plugin requirements check.
+- Added Custom Pages for the Hydro Raindrop MFA flow.
+- Added shortcodes which allow developers to fully customize the Hydro Raindrop integration.
+- Added support for re-authentication for (custom) Posts.
+- Added support for users to set-up their HydroID in the MFA flow.
+- Improved MFA flow security
+- Added support for forcing users to use MFA.
+- Added actions/filters for developers to hook into the MFA flow.
+
 ## 1.4.1
 
 - Updated Author.
