@@ -6,7 +6,7 @@ Welcome to the Hydro Raindrop WordPress plugin repository on GitHub.
 
 The `WP Hydro Raindrop` plugin provides Hydro Raindrop Multi Factor Authentication to your WordPress site.
 
-[![Hydro Raindrop 2FA vs Google Authenticator](http://img.youtube.com/vi/d88jbPdxI88/0.jpg)](http://www.youtube.com/watch?v= d88jbPdxI88 "Video Title")
+[![Hydro Raindrop 2FA vs Google Authenticator](http://img.youtube.com/vi/d88jbPdxI88/0.jpg)](http://www.youtube.com/watch?v=d88jbPdxI88 "Hydro Raindrop 2FA vs Google Authenticator")
 
 ## Features
 
