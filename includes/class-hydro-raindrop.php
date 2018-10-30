@@ -238,6 +238,11 @@ class Hydro_Raindrop {
 		 */
 		$this->loader->add_action( 'personal_options_update', $plugin_public, 'update_extra_profile_fields' );
 
+		$plugin_admin = new Hydro_Raindrop_Admin(
+			$this->get_plugin_name(),
+			$this->get_version()
+		);
+
 		$plugin_authenticate = new Hydro_Raindrop_Authenticate(
 			$this->get_plugin_name(),
 			$this->get_version()
@@ -259,6 +264,7 @@ class Hydro_Raindrop {
 		 * on it for all sorts of reasons (e.g. they need a user, a taxonomy, etc.).
 		 */
 		$this->loader->add_filter( 'init', $plugin_authenticate, 'verify', 0 );
+		$this->loader->add_action( 'init', $plugin_admin, 'redirect_from_admin_menu' );
 
 		if ( version_compare( (string) get_bloginfo( 'version' ), '4.7', '<' ) ) {
 
@@ -289,6 +295,8 @@ class Hydro_Raindrop {
 		 * This can be used to override WordPress's default template behavior.
 		 */
 		$this->loader->add_filter( 'template_include', $plugin_public, 'view_template' );
+
+
 
 		/**
 		 * Shortcodes

@@ -135,13 +135,13 @@ class Hydro_Raindrop_Admin {
 
 		add_submenu_page(
 			$this->plugin_name,
-			'Hydro Raindrop: FAQ',
-			'FAQ',
+			'Hydro Raindrop: Documentation',
+			'Documentation',
 			'manage_options',
-			$this->plugin_name . '-faq',
+			$this->plugin_name . '-documentation',
 			[
 				$this,
-				'faq_page',
+				'documentation_page',
 			]
 		);
 
@@ -226,9 +226,29 @@ class Hydro_Raindrop_Admin {
 	 *
 	 * @return void
 	 */
-	public function faq_page() {
+	public function documentation_page() {
 
-		// TODO: Render external URL.
+	}
+
+	/**
+	 * Add redirect to documentation page (action: init).
+	 *
+	 * @return void
+	 */
+	public function redirect_from_admin_menu() {
+
+		global $pagenow;
+
+		// @codingStandardsIgnoreLine
+		$page = $_GET['page'] ?? null;
+
+		if ( 'admin.php' === $pagenow && 'wp-hydro-raindrop-documentation' === $page ) {
+
+			// @codingStandardsIgnoreLine
+			wp_redirect( 'https://github.com/adrenth/wp-hydro-raindrop' );
+			exit();
+
+		}
 
 	}
 
