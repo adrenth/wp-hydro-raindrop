@@ -143,6 +143,19 @@ final class Hydro_Raindrop_Helper {
 	}
 
 	/**
+	 * Get the MFA page ID.
+	 *
+	 * @return int|bool
+	 */
+	public function get_mfa_page_id() {
+
+		$post_id = (int) get_option( self::OPTION_PAGE_MFA );
+
+		return $post_id > 0 ? $post_id : false;
+
+	}
+
+	/**
 	 * Get the HydroID page URL.
 	 *
 	 * @return string
@@ -156,6 +169,19 @@ final class Hydro_Raindrop_Helper {
 	}
 
 	/**
+	 * Get the HydroID page ID.
+	 *
+	 * @return int|bool
+	 */
+	public function get_setup_page_id() {
+
+		$post_id = (int) get_option( self::OPTION_PAGE_SETUP );
+
+		return $post_id > 0 ? $post_id : false;
+
+	}
+
+	/**
 	 * Get the Settings page URL.
 	 *
 	 * @return string
@@ -165,6 +191,19 @@ final class Hydro_Raindrop_Helper {
 		$post_id = (int) get_option( self::OPTION_PAGE_SETTINGS );
 
 		return $post_id > 0 ? get_permalink( $post_id ) : '';
+
+	}
+
+	/**
+	 * Get the Settings page ID.
+	 *
+	 * @return int|bool
+	 */
+	public function get_settings_page_id() {
+
+		$post_id = (int) get_option( self::OPTION_PAGE_SETTINGS );
+
+		return $post_id > 0 ? $post_id : false;
 
 	}
 

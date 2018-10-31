@@ -151,7 +151,7 @@ final class Hydro_Raindrop_Authenticate {
 
 			// Check and set cookie timed out
 			if ( ! isset( $_COOKIE[ Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT ] )
-				|| $_COOKIE[ Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT ] === 'false'
+					|| $_COOKIE[ Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT ] === 'false'
 			) {
 				setcookie( Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT, 'true', time() + 3600, COOKIEPATH, '' );
 			}
@@ -163,11 +163,14 @@ final class Hydro_Raindrop_Authenticate {
 
 		$this->verify_post_request();
 
+		// @codingStandardsIgnoreLine
+		$post_id = url_to_postid( $this->helper->get_current_url() );
+
 		/*
 		 * Skip further verification when we're at the MFA Settings page.
 		 */
 		if ( $this->helper->is_settings_page_enabled()
-				&& strpos( $this->helper->get_current_url(), $this->helper->get_mfa_page_url() ) !== false
+				&& $this->helper->get_settings_page_id() === $post_id
 		) {
 			$this->log( 'Accessing Custom MFA Settings page.' );
 			return;
@@ -196,7 +199,9 @@ final class Hydro_Raindrop_Authenticate {
 		 */
 		if ( ! $cookie_is_valid
 				&& $this->helper->is_mfa_page_enabled()
-				&& strpos( $this->helper->get_current_url(), $this->helper->get_mfa_page_url() ) !== false ) {
+				&& $this->helper->get_mfa_page_id() === $post_id
+		) {
+			$this->log( 'Cookie not valid. User accessing MFA Page which is not allowed. Redirecting to home.' );
 			// @codingStandardsIgnoreLine
 			wp_redirect( home_url() );
 			exit();
@@ -207,14 +212,13 @@ final class Hydro_Raindrop_Authenticate {
 		 */
 		if ( ! $cookie_is_valid
 				&& $this->helper->is_setup_page_enabled()
-				&& strpos( $this->helper->get_current_url(), $this->helper->get_setup_page_url() ) !== false ) {
+				&& $this->helper->get_setup_page_id() === $post_id
+		) {
+			$this->log( 'Cookie not valid. User accessing MFA Setup Page which is not allowed. Redirecting to home.' );
 			// @codingStandardsIgnoreLine
 			wp_redirect( home_url() );
 			exit();
 		}
-
-		// @codingStandardsIgnoreLine
-		$post_id = url_to_postid( $this->helper->get_current_url() );
 
 		/*
 		 * Perform re-verification on post.
@@ -231,6 +235,8 @@ final class Hydro_Raindrop_Authenticate {
 			}
 
 			if ( $mfa_required && $user && '' === $mfa_timestamp ) {
+				$this->log( 'Storing Redirect URL: ' . $this->helper->get_current_url() );
+
 				// @codingStandardsIgnoreLine
 				update_user_meta(
 					$user->ID,
@@ -238,14 +244,14 @@ final class Hydro_Raindrop_Authenticate {
 					$this->helper->get_current_url()
 				);
 
+				$this->log( sprintf( 'User %s is accessing a post which requires MFA.', $user->user_login ) );
+
 				// Register for which Post we need to perform a MFA.
 				set_transient(
 					sprintf( self::TRANSIENT_ID_POST_VERIFICATION, $user->ID ),
 					$post_id,
 					Hydro_Raindrop_Cookie::MFA_TIME_OUT
 				);
-
-				$this->log( sprintf( 'User %s is accessing a post which requires MFA.', $user->user_login ) );
 
 				$this->start_mfa( $user );
 			}
@@ -264,7 +270,7 @@ final class Hydro_Raindrop_Authenticate {
 		 */
 		if ( $this->helper->is_mfa_page_enabled()
 				&& $this->user_requires_mfa( $user )
-				&& strpos( $this->helper->get_current_url(), $this->helper->get_mfa_page_url() ) === false
+				&& $this->helper->get_mfa_page_id() !== $post_id
 		) {
 			if ( $mfa_post_id > 0 ) {
 				$this->log( 'Post re-authentication MFA in effect, but different page accessed. Cancel MFA.' );
@@ -295,7 +301,7 @@ final class Hydro_Raindrop_Authenticate {
 			$this->log( 'User requires setup Hydro Raindrop MFA.' );
 
 			if ( $this->helper->is_setup_page_enabled()
-					&& $this->helper->get_current_url() !== $this->helper->get_setup_page_url()
+					&& $this->helper->get_setup_page_id() !== $post_id
 			) {
 				$this->log( 'User not on Hydro Raindrop Setup page. Redirecting...' );
 
@@ -499,6 +505,7 @@ final class Hydro_Raindrop_Authenticate {
 	 * Start Hydro Raindrop Multi Factor Authentication.
 	 *
 	 * @param WP_User $user Authenticated user.
+	 *
 	 * @throws Exception If message could not be generated.
 	 */
 	private function start_mfa( WP_User $user ) {
@@ -518,9 +525,15 @@ final class Hydro_Raindrop_Authenticate {
 		// Redirect to the Custom MFA page (if applicable).
 		if ( $this->helper->is_mfa_page_enabled() ) {
 
+			// @codingStandardsIgnoreLine
+			$post_id = url_to_postid( $this->helper->get_current_url() );
+
 			$this->log( 'MFA page is enabled.' );
 
-			if ( strpos( $this->helper->get_current_url(), $this->helper->get_mfa_page_url() ) !== 0 ) {
+			if ( $this->helper->get_mfa_page_id() !== $post_id ) {
+
+				$this->log( 'MFA Page is enabled but currently not on MFA Page. Redirecting to MFA page.' );
+
 				// @codingStandardsIgnoreLine
 				wp_redirect( $this->helper->get_mfa_page_url() );
 				exit();
@@ -529,7 +542,8 @@ final class Hydro_Raindrop_Authenticate {
 			return;
 		}
 
-		// Render the default MFA page.
+		$this->log( 'Render the default MFA Page.' );
+
 		require __DIR__ . '/partials/hydro-raindrop-public-mfa.php';
 		exit();
 
@@ -539,6 +553,7 @@ final class Hydro_Raindrop_Authenticate {
 	 * Start Hydro Raindrop Setup.
 	 *
 	 * @param WP_User $user Authenticated user.
+	 *
 	 * @return void
 	 */
 	private function start_mfa_setup( WP_User $user ) {
@@ -562,6 +577,8 @@ final class Hydro_Raindrop_Authenticate {
 			return;
 		}
 
+		$this->log( 'Render the default MFA Setup Page.' );
+
 		require __DIR__ . '/partials/hydro-raindrop-public-setup.php';
 		exit();
 
@@ -571,12 +588,13 @@ final class Hydro_Raindrop_Authenticate {
 	 * Handle Setup POST Request.
 	 *
 	 * @param WP_User $user Authenticated user.
+	 *
 	 * @return bool
 	 */
 	private function handle_setup( WP_User $user ) : bool {
 
 		// @codingStandardsIgnoreLine
-		$hydro_id = sanitize_text_field( (string) ( $_POST[ 'hydro_id' ] ?? '' ) );
+		$hydro_id = sanitize_text_field( (string) ( $_POST['hydro_id'] ?? '' ) );
 		$flash    = new Hydro_Raindrop_Flash( $user->user_login );
 		$client   = Hydro_Raindrop::get_raindrop_client();
 		$length   = strlen( $hydro_id );
@@ -654,6 +672,7 @@ final class Hydro_Raindrop_Authenticate {
 	 * Handle MFA POST Request.
 	 *
 	 * @param WP_User $user Authenticated user.
+	 *
 	 * @return bool
 	 */
 	private function handle_mfa( WP_User $user ) : bool {
@@ -673,6 +692,7 @@ final class Hydro_Raindrop_Authenticate {
 	 * Handle a successful MFA.
 	 *
 	 * @param WP_User $user The user for which the MFA was successful.
+	 *
 	 * @return void
 	 */
 	private function handle_mfa_success( WP_User $user ) {
@@ -764,6 +784,7 @@ final class Hydro_Raindrop_Authenticate {
 	 * Handle a MFA failure.
 	 *
 	 * @param WP_User $user The user for which the MFA has failed.
+	 *
 	 * @return void
 	 */
 	private function handle_mfa_failure( WP_User $user ) {
@@ -817,6 +838,7 @@ final class Hydro_Raindrop_Authenticate {
 	 * Handle Settings POST Request.
 	 *
 	 * @param WP_User $user Authenticated user.
+	 *
 	 * @return bool
 	 */
 	private function handle_settings( WP_User $user ) : bool {
@@ -833,6 +855,7 @@ final class Hydro_Raindrop_Authenticate {
 	 *
 	 * @param WP_User $user     Authenticated user.
 	 * @param bool    $remember Whether to remember the user.
+	 *
 	 * @return void
 	 */
 	private function set_auth_cookie( WP_User $user, bool $remember = false ) {
@@ -880,7 +903,7 @@ final class Hydro_Raindrop_Authenticate {
 		 */
 		$redirect_to = apply_filters( 'login_redirect', $redirect_to, $requested_redirect_to, $user );
 
-		if ( ( empty( $redirect_to ) || 'wp-admin/' === $redirect_to || $redirect_to === admin_url() ) ) {
+		if ( ( empty( $redirect_to ) || 'wp-admin/' === $redirect_to || admin_url() === $redirect_to ) ) {
 			/*
 			 * If the user doesn't belong to a blog, send them to user admin.
 			 * If the user can't edit posts, send them to their profile.
@@ -937,7 +960,7 @@ final class Hydro_Raindrop_Authenticate {
 	private function is_action_disable() : bool {
 
 		// @codingStandardsIgnoreLine
-		return ( $_GET['hydro-raindrop-action'] ?? '') === 'disable';
+		return ( $_GET['hydro-raindrop-action'] ?? '' ) === 'disable';
 
 	}
 
@@ -949,7 +972,7 @@ final class Hydro_Raindrop_Authenticate {
 	private function is_action_enable() : bool {
 
 		// @codingStandardsIgnoreLine
-		return ( $_GET['hydro-raindrop-action'] ?? '') === 'enable';
+		return ( $_GET['hydro-raindrop-action'] ?? '' ) === 'enable';
 
 	}
 
@@ -1073,6 +1096,7 @@ final class Hydro_Raindrop_Authenticate {
 			return true;
 		} catch ( VerifySignatureFailed $e ) {
 			$this->log( $e->getMessage() );
+
 			return false;
 		}
 
