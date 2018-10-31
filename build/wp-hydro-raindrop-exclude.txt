@@ -1,3 +1,3 @@
 ../../wp-hydro-raindrop/.git/*
 ../../wp-hydro-raindrop/vendor/adrenth/raindrop-sdk/.git/*
-../../build/*
+../../wp-hydro-raindrop/build/*

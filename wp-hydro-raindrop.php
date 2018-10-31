@@ -11,7 +11,7 @@
  * Plugin Name:       WP Hydro Raindrop
  * Plugin URI:        https://github.com/adrenth/wp-hydro-raindrop
  * Description:       A WordPress plugin to integrate Hydro Raindrop MFA
- * Version:           1.4.2
+ * Version:           2.0.0
  * Author:            Hydrogen API
  * Author URI:        https://hydrogenplatform.com
  * License:           GPL-2.0+
@@ -25,8 +25,15 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-// Require composer autoloader if installed on it's own
-if ( file_exists( $composer = __DIR__ . '/vendor/autoload.php' ) ) {
+// Require composer autoloader if installed on it's own.
+$composer = __DIR__ . '/vendor/autoload.php';
+
+if ( file_exists( $composer ) ) {
+	/**
+	 * Expression is not analysed.
+	 *
+	 * @noinspection PhpIncludeInspection
+	 */
 	require_once $composer;
 }
 
@@ -35,33 +42,17 @@ if ( file_exists( $composer = __DIR__ . '/vendor/autoload.php' ) ) {
  *
  * @var string
  */
-define( 'HYDRO_RAINDROP_VERSION', '1.4.2' );
+define( 'HYDRO_RAINDROP_VERSION', '2.0.0' );
 
 /**
- * The code that runs during plugin activation.
- * This action is documented in includes/class-hydro-raindrop-activator.php
+ * The installer class which handles the activation,
+ * deactivation and un-installation of this plugin.
  */
-function activate_hydro_raindrop() {
+require plugin_dir_path( __FILE__ ) . 'includes/class-hydro-raindrop-installer.php';
 
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-hydro-raindrop-activator.php';
-	Hydro_Raindrop_Activator::activate();
-
-}
-
-/**
- * The code that runs during plugin deactivation.
- * This action is documented in includes/class-hydro-raindrop-deactivator.php
- */
-function deactivate_hydro_raindrop() {
-
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-hydro-raindrop-deactivator.php';
-
-	Hydro_Raindrop_Deactivator::deactivate();
-
-}
-
-register_activation_hook( __FILE__, 'activate_hydro_raindrop' );
-register_deactivation_hook( __FILE__, 'deactivate_hydro_raindrop' );
+register_activation_hook( __FILE__, [ 'Hydro_Raindrop_Installer', 'activate' ] );
+register_deactivation_hook( __FILE__, [ 'Hydro_Raindrop_Installer', 'deactivate' ] );
+register_uninstall_hook( __FILE__, [ 'Hydro_Raindrop_Installer', 'uninstall' ] );
 
 /**
  * The core plugin class that is used to define internationalization,
@@ -75,8 +66,6 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-hydro-raindrop.php';
  * Since everything within the plugin is registered via hooks,
  * then kicking off the plugin from this point in the file does
  * not affect the page life cycle.
- *
- * @since    1.0.0
  */
 function run_hydro_raindrop() {
 
@@ -84,5 +73,4 @@ function run_hydro_raindrop() {
 	$plugin->run();
 
 }
-
 run_hydro_raindrop();

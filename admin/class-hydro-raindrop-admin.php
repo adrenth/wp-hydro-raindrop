@@ -26,6 +26,10 @@ use Adrenth\Raindrop\Exception\RefreshTokenFailed;
  */
 class Hydro_Raindrop_Admin {
 
+	const OPTION_GROUP_SYSTEM_REQUIREMENTS = 'hydro_raindrop_system_requirements';
+	const OPTION_GROUP_API_SETTINGS        = 'hydro_raindrop_api_settings';
+	const OPTION_GROUP_CUSTOMIZATION       = 'hydro_raindrop_customization';
+
 	/**
 	 * The ID of this plugin.
 	 *
@@ -82,12 +86,19 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function admin_init() {
 
-		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_APPLICATION_ID );
-		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_CLIENT_ID );
-		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET );
-		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_ENVIRONMENT );
-		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_CUSTOM_MFA_PAGE );
-		register_setting( 'hydro_api', Hydro_Raindrop_Helper::OPTION_CUSTOM_HYDRO_ID_PAGE );
+		register_setting( self::OPTION_GROUP_SYSTEM_REQUIREMENTS, Hydro_Raindrop_Helper::OPTION_ENABLED );
+
+		register_setting( self::OPTION_GROUP_API_SETTINGS, Hydro_Raindrop_Helper::OPTION_APPLICATION_ID );
+		register_setting( self::OPTION_GROUP_API_SETTINGS, Hydro_Raindrop_Helper::OPTION_CLIENT_ID );
+		register_setting( self::OPTION_GROUP_API_SETTINGS, Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET );
+		register_setting( self::OPTION_GROUP_API_SETTINGS, Hydro_Raindrop_Helper::OPTION_ENVIRONMENT );
+
+		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_PAGE_MFA );
+		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_PAGE_SETUP );
+		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_PAGE_SETTINGS );
+		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_MFA_METHOD );
+		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_MFA_MAXIMUM_ATTEMPTS );
+		register_setting( self::OPTION_GROUP_CUSTOMIZATION, Hydro_Raindrop_Helper::OPTION_POST_VERIFICATION_TIMEOUT );
 
 	}
 
@@ -98,16 +109,75 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function admin_menu() {
 
-		add_options_page(
-			'Hydro Raindrop MFA',
-			'Hydro Raindrop MFA',
+		add_menu_page(
+			'Hydro Raindrop: General',
+			'Hydro Raindrop',
 			'manage_options',
-			$this->plugin_name . '-options',
+			$this->plugin_name,
 			[
 				$this,
-				'admin_page',
+				'settings_page',
+			],
+			plugins_url( 'images/icon.svg', __FILE__ )
+		);
+
+		add_submenu_page(
+			$this->plugin_name,
+			'Hydro Raindrop: Settings',
+			'Settings',
+			'manage_options',
+			$this->plugin_name,
+			[
+				$this,
+				'settings_page',
 			]
 		);
+
+		add_submenu_page(
+			$this->plugin_name,
+			'Hydro Raindrop: Documentation',
+			'Documentation',
+			'manage_options',
+			$this->plugin_name . '-documentation',
+			[
+				$this,
+				'documentation_page',
+			]
+		);
+
+	}
+
+	/**
+	 * This action hook is typically used to output new fields or data to the bottom of WordPress's user profile pages.
+	 *
+	 * @param null|WP_User $profileuser The WP_User object of the user being edited.
+	 *
+	 * @return void
+	 */
+	public function edit_user_profile( $profileuser ) {
+
+		if ( $profileuser instanceof WP_User && current_user_can( 'edit_user' ) ) {
+			require __DIR__ . '/partials/hydro-raindrop-profileuser.php';
+		}
+
+	}
+
+	/**
+	 * This action hook is generally used to save custom fields that have been added to the WordPress profile page.
+	 *
+	 * @param null|int $user_id The user ID of the user being edited.
+	 */
+	public function edit_user_profile_update( $user_id ) {
+
+		if ( ! current_user_can( 'edit_user', $user_id ) ) {
+			return;
+		}
+
+		// @codingStandardsIgnoreStart
+		$blocked = (int) ( $_POST[ Hydro_Raindrop_Helper::USER_META_ACCOUNT_BLOCKED ] ?? 0 );
+
+		update_user_meta( $user_id, Hydro_Raindrop_Helper::USER_META_ACCOUNT_BLOCKED, $blocked );
+		// @codingStandardsIgnoreEnd
 
 	}
 
@@ -121,6 +191,7 @@ class Hydro_Raindrop_Admin {
 	public function update_option( $option ) {
 
 		switch ( $option ) {
+
 			case Hydro_Raindrop_Helper::OPTION_APPLICATION_ID:
 			case Hydro_Raindrop_Helper::OPTION_CLIENT_ID:
 			case Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET:
@@ -131,8 +202,8 @@ class Hydro_Raindrop_Admin {
 				delete_option( Hydro_Raindrop_Helper::OPTION_ACCESS_TOKEN_SUCCESS );
 
 				delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, '', true );
-				delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, '', true );
-				delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, '', true );
+				delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED, '', true );
+				delete_metadata( 'user', 0, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED, '', true );
 
 				break;
 		}
@@ -140,34 +211,44 @@ class Hydro_Raindrop_Admin {
 	}
 
 	/**
-	 * Display the admin page.
+	 * Display the settings page.
 	 *
 	 * @return void
 	 */
-	public function admin_page() {
+	public function settings_page() {
 
-		$args = array(
-			'post_type'      => 'page',
-			'posts_per_page' => -1,
-			'order'          => 'ASC',
-			'orderby'        => 'menu_order',
-		);
+		include __DIR__ . '/../admin/partials/hydro-raindrop-settings.php';
 
-		$parent = new WP_Query( $args );
+	}
 
-		$posts = [];
+	/**
+	 * Display the FAQ page.
+	 *
+	 * @return void
+	 */
+	public function documentation_page() {
 
-		while ( $parent->have_posts() ) {
-			$parent->the_post();
+	}
 
-			$id = get_the_ID();
+	/**
+	 * Add redirect to documentation page (action: init).
+	 *
+	 * @return void
+	 */
+	public function redirect_from_admin_menu() {
 
-			if ( $id ) {
-				$posts[ $id ] = get_the_title() . ' - ' . get_the_permalink();
-			}
+		global $pagenow;
+
+		// @codingStandardsIgnoreLine
+		$page = $_GET['page'] ?? null;
+
+		if ( 'admin.php' === $pagenow && 'wp-hydro-raindrop-documentation' === $page ) {
+
+			// @codingStandardsIgnoreLine
+			wp_redirect( 'https://github.com/adrenth/wp-hydro-raindrop' );
+			exit();
+
 		}
-
-		include __DIR__ . '/../admin/partials/hydro-raindrop-admin-display.php';
 
 	}
 
@@ -206,7 +287,7 @@ class Hydro_Raindrop_Admin {
 			return;
 		}
 
-		$option_page_url = admin_url( 'options-general.php?page=' . $this->plugin_name . '-options' );
+		$option_page_url = admin_url( 'admin.php?page=' . $this->plugin_name );
 
 		$message = sprintf(
 			__( 'Succesfully activated the WP Hydro Raindrop plugin, to configure the plugin go to the Hydro Raindrop MFA <a style="color: #fff; font-weight: bold;" href="%1$s">settings page</a>.', $this->plugin_name ),
@@ -232,13 +313,48 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function add_action_links( array $links = [] ) : array {
 
-		$option_page_url = admin_url( 'options-general.php?page=' . $this->plugin_name . '-options' );
+		$option_page_url = admin_url( 'admin.php?page=' . $this->plugin_name );
 
 		$add_links = [
 			'<a href="' . $option_page_url . '">' . __( 'Settings', 'wp-hydro-raindrop' ) . '</a>',
 		];
 
 		return array_merge( $links, $add_links );
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_post_options() : array {
+
+		$args = array(
+			'post_type'      => 'page',
+			'posts_per_page' => -1,
+			'order'          => 'ASC',
+			'orderby'        => 'menu_order',
+		);
+
+		$parent = new WP_Query( $args );
+
+		$posts = [];
+
+		while ( $parent->have_posts() ) {
+			$parent->the_post();
+
+			$post_id = get_the_ID();
+
+			if ( $post_id ) {
+				/**
+				 * The variable $posts is used in the template file.
+				 *
+				 * @noinspection OnlyWritesOnParameterInspection
+				 */
+				$posts[ (int) $post_id ] = get_the_title() . ' - ' . get_the_permalink();
+			}
+		}
+
+		return $posts;
+
 	}
 
 }

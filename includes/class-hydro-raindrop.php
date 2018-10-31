@@ -99,24 +99,33 @@ class Hydro_Raindrop {
 	 * @access   private
 	 */
 	private function load_dependencies() {
-
 		$includes = [
 			// The class responsible for orchestrating the actions and filters of the core plugin.
 			__DIR__ . '/class-hydro-raindrop-loader.php',
 			// The class responsible for storing the access token from the Raindrop API.
-			__DIR__ . '/class-hydro-raindrop-token-storage.php',
+			__DIR__ . '/class-hydro-raindrop-transienttokenstorage.php',
 			// The class responsible for defining internationalization functionality of the plugin.
 			__DIR__ . '/class-hydro-raindrop-i18n.php',
 			// The class with some convenient helper methods.
 			__DIR__ . '/class-hydro-raindrop-helper.php',
 			// The class for handling the MFA cookie.
 			__DIR__ . '/class-hydro-raindrop-cookie.php',
+			// The class responsible for checking requirements.
+			__DIR__ . '/class-hydro-raindrop-requirementchecker.php',
 			// The class responsible for defining all actions that occur in the admin area.
 			__DIR__ . '/../admin/class-hydro-raindrop-admin.php',
 			// The class responsible for defining all actions that occur in the public-facing side of the site.
 			__DIR__ . '/../public/class-hydro-raindrop-public.php',
 			// The class responsible for Hydro Raindrop authentication.
 			__DIR__ . '/../public/class-hydro-raindrop-authenticate.php',
+			// The class responsible for rendering the Hydro Raindrop shortcodes.
+			__DIR__ . '/../public/class-hydro-raindrop-shortcode.php',
+			// The class responsible for rendering the Flash messages.
+			__DIR__ . '/../public/class-hydro-raindrop-flash.php',
+			// The class responsible for handling the meta boxes.
+			__DIR__ . '/../public/class-hydro-raindrop-metabox.php',
+			// Cookie Expired Exception.
+			__DIR__ . '/exceptions/class-hydro-raindrop-cookieexpired.php',
 		];
 
 		foreach ( $includes as $include ) {
@@ -164,16 +173,23 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'admin_init' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_menu' );
-
 		$this->loader->add_action( 'update_option', $plugin_admin, 'update_option' );
-
 		$this->loader->add_action( 'admin_notices', $plugin_admin, 'activation_notice' );
+		$this->loader->add_action( 'edit_user_profile', $plugin_admin, 'edit_user_profile' );
+		$this->loader->add_action( 'edit_user_profile_update', $plugin_admin, 'edit_user_profile_update' );
 
 		$this->loader->add_filter(
 			"plugin_action_links_{$this->plugin_name}/{$this->plugin_name}.php",
 			$plugin_admin,
 			'add_action_links'
 		);
+
+		$meta_box = new Hydro_Raindrop_MetaBox();
+
+		$this->loader->add_action( 'load-post.php', $meta_box, 'init' );
+		$this->loader->add_action( 'load-post-new.php', $meta_box, 'init' );
+		$this->loader->add_action( 'add_meta_boxes', $meta_box, 'init' );
+		$this->loader->add_action( 'save_post', $meta_box, 'save' );
 
 	}
 
@@ -199,12 +215,13 @@ class Hydro_Raindrop {
 		$this->loader->add_action( 'login_enqueue_scripts', $plugin_public, 'enqueue_login_styles' );
 
 		/**
-		 * Action: user_profile_update_errors
+		 * Action: wp_head
 		 *
-		 * This hook runs AFTER edit_user_profile_update and personal_options_update.
-		 * This same callback, after performing your validations, and save the data if it is empty.
+		 * The wp_head action hook is triggered within the <head></head> section of the user's template by
+		 * the wp_head() function. Although this is theme-dependent, it is one of the most essential theme hooks,
+		 * so it is widely supported.
 		 */
-		$this->loader->add_action( 'user_profile_update_errors', $plugin_public, 'custom_user_profile_validate', 10, 3 );
+		$this->loader->add_action( 'wp_head', $plugin_public, 'init_head' );
 
 		/**
 		 * Action: show_user_profile
@@ -213,6 +230,18 @@ class Hydro_Raindrop {
 		 * pages.
 		 */
 		$this->loader->add_action( 'show_user_profile', $plugin_public, 'custom_user_profile_fields' );
+
+		/**
+		 * Action: personal_options_update
+		 *
+		 * Generally, action hook is used to save custom fields that have been added to the WordPress profile page.
+		 */
+		$this->loader->add_action( 'personal_options_update', $plugin_public, 'update_extra_profile_fields' );
+
+		$plugin_admin = new Hydro_Raindrop_Admin(
+			$this->get_plugin_name(),
+			$this->get_version()
+		);
 
 		$plugin_authenticate = new Hydro_Raindrop_Authenticate(
 			$this->get_plugin_name(),
@@ -235,19 +264,75 @@ class Hydro_Raindrop {
 		 * on it for all sorts of reasons (e.g. they need a user, a taxonomy, etc.).
 		 */
 		$this->loader->add_filter( 'init', $plugin_authenticate, 'verify', 0 );
-		$this->loader->add_filter( 'init', $plugin_public, 'manage_hydro_id', 0 );
+		$this->loader->add_action( 'init', $plugin_admin, 'redirect_from_admin_menu' );
+
+		if ( version_compare( (string) get_bloginfo( 'version' ), '4.7', '<' ) ) {
+
+			/**
+			 * Filter: page_attributes_dropdown_pages_args
+			 *
+			 * Filters the arguments used to generate a Pages drop-down element.
+			 */
+			$this->loader->add_filter( 'page_attributes_dropdown_pages_args', $plugin_public, 'register_templates' );
+
+		} else {
+
+			$this->loader->add_filter( 'theme_page_templates', $plugin_public, 'add_new_template' );
+
+		}
+
+		/**
+		 * Filter: wp_insert_post_data
+		 *
+		 * A filter hook called by the wp_insert_post function prior to inserting into or updating the database.
+		 */
+		$this->loader->add_filter( 'wp_insert_post_data', $plugin_public, 'register_templates' );
+
+		/**
+		 * Filter: template_include
+		 *
+		 * This filter hook is executed immediately before WordPress includes the predetermined template file.
+		 * This can be used to override WordPress's default template behavior.
+		 */
+		$this->loader->add_filter( 'template_include', $plugin_public, 'view_template' );
+
+
 
 		/**
 		 * Shortcodes
 		 *
 		 * @see https://codex.wordpress.org/Shortcode_API
 		 */
-		add_shortcode( 'hydro_raindrop_mfa_form_open', [ $plugin_public, 'shortcode_form_open' ] );
-		add_shortcode( 'hydro_raindrop_mfa_form_close', [ $plugin_public, 'shortcode_form_close' ] );
-		add_shortcode( 'hydro_raindrop_mfa_digits', [ $plugin_public, 'shortcode_digits' ] );
-		add_shortcode( 'hydro_raindrop_mfa_button_authorize', [ $plugin_public, 'shortcode_button_authorize' ] );
-		add_shortcode( 'hydro_raindrop_mfa_button_cancel', [ $plugin_public, 'shortcode_button_cancel' ] );
-		add_shortcode( 'hydro_raindrop_manage_hydro_id', [ $plugin_public, 'shortcode_manage_hydro_id' ] );
+		$plugin_shortcode = new Hydro_Raindrop_Shortcode(
+			$this->get_plugin_name(),
+			$this->get_version()
+		);
+
+		add_shortcode( 'hydro_raindrop_mfa', [ $plugin_shortcode, 'mfa' ] );
+		add_shortcode( 'hydro_raindrop_mfa_flash', [ $plugin_shortcode, 'mfa_flash' ] );
+		add_shortcode( 'hydro_raindrop_mfa_form_open', [ $plugin_shortcode, 'mfa_form_open' ] );
+		add_shortcode( 'hydro_raindrop_mfa_digits', [ $plugin_shortcode, 'mfa_digits' ] );
+		add_shortcode( 'hydro_raindrop_mfa_button_authorize', [ $plugin_shortcode, 'mfa_button_authorize' ] );
+		add_shortcode( 'hydro_raindrop_mfa_button_cancel', [ $plugin_shortcode, 'mfa_button_cancel' ] );
+		add_shortcode( 'hydro_raindrop_mfa_form_close', [ $plugin_shortcode, 'mfa_form_close' ] );
+
+		add_shortcode( 'hydro_raindrop_setup', [ $plugin_shortcode, 'setup' ] );
+		add_shortcode( 'hydro_raindrop_setup_flash', [ $plugin_shortcode, 'setup_flash' ] );
+		add_shortcode( 'hydro_raindrop_setup_form_open', [ $plugin_shortcode, 'setup_form_open' ] );
+		add_shortcode( 'hydro_raindrop_setup_hydro_id', [ $plugin_shortcode, 'setup_hydro_id' ] );
+		add_shortcode( 'hydro_raindrop_setup_button_submit', [ $plugin_shortcode, 'setup_button_submit' ] );
+		add_shortcode( 'hydro_raindrop_setup_button_skip', [ $plugin_shortcode, 'setup_button_skip' ] );
+		add_shortcode( 'hydro_raindrop_setup_form_close', [ $plugin_shortcode, 'setup_form_close' ] );
+
+		add_shortcode( 'hydro_raindrop_settings', [ $plugin_shortcode, 'settings' ] );
+		add_shortcode( 'hydro_raindrop_settings_flash', [ $plugin_shortcode, 'settings_flash' ] );
+		add_shortcode( 'hydro_raindrop_settings_form_open', [ $plugin_shortcode, 'settings_form_open' ] );
+		add_shortcode( 'hydro_raindrop_settings_checkbox_mfa_enabled', [ $plugin_shortcode, 'settings_checkbox_mfa_enabled' ] );
+		add_shortcode( 'hydro_raindrop_settings_button_submit', [ $plugin_shortcode, 'settings_button_submit' ] );
+		add_shortcode( 'hydro_raindrop_settings_form_close', [ $plugin_shortcode, 'settings_form_close' ] );
+
+		add_shortcode( 'hydro_raindrop_mfa_timed_out_notice', [ $plugin_shortcode, 'mfa_timed_out_notice' ] );
+
 	}
 
 	/**

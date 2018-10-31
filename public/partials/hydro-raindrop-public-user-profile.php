@@ -3,31 +3,38 @@
 declare( strict_types=1 );
 
 /**
- * Hydro Raindrop MFA user profile form extension.
+ * User Profile
  *
  * @package    Hydro_Raindrop
- * @author     Alwin Drenth <adrenth@gmail.com>, Ronald Drenth <ronalddrenth@gmail.com>
+ * @author     Alwin Drenth <adrenth@gmail.com>
  */
 
-if ( ! isset( $user ) ) {
-	exit;
-}
-
-if ( ! defined( 'HYDRO_RAINDROP_MANAGE_HYDRO_ID' ) ) {
-	define( 'HYDRO_RAINDROP_MANAGE_HYDRO_ID', true );
-}
+// @codingStandardsIgnoreStart
+$hydro_id                   = (string) get_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, true );
+$hydro_raindrop_mfa_enabled = (bool) get_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED, true );
+$hydro_raindrop_mfa_method  = (string) get_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD, true );
+$enabled                    = (bool) get_option( Hydro_Raindrop_Helper::OPTION_ENABLED );
+// @codingStandardsIgnoreEnd
 ?>
-<h2><?php esc_html_e( 'Hydro Raindrop MFA', 'wp-hydro-raindrop' ); ?></h2>
 
-<?php if ( Hydro_Raindrop::has_valid_raindrop_client_options() ) : ?>
-
-	<?php include __DIR__ . '/manage-hydro-id/hydro-raindrop-mfa-enabled.php'; ?>
-	<?php include __DIR__ . '/manage-hydro-id/hydro-raindrop-mfa-disabled.php'; ?>
-	<?php include __DIR__ . '/manage-hydro-id/hydro-raindrop-mfa-unconfirmed.php'; ?>
-	<?php include __DIR__ . '/manage-hydro-id/hydro-id-form.php'; ?>
-
-<?php else : ?>
-
-	<?php include __DIR__ . '/manage-hydro-id/invalid-raindrop-client-options.php'; ?>
-
-<?php endif ?>
+<table class="form-table">
+	<?php if ( $enabled ) : ?>
+	<tr>
+			<th scope="row"><?php esc_html_e( 'Hydro Raindrop MFA', 'wp-hydro-raindrop' ); ?></th>
+			<td>
+				<label>
+					<input name="<?php echo esc_attr( Hydro_Raindrop_Helper::USER_META_MFA_ENABLED ); ?>"
+							type="checkbox"
+							value="1"
+						<?php if ( $hydro_raindrop_mfa_enabled ) : ?>
+							checked
+						<?php endif; ?>
+						<?php if ( Hydro_Raindrop_Helper::MFA_METHOD_ENFORCED === $hydro_raindrop_mfa_method ) : ?>
+							disabled
+						<?php endif; ?>>
+					Enable Multi Factor Authentication
+				</label>
+			</td>
+		</tr>
+	<?php endif; ?>
+</table>
