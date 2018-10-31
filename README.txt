@@ -79,12 +79,10 @@ For more info on Hydro or MFA and how it’s changing the world, check out the f
 
 == Screenshots ==
 
-1. Default HydroID Setup screen.
-2. Default Hydro MFA screen.
-3. Hydro Raindrop Settings
-4. Custom HydroID Setup Page.
-5. Custom Hydro MFA Page.
-6. Custom Hydro Settings Page.
+1. Custom HydroID Setup Page.
+2. Custom Hydro MFA Page.
+3. Custom Hydro Settings Page.
+4. Hydro Raindrop Settings
 
 == Frequently Asked Questions ==
 
