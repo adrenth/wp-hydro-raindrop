@@ -79,10 +79,12 @@ For more info on Hydro or MFA and how it’s changing the world, check out the f
 
 == Screenshots ==
 
-1. Sample Authentication Screen With The Plugin — Beautiful And Clean!
-2. Enabling Hydro Raindrop In The Wordpress Admin
-3. Integrated Raindrop For Wordpress Admins!
-4. Custom Authentication Page can be created by Admin for their users as well
+1. Default HydroID Setup screen.
+2. Default Hydro MFA screen.
+3. Hydro Raindrop Settings
+4. Custom HydroID Setup Page.
+5. Custom Hydro MFA Page.
+6. Custom Hydro Settings Page.
 
 == Frequently Asked Questions ==
 
