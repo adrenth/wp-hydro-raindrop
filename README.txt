@@ -20,27 +20,18 @@ Hydro MFA Plugin adds another security layer to your website using blockchain-ba
 https://www.youtube.com/watch?v=d88jbPdxI88
 
 #### Features
-
-* Requires minimum hassle to setup
+* Works out of the Box
 * Intercepts the Login automatically
 * Allows users to set-up MFA with their HydroID
+* Customization options to suit every site neeeds!
 * Instant Authentication
 
 > Note: Free Hydro Mobile App is required to complete the MFA process. You can get iOS App [here](https://goo.gl/LpAuzq) or the Android App [here](https://goo.gl/eNrdn2).
 
-#### After activation process
+### After Activation Process
+The **following steps are necessary** to enable Hydro MFA on your site:
 
-When the plugin is activated, three pages are automatically created:
-
-* Hydro Raindrop MFA Page (`/hydro-raindrop/`)
-* Hydro Raindrop MFA Settings Page (`/hydro-raindrop/settings`)
-* Hydro Raindrop MFA Setup Page (`/hydro-raindrop/setup`)
-
-Each page contains it's corresponding shortcode which will be responsible for the Hydro Raindrop MFA implementation to work.
-These pages are meant for customization and integration in your own custom theme.
-
-By default the Hydro Raindrop **integrated** pages are enabled.
-
+#### MFA Activation (Admin Side)
 The **following steps are necessary** to enable Hydro Raindrop MFA on your site:
 
 * Create an account over at [Hydrogen Website](https://www.hydrogenplatform.com/).
@@ -68,7 +59,7 @@ That's it!
 
 #### Further reading
 
-For more info on Hydro or MFA and how it’s changing the world, check out the following:
+For more info on Hydro or MFA and how it's changing the world, check out the following:
 
 * [Hydro's Official Site](https://www.hydrogenplatform.com/).
 * [Hydro's Medium Blog](https://medium.com/hydrogen-api).
@@ -96,14 +87,12 @@ site you should read the documentation if there are any changes which affects yo
 == Changelog ==
 
 = 2.0.0 =
-* Added Plugin requirements check.
-* Added Custom Pages for the Hydro Raindrop MFA flow.
-* Added shortcodes which allow developers to fully customize the Hydro Raindrop integration.
-* Added support for re-authentication for (custom) Posts.
-* Added support for users to set-up their HydroID in the MFA flow.
-* Improved MFA flow security
-* Added support for forcing users to use MFA.
-* Added actions/filters for developers to hook into the MFA flow.
+* Works out of the Box.
+* Frontend Included / Automatic setup / Frontend Settings.
+* Introduces 3 ways for MFA option (Enforced, Prompted and Optional).
+* Re-authentication Feature (for extra sensitive pages).
+* Blocking of Users on incorrect MFA Tries (customizable).
+* Additional features - Plugin requirements check, Shortcodes, actions and filters for advance developers.
 
 = 1.4.1 =
 * Updated Author.
