@@ -17,7 +17,7 @@ class Hydro_Raindrop_Cookie {
 	 *
 	 * @var string
 	 */
-	const NAME = 'HydroRaindropMfa';
+	const NAME = 'hydro_raindrop_cookie_mfa';
 
 	/**
 	 * Multi Factor Timeout in seconds.
@@ -84,19 +84,11 @@ class Hydro_Raindrop_Cookie {
 		$cookie     = $user->user_login . '|' . $expiration . '|' . $token . '|' . $hash;
 
 		// @codingStandardsIgnoreLine
-		$result = setcookie( self::NAME, $cookie, 0, COOKIEPATH, (string) COOKIE_DOMAIN, true, true );
-
-		if ( ! $result ) {
-			$this->log( 'Could not set MFA cookie.' );
-		}
+		setcookie( self::NAME, $cookie, 0, COOKIEPATH, (string) COOKIE_DOMAIN, true, true );
 
 		if ( COOKIEPATH !== SITECOOKIEPATH ) {
 			// @codingStandardsIgnoreLine
-			$result = setcookie( self::NAME, $cookie, 0, SITECOOKIEPATH, (string) COOKIE_DOMAIN, true, true );
-
-			if ( ! $result ) {
-				$this->log( 'Could not set MFA cookie.' );
-			}
+			setcookie( self::NAME, $cookie, 0, SITECOOKIEPATH, (string) COOKIE_DOMAIN, true, true );
 		}
 
 	}
@@ -134,6 +126,7 @@ class Hydro_Raindrop_Cookie {
 	 * Returns the User ID when validates or FALSE when invalidates.
 	 *
 	 * @return bool|int
+	 * @throws Hydro_Raindrop_CookieExpired When cookie is expired.
 	 */
 	public function validate() {
 		/**
@@ -153,7 +146,11 @@ class Hydro_Raindrop_Cookie {
 		$expiration = $cookie_elements['expiration'];
 
 		if ( $expiration < time() ) {
-			return false;
+
+			$this->unset();
+
+			throw new Hydro_Raindrop_CookieExpired( 'MFA Cookie expired!' );
+
 		}
 
 		$user = get_user_by( 'login', $username );

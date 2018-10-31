@@ -12,9 +12,6 @@ declare( strict_types=1 );
  * @subpackage Hydro_Raindrop/public
  */
 
-use Adrenth\Raindrop\Exception\RegisterUserFailed;
-use Adrenth\Raindrop\Exception\UserAlreadyMappedToApplication;
-
 /**
  * The public-facing functionality of the plugin.
  *
@@ -46,12 +43,13 @@ class Hydro_Raindrop_Public {
 	private $version;
 
 	/**
-	 * Errors occurred when managing HydroID.
+	 * The array of templates that this plugin tracks.
 	 *
-	 * @var WP_Error|null
-	 * @since 1.3.0
+	 * @since    2.0.0
+	 * @access   private
+	 * @var array
 	 */
-	private $manage_hydro_id_errors;
+	private $templates;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -61,10 +59,13 @@ class Hydro_Raindrop_Public {
 	 * @param      string $plugin_name The name of the plugin.
 	 * @param      string $version     The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct( string $plugin_name, string $version ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
+		$this->templates   = [
+			'template-hydro-mfa-display.php' => 'Hydro MFA Display Template',
+		];
 
 	}
 
@@ -106,6 +107,7 @@ class Hydro_Raindrop_Public {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
+		wp_enqueue_script( 'jquery' );
 
 		wp_enqueue_script(
 			$this->plugin_name,
@@ -119,7 +121,119 @@ class Hydro_Raindrop_Public {
 	}
 
 	/**
-	 * @param WP_User $user
+	 * Handle timed out cookie for MFA.
+	 *
+	 * @return void
+	 */
+	public function init_head() {
+
+		// @codingStandardsIgnoreStart
+		if ( ! isset( $_COOKIE[ Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT ] ) ) {
+			return;
+		}
+
+		if ( $_COOKIE[ Hydro_Raindrop_Helper::COOKIE_MFA_TIMED_OUT ] === 'true' ) {
+			$output = do_shortcode( '[hydro_raindrop_mfa_timed_out_notice]' );
+
+			echo '<script type="text/javascript">';
+			echo "var HYDRO_MFA_TIMED_OUT = '" . esc_js( $output ) . "';";
+			echo 'var HYDRO_MFA_TIMED_OUT_NOTICE = true;';
+			echo '</script>';
+
+		}
+		// @codingStandardsIgnoreEnd
+	}
+
+	/**
+	 * Adds our template to the pages cache in order to trick WordPress into thinking the template file exists
+	 * where it doesn't really exist.
+	 *
+	 * @param array $dropdown_args Array of arguments used to generate the pages drop-down.
+	 * @return array
+	 */
+	public function register_templates( array $dropdown_args ) : array {
+
+		// Create the key used for the themes cache.
+		$cache_key = 'page_templates-' . md5( get_theme_root() . '/' . get_stylesheet() );
+
+		// Retrieve the cache list. If it doesn't exist, or it's empty prepare an array.
+		$templates = wp_get_theme()->get_page_templates();
+
+		if ( empty( $templates ) ) {
+			$templates = array();
+		}
+
+		// New cache, therefore remove the old one.
+		wp_cache_delete( $cache_key, 'themes' );
+
+		// Now add our template to the list of templates by merging our templates
+		// with the existing templates array from the cache.
+		$templates = array_merge( $templates, $this->templates );
+
+		// Add the modified cache to allow WordPress to pick it up for listing available templates.
+		wp_cache_add( $cache_key, $templates, 'themes', 1800 );
+
+		return $dropdown_args;
+
+	}
+
+	/**
+	 * Filters list of page templates for a theme.
+	 *
+	 * @param array $page_templates Array of page templates. Keys are filenames, values are translated names.
+	 * @return array
+	 */
+	public function add_new_template( array $page_templates ) : array {
+
+		return array_merge( $page_templates, $this->templates );
+
+	}
+
+	/**
+	 * Checks if the template is assigned to the page.
+	 *
+	 * @param mixed $template Template.
+	 * @return mixed
+	 */
+	public function view_template( $template ) {
+
+		// Return the search template if we're searching (instead of the template for the first result).
+		if ( is_search() ) {
+			return $template;
+		}
+
+		// Get global post.
+		global $post;
+
+		// Return template if post is empty.
+		if ( ! $post ) {
+			return $template;
+		}
+
+		// Return default template if we don't have a custom one defined.
+		if ( ! isset( $this->templates[ get_post_meta( $post->ID, '_wp_page_template', true ) ] ) ) {
+			return $template;
+		}
+
+		// Allows filtering of file path.
+		$file_path = apply_filters( 'page_templater_plugin_dir_path', plugin_dir_path( __FILE__ ) );
+
+		$file = $file_path . get_post_meta( $post->ID, '_wp_page_template', true );
+
+		// Just to be safe, we check if the file exist first.
+		if ( file_exists( $file ) ) {
+			return $file;
+		} else {
+			echo $file;
+		}
+
+		return $template;
+	}
+
+	/**
+	 * Extend the User Profile form.
+	 *
+	 * @param WP_User $user The current user.
 	 */
 	public function custom_user_profile_fields( WP_User $user ) {
 
@@ -128,303 +242,73 @@ class Hydro_Raindrop_Public {
 	}
 
 	/**
-	 * Validate and process Hydro Raindrop MFA post data.
+	 * Update the extra User Profile fields.
 	 *
-	 * @param WP_Error      $errors Error collection from edit_user().
-	 * @param bool|null     $update Wether the user profile is edited or not.
-	 * @param stdClass|null $user   User object being edited.
-	 *
-	 * @return void
+	 * @param int|null $user_id The user ID of the user being edited.
 	 */
-	public function custom_user_profile_validate( &$errors, bool $update = null, &$user = null ) {
-
-		// Already errors present. Do nothing. User will not be updated to database.
-		if ( ! $user || ! $update || count( $errors->errors ) > 0 ) {
-			return;
-		}
-
-		$this->handle_hydro_id_form( $errors, $user );
-
-	}
-
-	/**
-	 * Handles saving of the HydroID.
-	 *
-	 * @return string
-	 */
-	public function manage_hydro_id() {
-
-		if ( ! is_user_logged_in() ) {
-			return '';
-		}
-
-		$user = wp_get_current_user();
+	public function update_extra_profile_fields( $user_id = null ) {
 
 		// @codingStandardsIgnoreLine
-		$retrieved_nonce = $_POST['_hydro_id_nonce'] ?? null;
+		$enabled = (bool) ( $_POST[ Hydro_Raindrop_Helper::USER_META_MFA_ENABLED ] ?? false );
+		$helper  = new Hydro_Raindrop_Helper();
 
-		$errors = new WP_Error();
+		$hydro_raindrop_mfa_method = (string) get_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD, true );
+		$is_mfa_method_enforced    = Hydro_Raindrop_Helper::MFA_METHOD_ENFORCED === $hydro_raindrop_mfa_method;
 
+		// Register the redirect URL to goto when flow is finished.
 		// @codingStandardsIgnoreLine
-		if ( $retrieved_nonce && wp_verify_nonce( $retrieved_nonce, 'hydro_raindrop_hydro_id' ) ) {
-			$this->handle_hydro_id_form( $errors, $user->data );
-		}
+		update_user_meta(
+			$user_id,
+			Hydro_Raindrop_Helper::USER_META_REDIRECT_URL,
+			$helper->is_settings_page_enabled()
+				? $helper->get_settings_page_url()
+				: get_edit_profile_url( $user_id )
+		);
 
-		$this->manage_hydro_id_errors = $errors;
+		/*
+		 * Disable Hydro Raindrop MFA.
+		 */
+		if ( ! $enabled
+				&& ! $is_mfa_method_enforced
+				&& current_user_can( 'edit_user', $user_id )
+		) {
+			$redirect_url = $helper->get_current_url() . '?hydro-raindrop-verify=1&hydro-raindrop-action=disable';
 
-	}
-
-	/**
-	 * Handle the HydroID form. Must be handled before the headers are sent.
-	 *
-	 * @param WP_Error $errors Error collection from edit_user().
-	 * @param stdClass $user   User object being edited.
-	 */
-	public function handle_hydro_id_form( &$errors, stdClass $user ) {
-
-		$user_has_hydro_id = $this->user_has_hydro_id( $user );
-
-		// @codingStandardsIgnoreLine
-		$hydro_id = sanitize_text_field((string) ($_POST[Hydro_Raindrop_Helper::USER_META_HYDRO_ID] ?? ''));
-
-		if ( ! empty( $hydro_id ) && ! $user_has_hydro_id ) {
-
-			$client = Hydro_Raindrop::get_raindrop_client();
-
-			$length = strlen( $hydro_id );
-
-			if ( $length < 3 || $length > 32 ) {
-				$errors->add(
-					'hydro_id_invalid',
-					esc_html__( 'Please provide a valid HydroID.', 'wp-hydro-raindrop' )
-				);
-				return;
+			if ( $helper->is_mfa_page_enabled() ) {
+				$redirect_url = $helper->get_mfa_page_url() . '?hydro-raindrop-verify=1&hydro-raindrop-action=disable';
 			}
 
-			$hydro_raindrop_custom_mfa_page = (int) get_option( 'hydro_raindrop_custom_mfa_page' );
-			$hydro_raindrop_custom_mfa_url  = get_permalink( $hydro_raindrop_custom_mfa_page );
-
-			if ( $hydro_raindrop_custom_mfa_page > 0
-					&& get_post_status( $hydro_raindrop_custom_mfa_page ) === 'publish'
-			) {
-				$redirect_url = $hydro_raindrop_custom_mfa_url . '?hydro-raindrop-verify=1';
-			} else {
-				$redirect_url = self_admin_url( 'profile.php?hydro-raindrop-verify=1' );
-			}
-
-			try {
-
-				$client->registerUser( sanitize_text_field( $hydro_id ) );
-
-				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, $hydro_id );
-
-				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, 1 );
-
-				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, 0 );
-
-				// @codingStandardsIgnoreLine
-				wp_redirect( $redirect_url );
-				exit;
-
-			} catch ( UserAlreadyMappedToApplication $e) {
-				/*
-				 * User is already mapped to this application.
-				 *
-				 * Edge case: A user tries to re-register with Hydro ID. If the user meta has been deleted, the
-				 *            user can re-use his Hydro ID but needs to verify it again.
-				 */
-
-				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, $hydro_id );
-
-				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, 1 );
-
-				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, 0 );
-
-				// @codingStandardsIgnoreLine
-				wp_redirect( $redirect_url );
-				exit;
-
-			} catch ( RegisterUserFailed $e ) {
-
-				$errors->add( 'hydro_register_failed', $e->getMessage() );
-
-				// @codingStandardsIgnoreLine
-				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID );
-
-				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED, 0 );
-
-				// @codingStandardsIgnoreLine
-				update_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED, 0 );
-			}
-		}
-
-		// @codingStandardsIgnoreLine
-		$disable_hydro_mfa = isset( $_POST['disable_hydro_mfa'] );
-
-		if ( $disable_hydro_mfa && $user_has_hydro_id ) {
-
-			$client   = Hydro_Raindrop::get_raindrop_client();
-			$hydro_id = (string) get_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, true );
-
-			try {
-				$client->unregisterUser( $hydro_id );
-
-				// @codingStandardsIgnoreLine
-				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, $hydro_id );
-
-				// @codingStandardsIgnoreLine
-				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_MFA_ENABLED );
-
-				// @codingStandardsIgnoreLine
-				delete_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_RAINDROP_CONFIRMED );
-
-			} catch ( \Adrenth\Raindrop\Exception\UnregisterUserFailed $e ) {
-
-				$errors->add( 'hydro_unregister_failed', $e->getMessage() );
-
-			}
-
-		}
-
-	}
-
-	/**
-	 * Open <form> tag for the custom MFA page.
-	 *
-	 * @return string
-	 */
-	public function shortcode_form_open() : string {
-
-		return '<form action="" method="post">';
-
-	}
-
-	/**
-	 * Closing </form> tag for the custom MFA page.
-	 *
-	 * @return string
-	 */
-	public function shortcode_form_close() : string {
-
-		return wp_nonce_field( 'hydro_raindrop_mfa' ) . '</form>';
-
-	}
-
-	/**
-	 * MFA digits for the custom MFA page.
-	 *
-	 * @return string
-	 * @throws Exception When message cannot be generated.
-	 */
-	public function shortcode_digits() : string {
-
-		if ( is_user_logged_in() ) {
 			$user = wp_get_current_user();
-		} else {
-			$authenticate = new Hydro_Raindrop_Authenticate( $this->plugin_name, $this->version );
-			$user         = $authenticate->get_current_mfa_user();
+
+			$flash = new Hydro_Raindrop_Flash( $user->user_login );
+			$flash->info( 'Enter the security code into the Hydro app to disable Hydro Raindrop MFA.' );
+
+			$cookie = new Hydro_Raindrop_Cookie( $this->plugin_name, $this->version );
+			$cookie->set( $user->ID );
+
+			// @codingStandardsIgnoreLine
+			wp_redirect( $redirect_url );
+			exit();
+
 		}
 
-		if ( ! ( $user instanceof WP_User ) ) {
-			return '';
+		/*
+		 * Enable Hydro Raindrop MFA.
+		 */
+		if ( $enabled && current_user_can( 'edit_user', $user_id ) ) {
+
+			$user   = wp_get_current_user();
+			$helper = new Hydro_Raindrop_Helper();
+
+			$cookie = new Hydro_Raindrop_Cookie( $this->plugin_name, $this->version );
+			$cookie->set( $user->ID );
+
+			// @codingStandardsIgnoreLine
+			wp_redirect( $helper->get_current_url() . '?hydro-raindrop-action=enable' );
+			exit();
+
 		}
 
-		return (string) Hydro_Raindrop_Authenticate::get_message( $user );
-
-	}
-
-	/**
-	 * MFA authorize button for the custom MFA page.
-	 *
-	 * @param array $attributes Shortcode attributes.
-	 *
-	 * @return string
-	 */
-	public function shortcode_button_authorize( array $attributes = [] ) : string {
-
-		$attributes = shortcode_atts( [
-			'class' => 'hydro-raindrop-mfa-button-authorize',
-			'label' => esc_html__( 'Authenticate', 'wp-hydro-raindrop' ),
-		], $attributes);
-
-		return sprintf(
-			'<input type="submit" name="%s" class="%s" value="%s">',
-			'hydro_raindrop',
-			$attributes['class'],
-			$attributes['label']
-		);
-
-	}
-
-	/**
-	 * MFA cancel button for the custom MFA page.
-	 *
-	 * @param array $attributes Shortcode attributes.
-	 *
-	 * @return string
-	 */
-	public function shortcode_button_cancel( array $attributes = [] ) : string {
-
-		$attributes = shortcode_atts( [
-			'class' => 'hydro-raindrop-mfa-button-cancel',
-			'label' => esc_html__( 'Cancel', 'wp-hydro-raindrop' ),
-		], $attributes);
-
-		return sprintf(
-			'<input type="submit" name="%s" class="%s" value="%s">',
-			'cancel_hydro_raindrop',
-			$attributes['class'],
-			$attributes['label']
-		);
-
-	}
-
-	/**
-	 * Manage HydroID.
-	 *
-	 * @return string
-	 */
-	public function shortcode_manage_hydro_id() : string {
-
-		if ( ! is_user_logged_in() ) {
-			return '';
-		}
-
-		$user = wp_get_current_user();
-
-		$errors = $this->manage_hydro_id_errors;
-
-		ob_start();
-
-		include __DIR__ . '/partials/hydro-raindrop-public-manage-hydro-id.php';
-
-		$output = ob_get_contents();
-
-		ob_end_clean();
-
-		return $output;
-
-	}
-
-	/**
-	 * Whether given user has a HydroID.
-	 *
-	 * @param stdClass $user WP User object.
-	 *
-	 * @return bool
-	 */
-	private function user_has_hydro_id( stdClass $user ) : bool {
-		// @codingStandardsIgnoreLine
-		$hydro_id = (string) get_user_meta( $user->ID, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, true );
-
-		return ! empty( $hydro_id );
 	}
 
 }

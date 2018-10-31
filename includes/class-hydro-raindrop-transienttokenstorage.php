@@ -15,7 +15,7 @@ use Adrenth\Raindrop\TokenStorage\TokenStorage;
  */
 final class Hydro_Raindrop_TransientTokenStorage implements TokenStorage {
 
-	const TRANSIENT_ID = 'HydroRaindropTokenStorage';
+	const TRANSIENT_ID = 'hydro_raindrop_token_storage';
 
 	/**
 	 * {@inheritdoc}
