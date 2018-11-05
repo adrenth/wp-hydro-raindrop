@@ -1,5 +1,9 @@
 # wp-hydro-raindrop
 
+## 2.0.1
+
+- Fixed critical issue when upgrading from v1 to v2 which causes settings to be invalid.
+
 ## 2.0.0
 
 - Added Plugin requirements check.

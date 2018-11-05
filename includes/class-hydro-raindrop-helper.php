@@ -80,19 +80,6 @@ final class Hydro_Raindrop_Helper {
 	}
 
 	/**
-	 * Whether Hydro Raindrop is enabled.
-	 *
-	 * Only the site admin can enable/disable Hydro Raindrop MFA.
-	 *
-	 * @return bool
-	 */
-	public function is_hydro_raindrop_enabled() : bool {
-
-		return (int) get_option( self::OPTION_ENABLED ) === 1;
-
-	}
-
-	/**
 	 * Get the home URL.
 	 *
 	 * @return string

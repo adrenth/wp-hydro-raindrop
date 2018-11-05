@@ -86,8 +86,6 @@ class Hydro_Raindrop_Admin {
 	 */
 	public function admin_init() {
 
-		register_setting( self::OPTION_GROUP_SYSTEM_REQUIREMENTS, Hydro_Raindrop_Helper::OPTION_ENABLED );
-
 		register_setting( self::OPTION_GROUP_API_SETTINGS, Hydro_Raindrop_Helper::OPTION_APPLICATION_ID );
 		register_setting( self::OPTION_GROUP_API_SETTINGS, Hydro_Raindrop_Helper::OPTION_CLIENT_ID );
 		register_setting( self::OPTION_GROUP_API_SETTINGS, Hydro_Raindrop_Helper::OPTION_CLIENT_SECRET );

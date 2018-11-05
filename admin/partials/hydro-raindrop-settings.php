@@ -30,12 +30,11 @@ $groups = [
 ];
 
 // @codingStandardsIgnoreLine
-$active_tab             = $_GET['tab'] ?? Hydro_Raindrop_Admin::OPTION_GROUP_SYSTEM_REQUIREMENTS;
-$helper                 = new Helper();
-$requirement_checker    = new Hydro_Raindrop_RequirementChecker();
-$requirements_are_met   = $requirement_checker->passes();
-$hydro_raindrop_enabled = $helper->is_hydro_raindrop_enabled();
-$options_are_valid      = Hydro_Raindrop::has_valid_raindrop_client_options() && $this->options_are_valid();
+$active_tab           = $_GET['tab'] ?? Hydro_Raindrop_Admin::OPTION_GROUP_SYSTEM_REQUIREMENTS;
+$helper               = new Helper();
+$requirement_checker  = new Hydro_Raindrop_RequirementChecker();
+$requirements_are_met = $requirement_checker->passes();
+$options_are_valid    = Hydro_Raindrop::has_valid_raindrop_client_options() && $this->options_are_valid();
 
 $tabs = [];
 
@@ -126,12 +125,7 @@ foreach ( $groups as $group => $caption ) {
 				</tbody>
 			</table>
 
-			<input name="<?php echo esc_attr( Helper::OPTION_ENABLED ); ?>"
-					id="<?php echo esc_attr( Helper::OPTION_ENABLED ); ?>"
-					type="hidden"
-					value="1">
-
-		<?php elseif ( Hydro_Raindrop_Admin::OPTION_GROUP_API_SETTINGS === $active_tab && $hydro_raindrop_enabled ) : ?>
+		<?php elseif ( Hydro_Raindrop_Admin::OPTION_GROUP_API_SETTINGS === $active_tab ) : ?>
 
 			<?php settings_fields( Hydro_Raindrop_Admin::OPTION_GROUP_API_SETTINGS ); ?>
 			<?php do_settings_sections( Hydro_Raindrop_Admin::OPTION_GROUP_API_SETTINGS ); ?>
@@ -209,7 +203,7 @@ foreach ( $groups as $group => $caption ) {
 				<strong>CAUTION</strong>: Changing these settings will disable Hydro Raindrop MFA for all users. Every user needs to re-enable Hydro Raindrop MFA from their profile page.
 			</p>
 
-		<?php elseif ( Hydro_Raindrop_Admin::OPTION_GROUP_CUSTOMIZATION === $active_tab && $hydro_raindrop_enabled ) : ?>
+		<?php elseif ( Hydro_Raindrop_Admin::OPTION_GROUP_CUSTOMIZATION === $active_tab ) : ?>
 			<?php settings_fields( Hydro_Raindrop_Admin::OPTION_GROUP_CUSTOMIZATION ); ?>
 			<?php do_settings_sections( Hydro_Raindrop_Admin::OPTION_GROUP_CUSTOMIZATION ); ?>
 

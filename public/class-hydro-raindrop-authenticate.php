@@ -985,12 +985,6 @@ final class Hydro_Raindrop_Authenticate {
 	 */
 	private function user_requires_mfa( WP_User $user ) : bool {
 
-		$enabled = (bool) get_option( Hydro_Raindrop_Helper::OPTION_ENABLED );
-
-		if ( ! $enabled ) {
-			return false;
-		}
-
 		// @codingStandardsIgnoreStart
 
 		$hydro_id                 = $this->get_user_hydro_id( $user );
@@ -1022,15 +1016,7 @@ final class Hydro_Raindrop_Authenticate {
 	 */
 	private function user_requires_setup_mfa( WP_User $user ) : bool {
 
-		$enabled = (bool) get_option( Hydro_Raindrop_Helper::OPTION_ENABLED );
-
-		if ( ! $enabled ) {
-			return false;
-		}
-
-		/*
-		 * User wants to enable Hydro Raindrop MFA from user profile.
-		 */
+		// User wants to enable Hydro Raindrop MFA from user profile.
 		if ( $this->is_action_enable() ) {
 			return true;
 		}

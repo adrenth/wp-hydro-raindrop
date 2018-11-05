@@ -42,10 +42,7 @@ https://developer.wordpress.org/plugins/wordpress-org/how-to-use-subversion/
     E.g. ~/svn/wp-hydro-raindrop/trunk
 * Commit the changes:
     `svn ci -m 'Adding new version x.y.z`
-* Create new tag directory:
-    `mkdir -p ~/svn/wp-hydro-raindrop/tags/x.y.z`
 * Copy the current version to the `tags/x.y.z` path:
     `svn cp trunk tags/z.y.z`
 * Commit the changes:
     `svn ci -m "Tagging version x.y.z"`
-
