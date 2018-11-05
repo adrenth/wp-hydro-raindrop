@@ -100,7 +100,6 @@ final class Hydro_Raindrop_Installer {
 			'template-hydro-mfa-display.php'
 		);
 
-		update_option( Hydro_Raindrop_Helper::OPTION_ENABLED, 1 );
 		update_option( Hydro_Raindrop_Helper::OPTION_MFA_MAXIMUM_ATTEMPTS, 0 );
 		update_option( Hydro_Raindrop_Helper::OPTION_MFA_METHOD, Hydro_Raindrop_Helper::MFA_METHOD_PROMPTED );
 		update_option( Hydro_Raindrop_Helper::OPTION_POST_VERIFICATION_TIMEOUT, 3600 );
@@ -126,7 +125,6 @@ final class Hydro_Raindrop_Installer {
 		self::load_dependencies();
 
 		delete_option( Hydro_Raindrop_Helper::OPTION_ACTIVATION_NOTICE );
-		update_option( Hydro_Raindrop_Helper::OPTION_ENABLED, 0 );
 
 		self::delete_posts();
 
@@ -195,7 +193,6 @@ final class Hydro_Raindrop_Installer {
 		delete_option( Hydro_Raindrop_Helper::OPTION_PAGE_MFA );
 		delete_option( Hydro_Raindrop_Helper::OPTION_PAGE_SETUP );
 		delete_option( Hydro_Raindrop_Helper::OPTION_PAGE_SETTINGS );
-		delete_option( Hydro_Raindrop_Helper::OPTION_ENABLED );
 		delete_option( Hydro_Raindrop_Helper::OPTION_POST_VERIFICATION_TIMEOUT );
 
 	}

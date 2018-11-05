@@ -46,4 +46,3 @@ https://developer.wordpress.org/plugins/wordpress-org/how-to-use-subversion/
     `svn cp trunk tags/z.y.z`
 * Commit the changes:
     `svn ci -m "Tagging version x.y.z"`
-
