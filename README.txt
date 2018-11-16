@@ -86,6 +86,9 @@ site you should read the documentation if there are any changes which affects yo
 
 == Changelog ==
 
+= 2.0.2 =
+* Do not load plugin on XML RPC requests.
+
 = 2.0.1 =
 * Fixed critical issue when upgrading from v1 to v2 which causes settings to be invalid.
 
