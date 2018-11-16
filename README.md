@@ -4,7 +4,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/adrenth/wp-hydro-raindrop.svg)](https://github.com/adrenth/wp-hydro-raindrop/network)
 [![GitHub stars](https://img.shields.io/github/stars/adrenth/wp-hydro-raindrop.svg)](https://github.com/adrenth/wp-hydro-raindrop/stargazers)
 [![GitHub license](https://img.shields.io/github/license/adrenth/wp-hydro-raindrop.svg)](https://github.com/adrenth/wp-hydro-raindrop)
-![Version](https://img.shields.io/badge/version-2.0.1-brightgreen.svg)
+![Version](https://img.shields.io/badge/version-2.0.2-brightgreen.svg)
 
 Welcome to the Hydro Raindrop WordPress plugin repository on GitHub.
 
