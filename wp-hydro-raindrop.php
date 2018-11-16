@@ -25,6 +25,10 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+if ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST === true ) {
+	return;
+}
+
 // Require composer autoloader if installed on it's own.
 $composer = __DIR__ . '/vendor/autoload.php';
 
