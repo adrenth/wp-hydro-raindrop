@@ -1,5 +1,9 @@
 # wp-hydro-raindrop
 
+## 2.0.3
+
+- Update WP requirements for plugin.
+
 ## 2.0.2
 
 - Do not load plugin on XML RPC requests.
