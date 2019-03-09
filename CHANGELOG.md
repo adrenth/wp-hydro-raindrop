@@ -1,5 +1,9 @@
 # wp-hydro-raindrop
 
+## 2.0.4
+
+- Minor code improvements
+
 ## 2.0.3
 
 - Update WP requirements for plugin.
