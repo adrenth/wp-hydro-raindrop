@@ -170,13 +170,14 @@ class Hydro_Raindrop {
 
 		$plugin_admin = new Hydro_Raindrop_Admin( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
+		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'admin_init' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_menu' );
 		$this->loader->add_action( 'update_option', $plugin_admin, 'update_option' );
 		$this->loader->add_action( 'admin_notices', $plugin_admin, 'activation_notice' );
 		$this->loader->add_action( 'edit_user_profile', $plugin_admin, 'edit_user_profile' );
 		$this->loader->add_action( 'edit_user_profile_update', $plugin_admin, 'edit_user_profile_update' );
+		$this->loader->add_action( 'wp_ajax_reset-hydro-id', $plugin_admin, 'reset_hydro_id' );
 
 		$this->loader->add_filter(
 			"plugin_action_links_{$this->plugin_name}/{$this->plugin_name}.php",
@@ -295,8 +296,6 @@ class Hydro_Raindrop {
 		 * This can be used to override WordPress's default template behavior.
 		 */
 		$this->loader->add_filter( 'template_include', $plugin_public, 'view_template' );
-
-
 
 		/**
 		 * Shortcodes

@@ -254,7 +254,7 @@ If you want to address an issue/bug, please create an issue first.
 For more info on Hydro or MFA and how it’s changing the world, check out the following:
 
 * [Hydro's Official Site](https://www.hydrogenplatform.com/).
-* [ProjectHydro](https://www.projecthydro.org/).
+* [ProjectHydro](https://projecthydro.org/).
 * [Hydro's Medium Blog](https://medium.com/hydrogen-api).
 * [Hydro MFA Client Side Raindrop API](https://www.hydrogenplatform.com/docs/hydro/v1/).
 * Become a part of the fastest growing Community! [Join Hydro Community](https://github.com/HydroCommunity).
