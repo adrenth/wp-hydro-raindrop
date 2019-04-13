@@ -22,4 +22,15 @@ $blocked = (bool) get_the_author_meta( Hydro_Raindrop_Helper::USER_META_ACCOUNT_
 			</label>
 		</td>
 	</tr>
+	<tr>
+		<th></th>
+		<td>
+			<a href="javascript:;" id="resetHydroId" data-user-id="<?php echo $profileuser->ID; ?>">
+				<?php esc_html_e( 'Reset HydroID' ); ?>
+			</a>
+			<p class="description">
+				<?php esc_html_e( 'After resetting the HydroID, the user is able to set-up Hydro Raindrop MFA again.' ); ?>
+			</p>
+		</td>
+	</tr>
 </table>

@@ -29,6 +29,7 @@ class Hydro_Raindrop_Admin {
 	const OPTION_GROUP_SYSTEM_REQUIREMENTS = 'hydro_raindrop_system_requirements';
 	const OPTION_GROUP_API_SETTINGS        = 'hydro_raindrop_api_settings';
 	const OPTION_GROUP_CUSTOMIZATION       = 'hydro_raindrop_customization';
+	const WP_NONCE_AJAX                    = 'hydro_raindrop_nonce_ajax';
 
 	/**
 	 * The ID of this plugin.
@@ -64,17 +65,35 @@ class Hydro_Raindrop_Admin {
 	}
 
 	/**
-	 * Register the stylesheets for the admin area.
+	 * Register the scripts for the admin area.
 	 *
-	 * @since    1.0.0
+	 * @return void
 	 */
-	public function enqueue_styles() {
+	public function enqueue_scripts() {
 
 		wp_enqueue_style(
 			$this->plugin_name,
 			plugin_dir_url( __FILE__ ) . 'css/hydro-raindrop-admin.css',
 			[],
 			$this->version
+		);
+
+		wp_enqueue_script(
+			$this->plugin_name,
+			plugin_dir_url( __FILE__ ) . 'js/hydro-raindrop-admin.js',
+			[ 'jquery' ],
+			$this->version
+		);
+
+		$nonce = wp_create_nonce( self::WP_NONCE_AJAX );
+
+		wp_localize_script(
+			$this->plugin_name,
+			'hydro_raindrop_ajax',
+			[
+				'ajax_url' => admin_url( 'admin-ajax.php' ),
+				'nonce'    => $nonce,
+			]
 		);
 
 	}
@@ -176,6 +195,48 @@ class Hydro_Raindrop_Admin {
 
 		update_user_meta( $user_id, Hydro_Raindrop_Helper::USER_META_ACCOUNT_BLOCKED, $blocked );
 		// @codingStandardsIgnoreEnd
+
+	}
+
+	/**
+	 * Ajax Handler: reset_hydro_id
+	 *
+	 * @return void
+	 */
+	public function reset_hydro_id() {
+
+		check_ajax_referer( self::WP_NONCE_AJAX );
+
+		$user_id = (int) ( $_POST['user_id'] ?? '0' );
+
+		if ( ! current_user_can( 'edit_user', $user_id ) ) {
+			wp_die( 'Not allowed', 403 );
+		}
+
+		if ( ! current_user_can( 'administrator' ) ) {
+			wp_die( 'Not allowed', 403 );
+		}
+
+		try {
+			$hydro_id = (string) get_user_meta( $user_id, Hydro_Raindrop_Helper::USER_META_HYDRO_ID, true );
+
+			if ( '' !== $hydro_id ) {
+				$client = Hydro_Raindrop::get_raindrop_client();
+				$client->unregisterUser( $hydro_id );
+			}
+
+			delete_user_meta( $user_id, Hydro_Raindrop_Helper::USER_META_HYDRO_ID );
+		} catch ( \Throwable $e ) {
+
+		}
+
+		// @codingStandardsIgnoreStart
+		delete_user_meta( $user_id, Hydro_Raindrop_Helper::USER_META_MFA_ENABLED );
+		delete_user_meta( $user_id, Hydro_Raindrop_Helper::USER_META_MFA_CONFIRMED );
+		delete_user_meta( $user_id, Hydro_Raindrop_Helper::USER_META_MFA_FAILED_ATTEMPTS );
+		// @codingStandardsIgnoreEnd
+
+		wp_die( 'OK' );
 
 	}
 
