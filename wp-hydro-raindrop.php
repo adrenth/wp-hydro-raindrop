@@ -11,7 +11,7 @@
  * Plugin Name:       WP Hydro Raindrop
  * Plugin URI:        https://github.com/adrenth/wp-hydro-raindrop
  * Description:       A WordPress plugin to integrate Hydro Raindrop MFA
- * Version:           2.0.4
+ * Version:           2.1.0
  * Author:            Hydrogen API
  * Author URI:        https://projecthydro.org
  * License:           GPL-2.0+
@@ -46,7 +46,7 @@ if ( file_exists( $composer ) ) {
  *
  * @var string
  */
-define( 'HYDRO_RAINDROP_VERSION', '2.0.4' );
+define( 'HYDRO_RAINDROP_VERSION', '2.1.0' );
 
 /**
  * The installer class which handles the activation,
