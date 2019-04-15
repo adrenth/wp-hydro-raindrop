@@ -4,7 +4,7 @@ Donate link:
 Tags: hydro, raindrop, mfa, 2fa, authenticator
 Requires at least: 3.0.1
 Tested up to: 5.1
-Stable tag: 5.1
+Stable tag: 2.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.0
@@ -86,6 +86,9 @@ Upgrading from 1.0 to 2.0 can be done without issues when using the default conf
 site you should read the documentation if there are any changes which affects your custom implementation.
 
 == Changelog ==
+
+= 2.1.1 =
+* Update WP requirements for plugin.
 
 = 2.1.0 =
 * Add support for resetting the HydroID of a user.

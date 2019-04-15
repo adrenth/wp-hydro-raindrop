@@ -1,6 +1,7 @@
 # Build instructions
 
 - Update the changelog list in `./README.txt`.
+- Update the `Stable Tag` in `./README.txt`.
 - Update `CHANGELOG.md`.
 - Update plugin version in `./README.txt`
 - Update plugin version in `./wp-hydro-raindrop.php`, change value of `HYDRO_RAINDROP_VERSION`.
