@@ -1,5 +1,9 @@
 # wp-hydro-raindrop
 
+## 2.1.1
+
+- Update WP requirements for plugin.
+
 ## 2.1.0
 
 - Add support for resetting the HydroID of a user.
